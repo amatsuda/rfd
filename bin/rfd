@@ -12,8 +12,11 @@ begin
   loop do
     c = Curses.getch
     rfd.debug "getch: #{c}"
-    if rfd.respond_to? c
-      rfd.public_send c
+    case c
+    when 27  # esc
+      rfd.q
+    when (?a)..(?z)
+      rfd.public_send c if rfd.respond_to? c
     else
       p c
     end

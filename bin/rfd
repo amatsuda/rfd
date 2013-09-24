@@ -11,7 +11,11 @@ begin
 
   loop do
     c = Curses.getch
-    p c
+    if rfd.respond_to? c
+      rfd.public_send c
+    else
+      p c
+    end
   end
 ensure
   Curses.close_screen

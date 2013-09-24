@@ -22,6 +22,10 @@ module Rfd
       @win.box ?|, ?-, ?*
       @main = MainWindow.new dir
     end
+
+    def q
+      raise StopIteration
+    end
   end
 
   class MainWindow < SubWindow

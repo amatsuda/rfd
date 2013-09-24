@@ -3,6 +3,7 @@ module Rfd
 
   class Window
     def draw(contents)
+      @win.setpos 0, 0
       @win.addstr contents
       @win.refresh
     end

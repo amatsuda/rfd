@@ -1,11 +1,10 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'rfd/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "rfd"
-  spec.version       = Rfd::VERSION
+  spec.version       = '0.0.1'
   spec.authors       = ["Akira Matsuda"]
   spec.email         = ["ronnie@dio.jp"]
   spec.description   = %q{TODO: Write a gem description}

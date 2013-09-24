@@ -1,5 +1,3 @@
-require "rfd/version"
-
 module Rfd
-  # Your code goes here...
+  VERSION = Gem.loaded_specs['rfd'].version.to_s
 end

@@ -20,11 +20,19 @@ module Rfd
     def initialize(dir = '.')
       @win = Curses.stdscr
       @win.box ?|, ?-, ?*
+      @header = HeaderWindow.new
       @main = MainWindow.new dir
     end
 
     def q
       raise StopIteration
+    end
+  end
+
+  class HeaderWindow < SubWindow
+    def initialize
+      @win = Curses.stdscr.subwin 6, Curses.stdscr.maxx - 2, 1, 1
+      super
     end
   end
 

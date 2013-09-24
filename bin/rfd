@@ -11,6 +11,7 @@ begin
 
   loop do
     c = Curses.getch
+    rfd.debug "getch: #{c}"
     if rfd.respond_to? c
       rfd.public_send c
     else

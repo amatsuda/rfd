@@ -24,6 +24,10 @@ module Rfd
       @main = MainWindow.new dir
     end
 
+    def debug(str)
+      @header.draw str
+    end
+
     def q
       raise StopIteration
     end

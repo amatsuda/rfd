@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+require 'curses'
+require File.expand_path('../../lib/rfd', __FILE__)
+
+Curses.cbreak
+Curses.noecho
+Curses.init_screen
+
+rfd = Rfd::MainWindow.new ARGV[0] || '.'
+rfd.draw 'Hello'
+
+Curses.getch
+
+Curses.close_screen

@@ -6,8 +6,13 @@ Curses.cbreak
 Curses.noecho
 Curses.init_screen
 
-rfd = Rfd::BaseWindow.new ARGV[0] || '.'
+begin
+  rfd = Rfd::BaseWindow.new ARGV[0] || '.'
 
-Curses.getch
-
-Curses.close_screen
+  loop do
+    c = Curses.getch
+    p c
+  end
+ensure
+  Curses.close_screen
+end

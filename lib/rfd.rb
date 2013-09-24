@@ -28,6 +28,7 @@ module Rfd
     def initialize(dir)
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       super
+      draw %Q!#{Dir.foreach(dir).to_a.join("\n")}\n!
     end
   end
 end

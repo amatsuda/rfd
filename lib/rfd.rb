@@ -9,9 +9,18 @@ module Rfd
     end
   end
 
-  class MainWindow < Window
+  class BaseWindow < Window
     def initialize(dir = '.')
       @win = Curses.stdscr
+      @win.box ?|, ?-, ?*
+      @main = MainWindow.new dir
+    end
+  end
+
+  class MainWindow < Window
+    def initialize(dir)
+      @win = Curses.stdscr.subwin Curses.stdscr.maxy - 6, Curses.stdscr.maxx, 6, 0
+      @win.box ?|, ?-, ?*
     end
   end
 end

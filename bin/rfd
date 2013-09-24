@@ -6,7 +6,7 @@ Curses.cbreak
 Curses.noecho
 Curses.init_screen
 
-rfd = Rfd::MainWindow.new ARGV[0] || '.'
+rfd = Rfd::BaseWindow.new ARGV[0] || '.'
 rfd.draw 'Hello'
 
 Curses.getch

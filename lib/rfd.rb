@@ -3,9 +3,16 @@ module Rfd
 
   class Window
     def draw(contents)
-      @win.setpos 2, 2
       @win.addstr contents
       @win.refresh
+    end
+  end
+
+  # bordered Window
+  class SubWindow < Window
+    def initialize(*)
+      border_window = Curses.stdscr.subwin @win.maxy + 2, @win.maxx + 2, @win.begy - 1, @win.begx - 1
+      border_window.box ?|, ?-, ?*
     end
   end
 
@@ -17,10 +24,10 @@ module Rfd
     end
   end
 
-  class MainWindow < Window
+  class MainWindow < SubWindow
     def initialize(dir)
-      @win = Curses.stdscr.subwin Curses.stdscr.maxy - 6, Curses.stdscr.maxx, 6, 0
-      @win.box ?|, ?-, ?*
+      @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+      super
     end
   end
 end

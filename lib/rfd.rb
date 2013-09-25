@@ -22,7 +22,7 @@ module Rfd
       @win = Curses.stdscr
       @win.box ?|, ?-
       @header = HeaderWindow.new
-      @main = MainWindow.new dir
+      @main = MainWindow.new dir: dir
     end
 
     def debug(str)
@@ -42,7 +42,7 @@ module Rfd
   end
 
   class MainWindow < SubWindow
-    def initialize(dir)
+    def initialize(dir: nil)
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       super
       draw %Q!#{Dir.foreach(dir).to_a.join("\n")}\n!

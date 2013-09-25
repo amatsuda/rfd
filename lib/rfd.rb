@@ -25,6 +25,10 @@ module Rfd
       @main = MainWindow.new base: self, dir: dir
     end
 
+    def move_cursor(row)
+      @win.setpos row, 1
+    end
+
     def debug(str)
       @header.draw str
     end
@@ -47,6 +51,10 @@ module Rfd
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       super
       draw %Q!#{Dir.foreach(dir).to_a.join("\n")}\n!
+    end
+
+    def move_cursor(row)
+      @base.move_cursor @win.begy + row
     end
   end
 end

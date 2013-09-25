@@ -23,6 +23,7 @@ module Rfd
       @win.box ?|, ?-
       @header = HeaderWindow.new
       @main = MainWindow.new base: self, dir: dir
+      @main.move_cursor 0
     end
 
     def move_cursor(row)

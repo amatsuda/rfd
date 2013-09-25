@@ -51,7 +51,8 @@ module Rfd
       @base = base
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       super
-      draw %Q!#{Dir.foreach(dir).to_a.join("\n")}\n!
+      @files = Dir.foreach(dir).to_a
+      draw %Q!#{@files.join("\n")}\n!
     end
 
     def move_cursor(row)

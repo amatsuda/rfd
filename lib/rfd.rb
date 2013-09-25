@@ -13,14 +13,14 @@ module Rfd
   class SubWindow < Window
     def initialize(*)
       border_window = Curses.stdscr.subwin @win.maxy + 2, @win.maxx + 2, @win.begy - 1, @win.begx - 1
-      border_window.box ?|, ?-, ?*
+      border_window.box ?|, ?-
     end
   end
 
   class BaseWindow < Window
     def initialize(dir = '.')
       @win = Curses.stdscr
-      @win.box ?|, ?-, ?*
+      @win.box ?|, ?-
       @header = HeaderWindow.new
       @main = MainWindow.new dir
     end

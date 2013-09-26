@@ -20,7 +20,7 @@ begin
       rfd.q
     when 127  # BS
       rfd.bs
-    when (?a)..(?z)
+    when (?a)..(?z), (?A)..(?Z)
       rfd.main.public_send c if rfd.command_mode? && rfd.main.respond_to?(c)
     else
       p c

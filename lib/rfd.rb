@@ -98,6 +98,10 @@ module Rfd
       @win.refresh
     end
 
+    def current_item
+      @items[@row]
+    end
+
     def move_cursor(row)
       @base.move_cursor @win.begy + row
     end
@@ -137,7 +141,7 @@ module Rfd
     def v
       switch_mode MODE::MIEL
       @viewer = ViewerWindow.new
-      @viewer.draw @items[@row].read
+      @viewer.draw current_item.read
     end
   end
 

@@ -82,11 +82,15 @@ module Rfd
     end
 
     def move_cursor_up
-      move_cursor @row -= 1
+      @row -= 1
+      @row = @items.size - 1 if @row <= 0
+      move_cursor @row
     end
 
     def move_cursor_down
-      move_cursor @row += 1
+      @row += 1
+      @row = 0 if @row >= @items.size
+      move_cursor @row
     end
   end
 

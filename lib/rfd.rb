@@ -111,11 +111,12 @@ module Rfd
     include Rfd::Commands
 
     def initialize(base: nil, dir: nil)
-      @base, @dir = base, dir
+      @base = base
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       @row = 0
       super
 
+      cd dir
       ls
       @win.refresh
     end
@@ -135,6 +136,10 @@ module Rfd
     def close_viewer
       @viewer.close
       ls
+    end
+
+    def cd(dir)
+      @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir)
     end
 
     def ls

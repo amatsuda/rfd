@@ -81,7 +81,7 @@ module Rfd
   end
 
   class BaseWindow < Window
-    attr_reader :main
+    attr_reader :header, :main
     attr_writer :mode
 
     def initialize(dir = '.')
@@ -137,6 +137,10 @@ module Rfd
       @window = Curses.stdscr.subwin 6, Curses.stdscr.maxx - 2, 1, 1
       super
     end
+
+    def draw_page_number(current: 1, total: nil)
+      draw "Page: #{current}/ #{total}"
+    end
   end
 
   class MainWindow < SubWindow
@@ -183,7 +187,12 @@ module Rfd
         end
       end
       @window.refresh
+      draw_page_number
       move_cursor 0
+    end
+
+    def draw_page_number
+      @base.header.draw_page_number current: @row / @window.maxy + 1, total: @items.size / @window.maxy + 1
     end
   end
 

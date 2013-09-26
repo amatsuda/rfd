@@ -77,6 +77,10 @@ module Rfd
       @dir, @name = dir, name
     end
 
+    def path
+      @path ||= File.join @dir, @name
+    end
+
     def color
       Curses::COLOR_WHITE
     end

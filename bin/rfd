@@ -12,7 +12,6 @@ begin
 
   loop do
     c = Curses.getch
-    rfd.debug "getch: #{c}"
     case c
     when 10  # enter
       rfd.enter

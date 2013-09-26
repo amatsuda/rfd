@@ -52,6 +52,10 @@ module Rfd
     def q
       raise StopIteration
     end
+
+    def v
+      @main.v
+    end
   end
 
   class HeaderWindow < SubWindow
@@ -92,6 +96,10 @@ module Rfd
       @row = 0 if @row >= @items.size
       move_cursor @row
     end
+
+    def v
+      draw @items[@row].read
+    end
   end
 
   class Item
@@ -125,6 +133,10 @@ module Rfd
 
     def directory?
       stat.directory?
+    end
+
+    def read
+      File.read path
     end
 
     def to_s

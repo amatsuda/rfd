@@ -42,6 +42,14 @@ module Rfd
       ls
     end
 
+    def H
+      move_cursor @row = 0
+    end
+
+    def L
+      move_cursor @row = @items.size - 1
+    end
+
     def enter
       if current_item.directory?
         cd current_item

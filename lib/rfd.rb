@@ -89,6 +89,10 @@ module Rfd
       Curses::COLOR_WHITE
     end
 
+    def directory?
+      stat.directory?
+    end
+
     def to_s
       @name
     end

@@ -54,6 +54,7 @@ module Rfd
   end
 
   class BaseWindow < Window
+    attr_reader :main
     attr_writer :mode
 
     def initialize(dir = '.')
@@ -94,24 +95,8 @@ module Rfd
       end
     end
 
-    def d
-      @main.d if command_mode?
-    end
-
-    def k
-      @main.k if command_mode?
-    end
-
-    def j
-      @main.j if command_mode?
-    end
-
     def q
       @main.q
-    end
-
-    def v
-      @main.v if command_mode?
     end
   end
 

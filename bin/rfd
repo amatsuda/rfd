@@ -16,6 +16,8 @@ begin
     case c
     when 27  # esc
       rfd.q
+    when 127  # BS
+      rfd.bs
     when (?a)..(?z)
       rfd.public_send c if rfd.respond_to? c
     else

@@ -56,6 +56,13 @@ module Rfd
       @header.draw str
     end
 
+    def bs
+      if miel_mode?
+        @mode = MODE::COMMAND
+        @main.close_viewer
+      end
+    end
+
     def k
       @main.k if command_mode?
     end
@@ -99,13 +106,20 @@ module Rfd
       @base.mode = mode
     end
 
+    def close_viewer
+      @viewer.close
+      ls
+    end
+
     def ls
+      @win.clear
       @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}
       @items.each do |item|
         @win.attron Curses.color_pair(item.color) do
           @win.addstr "#{item.to_s}\n"
         end
       end
+      @win.refresh
     end
 
     def k
@@ -130,6 +144,10 @@ module Rfd
   class ViewerWindow < SubWindow
     def initialize
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+    end
+
+    def close
+      @win.close
     end
   end
 

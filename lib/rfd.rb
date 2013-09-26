@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
@@ -63,6 +65,10 @@ module Rfd
       end
     end
 
+    def d
+      @main.d if command_mode?
+    end
+
     def k
       @main.k if command_mode?
     end
@@ -124,6 +130,11 @@ module Rfd
         end
       end
       @win.refresh
+    end
+
+    def d
+      FileUtils.mv current_item.path, File.expand_path('~/.Trash/')
+      ls
     end
 
     def k

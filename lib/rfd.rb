@@ -106,6 +106,7 @@ module Rfd
       if miel_mode?
         @mode = MODE::COMMAND
         @main.close_viewer
+        @main.move_cursor
       end
     end
 

@@ -51,12 +51,22 @@ module Rfd
       @base = base
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       super
-      @files = Dir.foreach(dir).to_a
-      draw %Q!#{@files.join("\n")}\n!
+      @items = Dir.foreach(dir).map {|fn| Item.new dir: dir, name: fn}
+      draw %Q!#{@items.join("\n")}\n!
     end
 
     def move_cursor(row)
       @base.move_cursor @win.begy + row
+    end
+  end
+
+  class Item
+    def initialize(dir: nil, name: nil)
+      @dir, @name = dir, name
+    end
+
+    def to_s
+      @name
     end
   end
 end

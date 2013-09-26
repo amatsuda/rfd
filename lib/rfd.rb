@@ -178,10 +178,10 @@ module Rfd
       @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir)
     end
 
-    def ls
+    def ls(page = nil)
       @window.clear
-      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}
-      @items.each do |item|
+      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a unless page
+      @items[(page || 0) * @window.maxy, @window.maxy].each do |item|
         @window.attron Curses.color_pair(item.color) do
           @window.addstr "#{item.to_s}\n"
         end

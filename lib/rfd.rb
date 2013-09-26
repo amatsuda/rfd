@@ -95,7 +95,11 @@ module Rfd
     end
 
     def size
-      stat.size
+      if directory?
+        '<DIR>'
+      else
+        stat.size
+      end
     end
 
     def directory?

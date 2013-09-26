@@ -146,6 +146,7 @@ module Rfd
         end
       end
       @win.refresh
+      move_cursor 0
     end
   end
 

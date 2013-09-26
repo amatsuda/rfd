@@ -35,6 +35,15 @@ module Rfd
       @viewer = ViewerWindow.new
       @viewer.draw current_item.read
     end
+
+    def enter
+      if current_item.directory?
+        cd current_item
+        ls
+      else
+        v
+      end
+    end
   end
 
   class Window
@@ -86,6 +95,10 @@ module Rfd
 
     def debug(str)
       @header.draw str
+    end
+
+    def enter
+      @main.enter
     end
 
     def bs

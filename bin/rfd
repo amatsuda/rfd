@@ -15,7 +15,7 @@ begin
     rfd.debug "getch: #{c}"
     case c
     when 10  # enter
-      rfd.v
+      rfd.enter
     when 27  # esc
       rfd.q
     when 127  # BS

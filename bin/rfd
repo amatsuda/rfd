@@ -14,6 +14,8 @@ begin
     c = Curses.getch
     rfd.debug "getch: #{c}"
     case c
+    when 10  # enter
+      rfd.v
     when 27  # esc
       rfd.q
     when 127  # BS

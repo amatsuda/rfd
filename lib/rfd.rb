@@ -4,7 +4,9 @@ module Rfd
   class Window
     def draw(contents)
       @win.setpos 0, 0
-      @win.addstr contents
+      @win.attron(Curses.color_pair(1)) do
+        @win.addstr contents
+      end
       @win.refresh
     end
   end
@@ -19,11 +21,17 @@ module Rfd
 
   class BaseWindow < Window
     def initialize(dir = '.')
+      init_colors
+
       @win = Curses.stdscr
       @win.box ?|, ?-
       @header = HeaderWindow.new
       @main = MainWindow.new base: self, dir: dir
       @main.move_cursor 0
+    end
+
+    def init_colors
+      Curses.init_pair 1, Curses::COLOR_WHITE, Curses::COLOR_BLACK
     end
 
     def move_cursor(row)

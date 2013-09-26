@@ -5,6 +5,7 @@ require File.expand_path('../../lib/rfd', __FILE__)
 Curses.cbreak
 Curses.noecho
 Curses.init_screen
+Curses.start_color
 
 begin
   rfd = Rfd::BaseWindow.new ARGV[0] || '.'

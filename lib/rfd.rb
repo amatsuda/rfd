@@ -8,6 +8,31 @@ module Rfd
     MIEL = :miel
   end
 
+  module Commands
+    def d
+      FileUtils.mv current_item.path, File.expand_path('~/.Trash/')
+      ls
+    end
+
+    def k
+      @row -= 1
+      @row = @items.size - 1 if @row <= 0
+      move_cursor @row
+    end
+
+    def j
+      @row += 1
+      @row = 0 if @row >= @items.size
+      move_cursor @row
+    end
+
+    def v
+      switch_mode MODE::MIEL
+      @viewer = ViewerWindow.new
+      @viewer.draw current_item.read
+    end
+  end
+
   class Window
     def draw(contents)
       @win.setpos 0, 0
@@ -94,6 +119,8 @@ module Rfd
   end
 
   class MainWindow < SubWindow
+    include Rfd::Commands
+
     def initialize(base: nil, dir: nil)
       @base, @dir = base, dir
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
@@ -130,29 +157,6 @@ module Rfd
         end
       end
       @win.refresh
-    end
-
-    def d
-      FileUtils.mv current_item.path, File.expand_path('~/.Trash/')
-      ls
-    end
-
-    def k
-      @row -= 1
-      @row = @items.size - 1 if @row <= 0
-      move_cursor @row
-    end
-
-    def j
-      @row += 1
-      @row = 0 if @row >= @items.size
-      move_cursor @row
-    end
-
-    def v
-      switch_mode MODE::MIEL
-      @viewer = ViewerWindow.new
-      @viewer.draw current_item.read
     end
   end
 

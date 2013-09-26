@@ -4,9 +4,7 @@ module Rfd
   class Window
     def draw(contents)
       @win.setpos 0, 0
-      @win.attron(Curses.color_pair(1)) do
-        @win.addstr contents
-      end
+      @win.addstr contents
       @win.refresh
     end
   end
@@ -59,8 +57,14 @@ module Rfd
       @base = base
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       super
+
       @items = Dir.foreach(dir).map {|fn| Item.new dir: dir, name: fn}
-      draw %Q!#{@items.join("\n")}\n!
+      @items.each do |item|
+        @win.attron Curses.color_pair(1) do
+          @win.addstr "#{item.to_s}\n"
+        end
+      end
+      @win.refresh
     end
 
     def move_cursor(row)

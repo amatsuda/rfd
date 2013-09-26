@@ -48,16 +48,16 @@ module Rfd
 
   class Window
     def draw(contents)
-      @win.setpos 0, 0
-      @win.addstr contents
-      @win.refresh
+      @window.setpos 0, 0
+      @window.addstr contents
+      @window.refresh
     end
   end
 
   # bordered Window
   class SubWindow < Window
     def initialize(*)
-      border_window = Curses.stdscr.subwin @win.maxy + 2, @win.maxx + 2, @win.begy - 1, @win.begx - 1
+      border_window = Curses.stdscr.subwin @window.maxy + 2, @window.maxx + 2, @window.begy - 1, @window.begx - 1
       border_window.box ?|, ?-
     end
   end
@@ -69,8 +69,8 @@ module Rfd
     def initialize(dir = '.')
       init_colors
 
-      @win = Curses.stdscr
-      @win.box ?|, ?-
+      @window = Curses.stdscr
+      @window.box ?|, ?-
       @header = HeaderWindow.new
       @main = MainWindow.new base: self, dir: dir
       @main.move_cursor 0
@@ -90,7 +90,7 @@ module Rfd
     end
 
     def move_cursor(row)
-      @win.setpos row, 1
+      @window.setpos row, 1
     end
 
     def debug(str)
@@ -115,7 +115,7 @@ module Rfd
 
   class HeaderWindow < SubWindow
     def initialize
-      @win = Curses.stdscr.subwin 6, Curses.stdscr.maxx - 2, 1, 1
+      @window = Curses.stdscr.subwin 6, Curses.stdscr.maxx - 2, 1, 1
       super
     end
   end
@@ -125,13 +125,13 @@ module Rfd
 
     def initialize(base: nil, dir: nil)
       @base = base
-      @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+      @window = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       @row = 0
       super
 
       cd dir
       ls
-      @win.refresh
+      @window.refresh
     end
 
     def current_item
@@ -139,7 +139,7 @@ module Rfd
     end
 
     def move_cursor(row)
-      @base.move_cursor @win.begy + row
+      @base.move_cursor @window.begy + row
     end
 
     def switch_mode(mode)
@@ -156,25 +156,25 @@ module Rfd
     end
 
     def ls
-      @win.clear
+      @window.clear
       @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}
       @items.each do |item|
-        @win.attron Curses.color_pair(item.color) do
-          @win.addstr "#{item.to_s}\n"
+        @window.attron Curses.color_pair(item.color) do
+          @window.addstr "#{item.to_s}\n"
         end
       end
-      @win.refresh
+      @window.refresh
       move_cursor 0
     end
   end
 
   class ViewerWindow < SubWindow
     def initialize
-      @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+      @window = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
     end
 
     def close
-      @win.close
+      @window.close
     end
   end
 

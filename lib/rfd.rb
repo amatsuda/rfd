@@ -57,11 +57,11 @@ module Rfd
     end
 
     def k
-      @main.k
+      @main.k if command_mode?
     end
 
     def j
-      @main.j
+      @main.j if command_mode?
     end
 
     def q
@@ -69,7 +69,7 @@ module Rfd
     end
 
     def v
-      @main.v
+      @main.v if command_mode?
     end
   end
 

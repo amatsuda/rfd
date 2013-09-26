@@ -41,6 +41,10 @@ module Rfd
       @header.draw str
     end
 
+    def k
+      @main.move_cursor_up
+    end
+
     def j
       @main.move_cursor_down
     end
@@ -75,6 +79,10 @@ module Rfd
 
     def move_cursor(row)
       @base.move_cursor @win.begy + row
+    end
+
+    def move_cursor_up
+      move_cursor @row -= 1
     end
 
     def move_cursor_down

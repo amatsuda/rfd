@@ -32,6 +32,7 @@ module Rfd
 
     def v
       switch_mode MODE::MIEL
+      @window.clear
       @viewer = ViewerWindow.new
       @viewer.draw current_item.read
     end

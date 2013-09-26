@@ -121,7 +121,15 @@ module Rfd
     end
 
     def v
-      draw @items[@row].read
+      switch_mode MODE::MIEL
+      @viewer = ViewerWindow.new
+      @viewer.draw @items[@row].read
+    end
+  end
+
+  class ViewerWindow < SubWindow
+    def initialize
+      @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
     end
   end
 

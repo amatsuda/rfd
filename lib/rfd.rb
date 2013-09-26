@@ -17,13 +17,13 @@ module Rfd
     def k
       @row -= 1
       @row = @items.size - 1 if @row <= 0
-      move_cursor @row
+      move_cursor
     end
 
     def j
       @row += 1
       @row = 0 if @row >= @items.size
-      move_cursor @row
+      move_cursor
     end
 
     def q
@@ -74,7 +74,7 @@ module Rfd
       @window.box ?|, ?-
       @header = HeaderWindow.new
       @main = MainWindow.new base: self, dir: dir
-      @main.move_cursor 0
+      @main.move_cursor
       @mode = MODE::COMMAND
     end
 
@@ -139,8 +139,8 @@ module Rfd
       @items[@row]
     end
 
-    def move_cursor(row)
-      @base.move_cursor @window.begy + row
+    def move_cursor(row = nil)
+      @base.move_cursor @window.begy + (row || @row)
     end
 
     def switch_mode(mode)

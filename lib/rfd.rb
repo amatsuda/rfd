@@ -41,6 +41,10 @@ module Rfd
       @header.draw str
     end
 
+    def j
+      @main.move_cursor_down
+    end
+
     def q
       raise StopIteration
     end
@@ -57,6 +61,7 @@ module Rfd
     def initialize(base: nil, dir: nil)
       @base = base
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+      @row = 0
       super
 
       @items = Dir.foreach(dir).map {|fn| Item.new dir: dir, name: fn}
@@ -70,6 +75,10 @@ module Rfd
 
     def move_cursor(row)
       @base.move_cursor @win.begy + row
+    end
+
+    def move_cursor_down
+      move_cursor @row += 1
     end
   end
 

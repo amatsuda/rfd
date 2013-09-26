@@ -50,6 +50,10 @@ module Rfd
       move_cursor @row = @items.size - 1
     end
 
+    def M
+      move_cursor @row = @items.size / 2
+    end
+
     def enter
       if current_item.directory?
         cd current_item

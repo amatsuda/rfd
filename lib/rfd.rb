@@ -42,11 +42,11 @@ module Rfd
     end
 
     def k
-      @main.move_cursor_up
+      @main.k
     end
 
     def j
-      @main.move_cursor_down
+      @main.j
     end
 
     def q
@@ -81,13 +81,13 @@ module Rfd
       @base.move_cursor @win.begy + row
     end
 
-    def move_cursor_up
+    def k
       @row -= 1
       @row = @items.size - 1 if @row <= 0
       move_cursor @row
     end
 
-    def move_cursor_down
+    def j
       @row += 1
       @row = 0 if @row >= @items.size
       move_cursor @row

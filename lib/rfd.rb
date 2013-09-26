@@ -29,7 +29,7 @@ module Rfd
     end
 
     def init_colors
-      Curses.init_pair 1, Curses::COLOR_WHITE, Curses::COLOR_BLACK
+      Curses.init_pair Curses::COLOR_WHITE, Curses::COLOR_WHITE, Curses::COLOR_BLACK
     end
 
     def move_cursor(row)
@@ -60,7 +60,7 @@ module Rfd
 
       @items = Dir.foreach(dir).map {|fn| Item.new dir: dir, name: fn}
       @items.each do |item|
-        @win.attron Curses.color_pair(1) do
+        @win.attron Curses.color_pair(item.color) do
           @win.addstr "#{item.to_s}\n"
         end
       end
@@ -75,6 +75,10 @@ module Rfd
   class Item
     def initialize(dir: nil, name: nil)
       @dir, @name = dir, name
+    end
+
+    def color
+      Curses::COLOR_WHITE
     end
 
     def to_s

@@ -67,22 +67,26 @@ module Rfd
 
   class MainWindow < SubWindow
     def initialize(base: nil, dir: nil)
-      @base = base
+      @base, @dir = base, dir
       @win = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
       @row = 0
       super
 
-      @items = Dir.foreach(dir).map {|fn| Item.new dir: dir, name: fn}
-      @items.each do |item|
-        @win.attron Curses.color_pair(item.color) do
-          @win.addstr "#{item.to_s}\n"
-        end
-      end
+      ls
       @win.refresh
     end
 
     def move_cursor(row)
       @base.move_cursor @win.begy + row
+    end
+
+    def ls
+      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}
+      @items.each do |item|
+        @win.attron Curses.color_pair(item.color) do
+          @win.addstr "#{item.to_s}\n"
+        end
+      end
     end
 
     def k

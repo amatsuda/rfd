@@ -37,6 +37,11 @@ module Rfd
       @viewer.draw current_item.read
     end
 
+    def D
+      File.delete current_item.path
+      ls
+    end
+
     def enter
       if current_item.directory?
         cd current_item

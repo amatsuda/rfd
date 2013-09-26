@@ -1,6 +1,11 @@
 module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
+  module MODE
+    COMMAND = :command
+    MIEL = :miel
+  end
+
   class Window
     def draw(contents)
       @win.setpos 0, 0
@@ -18,6 +23,8 @@ module Rfd
   end
 
   class BaseWindow < Window
+    attr_writer :mode
+
     def initialize(dir = '.')
       init_colors
 
@@ -26,11 +33,19 @@ module Rfd
       @header = HeaderWindow.new
       @main = MainWindow.new base: self, dir: dir
       @main.move_cursor 0
+      @mode = MODE::COMMAND
     end
 
     def init_colors
       Curses.init_pair Curses::COLOR_WHITE, Curses::COLOR_WHITE, Curses::COLOR_BLACK
       Curses.init_pair Curses::COLOR_CYAN, Curses::COLOR_CYAN, Curses::COLOR_BLACK
+    end
+    def command_mode?
+      @mode == MODE::COMMAND
+    end
+
+    def miel_mode?
+      @mode == MODE::MIEL
     end
 
     def move_cursor(row)
@@ -78,6 +93,10 @@ module Rfd
 
     def move_cursor(row)
       @base.move_cursor @win.begy + row
+    end
+
+    def switch_mode(mode)
+      @base.mode = mode
     end
 
     def ls

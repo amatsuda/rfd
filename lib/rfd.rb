@@ -94,12 +94,16 @@ module Rfd
       end
     end
 
+    def size
+      stat.size
+    end
+
     def directory?
       stat.directory?
     end
 
     def to_s
-      @name
+      "#{@name.ljust(43)}#{size}"
     end
   end
 end

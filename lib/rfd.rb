@@ -30,6 +30,7 @@ module Rfd
 
     def init_colors
       Curses.init_pair Curses::COLOR_WHITE, Curses::COLOR_WHITE, Curses::COLOR_BLACK
+      Curses.init_pair Curses::COLOR_CYAN, Curses::COLOR_CYAN, Curses::COLOR_BLACK
     end
 
     def move_cursor(row)
@@ -86,7 +87,11 @@ module Rfd
     end
 
     def color
-      Curses::COLOR_WHITE
+      if directory?
+        Curses::COLOR_CYAN
+      else
+        Curses::COLOR_WHITE
+      end
     end
 
     def directory?

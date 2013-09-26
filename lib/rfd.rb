@@ -26,6 +26,10 @@ module Rfd
       move_cursor @row
     end
 
+    def q
+      raise StopIteration
+    end
+
     def v
       switch_mode MODE::MIEL
       @viewer = ViewerWindow.new
@@ -103,7 +107,7 @@ module Rfd
     end
 
     def q
-      raise StopIteration
+      @main.q
     end
 
     def v

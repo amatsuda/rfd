@@ -112,7 +112,7 @@ module Rfd
     end
 
     def debug(str)
-      @header.draw str
+      p str
     end
 
     def enter

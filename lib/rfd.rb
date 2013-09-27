@@ -152,10 +152,6 @@ module Rfd
       p str
     end
 
-    def enter
-      @main.enter
-    end
-
     def bs
       if miel_mode?
         @mode = MODE::COMMAND

@@ -14,7 +14,7 @@ begin
     c = FFI::NCurses.getch
     case c
     when 10  # enter
-      rfd.enter
+      rfd.main.enter
     when 27  # esc
       rfd.q
     when 127  # BS

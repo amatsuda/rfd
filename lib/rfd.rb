@@ -153,7 +153,10 @@ module Rfd
     end
 
     def bs
-      if miel_mode?
+      if command_mode? && (@dir != '/')
+        @main.cd '..'
+        @main.ls
+      elsif miel_mode?
         @mode = MODE::COMMAND
         @main.close_viewer
         @main.move_cursor
@@ -208,7 +211,7 @@ module Rfd
     end
 
     def cd(dir)
-      @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir)
+      @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
     end
 
     def ls(page = nil)

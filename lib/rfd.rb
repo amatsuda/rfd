@@ -21,9 +21,19 @@ module Rfd
     end
 
     def j
-      @row += 1
-      @row = 0 if @row >= @items.size
-      move_cursor
+      if last_page?
+        if @row + 1 >= @items.size % (FFI::NCurses.getmaxy(@window) + 1)
+          switch_page 0
+        else
+          move_cursor @row += 1
+        end
+      else
+        if @row + 1 >= FFI::NCurses.getmaxy(@window)
+          switch_page @current_page + 1
+        else
+          move_cursor @row += 1
+        end
+      end
     end
 
     def q

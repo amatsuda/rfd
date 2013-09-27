@@ -54,6 +54,16 @@ module Rfd
       move_cursor @row = @items.size / 2
     end
 
+    def ctrl_n
+      if @total_pages > 1
+        if @current_page + 1 < @total_pages
+          switch_page @current_page + 1
+        else
+          switch_page 0
+        end
+      end
+    end
+
     def enter
       if current_item.directory?
         cd current_item
@@ -197,6 +207,10 @@ module Rfd
 
     def last_page?
       @current_page == @total_pages - 1
+    end
+
+    def switch_page(page)
+      ls (@current_page = page)
     end
 
     def draw_page_number

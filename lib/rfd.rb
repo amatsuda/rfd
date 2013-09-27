@@ -174,8 +174,14 @@ module Rfd
     def ls(page = nil)
       FFI::NCurses.wclear @window
       maxy, maxx = FFI::NCurses.getmaxyx @window
-      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a unless page
-      @items[(page || 0) * maxy, maxy].each do |item|
+
+      unless page
+        @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
+        @total_pages = @items.size / maxy + 1
+      end
+      @current_page = page ? page : 0
+
+      @items[@current_page * maxy, maxy].each do |item|
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
         FFI::NCurses.waddstr @window, "#{item.to_s}\n"
       end

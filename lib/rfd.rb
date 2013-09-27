@@ -16,13 +16,13 @@ module Rfd
 
     def j
       if last_page?
-        if @row + 1 >= @items.size % (FFI::NCurses.getmaxy(@window) + 1)
+        if @row + 1 >= @items.size % (maxy + 1)
           switch_page 0
         else
           move_cursor @row += 1
         end
       else
-        if @row + 1 >= FFI::NCurses.getmaxy(@window)
+        if @row + 1 >= maxy
           switch_page @current_page + 1
         else
           move_cursor @row += 1
@@ -46,7 +46,7 @@ module Rfd
     def v
       switch_mode MODE::MIEL
       FFI::NCurses.wclear @window
-      @viewer = ViewerWindow.new
+      @viewer = ViewerWindow.new base: @base
       @viewer.draw current_item.read
     end
 
@@ -103,6 +103,18 @@ module Rfd
       FFI::NCurses.waddstr @window, contents
       FFI::NCurses.wrefresh @window
     end
+
+    def maxx
+      return @maxx if @maxx
+      @maxy, @maxx = FFI::NCurses.getmaxyx @window
+      @maxx
+    end
+
+    def maxy
+      return @maxy if @maxy
+      @maxy, @maxx = FFI::NCurses.getmaxyx @window
+      @maxy
+    end
   end
 
   class BaseWindow < Window
@@ -114,7 +126,7 @@ module Rfd
 
       @window = FFI::NCurses.stdscr
       FFI::NCurses.box @window, 0, 0
-      @header = HeaderWindow.new
+      @header = HeaderWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
       @main.move_cursor
       @mode = MODE::COMMAND
@@ -158,8 +170,8 @@ module Rfd
   end
 
   class HeaderWindow < Window
-    def initialize
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, FFI::NCurses.getmaxx(FFI::NCurses.stdscr) - 2, 1, 1
+    def initialize(base: nil)
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, base.maxx - 2, 1, 1
       FFI::NCurses.box @window, 0, 0
     end
 
@@ -173,8 +185,7 @@ module Rfd
 
     def initialize(base: nil, dir: nil)
       @base = base
-      y, x = FFI::NCurses.getmaxyx FFI::NCurses.stdscr
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, y - 9, x - 2, 8, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 9, base.maxx - 2, 8, 1
       FFI::NCurses.box @window, 0, 0
       @row = 0
 
@@ -206,7 +217,6 @@ module Rfd
 
     def ls(page = nil)
       FFI::NCurses.wclear @window
-      maxy, maxx = FFI::NCurses.getmaxyx @window
 
       unless page
         @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
@@ -242,9 +252,8 @@ module Rfd
   end
 
   class ViewerWindow < Window
-    def initialize
-      y, x = FFI::NCurses.getmaxyx FFI::NCurses.stdscr
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, y - 9, x - 2, 8, 1
+    def initialize(base: nil)
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 9, base.maxx - 2, 8, 1
     end
 
     def close

@@ -72,16 +72,6 @@ module Rfd
     end
   end
 
-  # bordered Window
-  class SubWindow < Window
-    def initialize(*)
-      maxy, maxx = FFI::NCurses.getmaxyx @window
-      begy, begx = FFI::NCurses.getbegyx @window
-      border_window = FFI::NCurses.derwin @window, maxy + 2, maxx + 2, begy - 1, begx - 1
-      FFI::NCurses.box border_window, 0, 0
-    end
-  end
-
   class BaseWindow < Window
     attr_reader :header, :main
     attr_writer :mode
@@ -134,10 +124,10 @@ module Rfd
     end
   end
 
-  class HeaderWindow < SubWindow
+  class HeaderWindow < Window
     def initialize
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, FFI::NCurses.getmaxx(FFI::NCurses.stdscr) - 2, 1, 1
-      super
+      FFI::NCurses.box @window, 0, 0
     end
 
     def draw_page_number(current: 1, total: nil)
@@ -145,15 +135,15 @@ module Rfd
     end
   end
 
-  class MainWindow < SubWindow
+  class MainWindow < Window
     include Rfd::Commands
 
     def initialize(base: nil, dir: nil)
       @base = base
       y, x = FFI::NCurses.getmaxyx FFI::NCurses.stdscr
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, y - 9, x - 2, 8, 1
+      FFI::NCurses.box @window, 0, 0
       @row = 0
-      super
 
       cd dir
       ls
@@ -201,11 +191,10 @@ module Rfd
     end
   end
 
-  class ViewerWindow < SubWindow
+  class ViewerWindow < Window
     def initialize
       y, x = FFI::NCurses.getmaxyx FFI::NCurses.stdscr
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, y - 9, x - 2, 8, 1
-      super
     end
 
     def close

@@ -191,9 +191,16 @@ module Rfd
       move_cursor 0
     end
 
+    def first_page?
+      @current_page == 0
+    end
+
+    def last_page?
+      @current_page == @total_pages - 1
+    end
+
     def draw_page_number
-      maxy = FFI::NCurses.getmaxy @window
-      @base.header.draw_page_number current: @row / maxy + 1, total: @items.size / maxy + 1
+      @base.header.draw_page_number current: @current_page + 1, total: @total_pages
     end
   end
 

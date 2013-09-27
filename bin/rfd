@@ -21,6 +21,9 @@ begin
       rfd.bs
     when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
       rfd.main.public_send c.chr if rfd.command_mode? && rfd.main.respond_to?(c.chr)
+    when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
+      chr = ((c - 1 + 65) ^ 0b0100000).chr
+      rfd.main.public_send "ctrl_#{chr}" if rfd.command_mode? && rfd.main.respond_to?("ctrl_#{chr}")
     else
       p c
     end

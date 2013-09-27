@@ -3,7 +3,7 @@ require 'ffi-ncurses'
 require File.expand_path('../../lib/rfd', __FILE__)
 
 FFI::NCurses.initscr
-FFI::NCurses.cbreak
+FFI::NCurses.raw
 FFI::NCurses.noecho
 FFI::NCurses.start_color
 

@@ -14,12 +14,6 @@ module Rfd
       ls
     end
 
-    def k
-      @row -= 1
-      @row = @items.size - 1 if @row <= 0
-      move_cursor
-    end
-
     def j
       if last_page?
         if @row + 1 >= @items.size % (FFI::NCurses.getmaxy(@window) + 1)
@@ -33,6 +27,15 @@ module Rfd
         else
           move_cursor @row += 1
         end
+      end
+    end
+
+    def k
+      if @row == 0
+        switch_page (first_page? ? @total_pages - 1 : @current_page - 1)
+        move_cursor (@row = last_page? ? @items.size % maxy - 1 : maxy - 1)
+      else
+        move_cursor @row -= 1
       end
     end
 

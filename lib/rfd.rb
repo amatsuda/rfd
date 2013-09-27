@@ -74,6 +74,16 @@ module Rfd
       end
     end
 
+    def ctrl_p
+      if @total_pages > 1
+        if @current_page > 0
+          switch_page @current_page - 1
+        else
+          switch_page @total_pages - 1
+        end
+      end
+    end
+
     def enter
       if current_item.directory?
         cd current_item

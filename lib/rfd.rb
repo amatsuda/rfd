@@ -32,7 +32,7 @@ module Rfd
 
     def v
       switch_mode MODE::MIEL
-      @window.clear
+      FFI::NCurses.wclear @window
       @viewer = ViewerWindow.new
       @viewer.draw current_item.read
     end
@@ -66,17 +66,19 @@ module Rfd
 
   class Window
     def draw(contents)
-      @window.setpos 0, 0
-      @window.addstr contents
-      @window.refresh
+      FFI::NCurses.wmove @window, 0, 0
+      FFI::NCurses.waddstr @window, contents
+      FFI::NCurses.wrefresh @window
     end
   end
 
   # bordered Window
   class SubWindow < Window
     def initialize(*)
-      border_window = Curses.stdscr.subwin @window.maxy + 2, @window.maxx + 2, @window.begy - 1, @window.begx - 1
-      border_window.box ?|, ?-
+      maxy, maxx = FFI::NCurses.getmaxyx @window
+      begy, begx = FFI::NCurses.getbegyx @window
+      border_window = FFI::NCurses.derwin @window, maxy + 2, maxx + 2, begy - 1, begx - 1
+      FFI::NCurses.box border_window, 0, 0
     end
   end
 
@@ -87,8 +89,8 @@ module Rfd
     def initialize(dir = '.')
       init_colors
 
-      @window = Curses.stdscr
-      @window.box ?|, ?-
+      @window = FFI::NCurses.stdscr
+      FFI::NCurses.box @window, 0, 0
       @header = HeaderWindow.new
       @main = MainWindow.new base: self, dir: dir
       @main.move_cursor
@@ -96,8 +98,8 @@ module Rfd
     end
 
     def init_colors
-      Curses.init_pair Curses::COLOR_WHITE, Curses::COLOR_WHITE, Curses::COLOR_BLACK
-      Curses.init_pair Curses::COLOR_CYAN, Curses::COLOR_CYAN, Curses::COLOR_BLACK
+      FFI::NCurses.init_pair FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_BLACK
+      FFI::NCurses.init_pair FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_BLACK
     end
     def command_mode?
       @mode == MODE::COMMAND
@@ -108,7 +110,7 @@ module Rfd
     end
 
     def move_cursor(row)
-      @window.setpos row, 1
+      FFI::NCurses.wmove @window, row, 1
     end
 
     def debug(str)
@@ -134,7 +136,7 @@ module Rfd
 
   class HeaderWindow < SubWindow
     def initialize
-      @window = Curses.stdscr.subwin 6, Curses.stdscr.maxx - 2, 1, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, FFI::NCurses.getmaxx(FFI::NCurses.stdscr) - 2, 1, 1
       super
     end
 
@@ -148,13 +150,14 @@ module Rfd
 
     def initialize(base: nil, dir: nil)
       @base = base
-      @window = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+      y, x = FFI::NCurses.getmaxyx FFI::NCurses.stdscr
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, y - 9, x - 2, 8, 1
       @row = 0
       super
 
       cd dir
       ls
-      @window.refresh
+      FFI::NCurses.wrefresh @window
     end
 
     def current_item
@@ -162,7 +165,7 @@ module Rfd
     end
 
     def move_cursor(row = nil)
-      @base.move_cursor @window.begy + (row || @row)
+      @base.move_cursor FFI::NCurses.getbegy(@window) + (row || @row)
     end
 
     def switch_mode(mode)
@@ -179,30 +182,34 @@ module Rfd
     end
 
     def ls(page = nil)
-      @window.clear
+      FFI::NCurses.wclear @window
+      maxy, maxx = FFI::NCurses.getmaxyx @window
       @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a unless page
-      @items[(page || 0) * @window.maxy, @window.maxy].each do |item|
-        @window.attron Curses.color_pair(item.color) do
-          @window.addstr "#{item.to_s}\n"
-        end
+      @items[(page || 0) * maxy, maxy].each do |item|
+        FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
+        FFI::NCurses.waddstr @window, "#{item.to_s}\n"
       end
-      @window.refresh
+      FFI::NCurses.wstandend @window
+      FFI::NCurses.wrefresh @window
       draw_page_number
       move_cursor 0
     end
 
     def draw_page_number
-      @base.header.draw_page_number current: @row / @window.maxy + 1, total: @items.size / @window.maxy + 1
+      maxy = FFI::NCurses.getmaxy @window
+      @base.header.draw_page_number current: @row / maxy + 1, total: @items.size / maxy + 1
     end
   end
 
   class ViewerWindow < SubWindow
     def initialize
-      @window = Curses.stdscr.subwin Curses.stdscr.maxy - 9, Curses.stdscr.maxx - 2, 8, 1
+      y, x = FFI::NCurses.getmaxyx FFI::NCurses.stdscr
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, y - 9, x - 2, 8, 1
+      super
     end
 
     def close
-      @window.close
+      FFI::NCurses.wclear @window
     end
   end
 
@@ -221,9 +228,9 @@ module Rfd
 
     def color
       if directory?
-        Curses::COLOR_CYAN
+        FFI::NCurses::COLOR_CYAN
       else
-        Curses::COLOR_WHITE
+        FFI::NCurses::COLOR_WHITE
       end
     end
 

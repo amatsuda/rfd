@@ -1,17 +1,17 @@
 #!/usr/bin/env ruby
-require 'curses'
+require 'ffi-ncurses'
 require File.expand_path('../../lib/rfd', __FILE__)
 
-Curses.cbreak
-Curses.noecho
-Curses.init_screen
-Curses.start_color
+FFI::NCurses.initscr
+FFI::NCurses.cbreak
+FFI::NCurses.noecho
+FFI::NCurses.start_color
 
 begin
   rfd = Rfd::BaseWindow.new ARGV[0] || '.'
 
   loop do
-    c = Curses.getch
+    c = FFI::NCurses.getch
     case c
     when 10  # enter
       rfd.enter
@@ -19,12 +19,12 @@ begin
       rfd.q
     when 127  # BS
       rfd.bs
-    when (?a)..(?z), (?A)..(?Z)
-      rfd.main.public_send c if rfd.command_mode? && rfd.main.respond_to?(c)
+    when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
+      rfd.main.public_send c.chr if rfd.command_mode? && rfd.main.respond_to?(c.chr)
     else
       p c
     end
   end
 ensure
-  Curses.close_screen
+  FFI::NCurses.endwin
 end

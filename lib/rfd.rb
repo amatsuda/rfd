@@ -195,7 +195,7 @@ module Rfd
     end
 
     def current_item
-      @items[@row]
+      @items[@current_page * maxy + @row]
     end
 
     def move_cursor(row = nil)

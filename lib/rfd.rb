@@ -15,25 +15,17 @@ module Rfd
     end
 
     def j
-      if last_page?
-        if @row + 1 >= @items.size % (maxy + 1)
-          switch_page 0
-        else
-          move_cursor @row += 1
-        end
+      if @row + 1 >= @displayed_items.size
+        switch_page last_page? ? 0 : @current_page + 1
       else
-        if @row + 1 >= maxy
-          switch_page @current_page + 1
-        else
-          move_cursor @row += 1
-        end
+        move_cursor @row += 1
       end
     end
 
     def k
       if @row == 0
         switch_page (first_page? ? @total_pages - 1 : @current_page - 1)
-        move_cursor (@row = last_page? ? @items.size % maxy - 1 : maxy - 1)
+        move_cursor (@row = @displayed_items.size - 1)
       else
         move_cursor @row -= 1
       end
@@ -60,11 +52,11 @@ module Rfd
     end
 
     def L
-      move_cursor @row = @items.size - 1
+      move_cursor @row = @displayed_items.size - 1
     end
 
     def M
-      move_cursor @row = @items.size / 2
+      move_cursor @row = @displayed_items.size / 2
     end
 
     def ctrl_n
@@ -223,7 +215,8 @@ module Rfd
       end
       @current_page = page ? page : 0
 
-      @items[@current_page * maxy, maxy].each do |item|
+      @displayed_items = @items[@current_page * maxy, maxy]
+      @displayed_items.each do |item|
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
         FFI::NCurses.waddstr @window, "#{item.to_s}\n"
       end

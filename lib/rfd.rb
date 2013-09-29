@@ -10,7 +10,7 @@ module Rfd
 
   module Commands
     def d
-      FileUtils.mv current_item.path, File.expand_path('~/.Trash/')
+      FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
       ls
     end
 
@@ -43,7 +43,7 @@ module Rfd
     end
 
     def D
-      FileUtils.rm_rf current_item.path
+      FileUtils.rm_rf selected_items.map(&:path)
       ls
     end
 

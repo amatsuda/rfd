@@ -165,7 +165,7 @@ module Rfd
     end
 
     def space
-      @main.mark
+      @main.toggle_mark
     end
 
     def q
@@ -255,8 +255,8 @@ module Rfd
       @base.header.draw_page_number current: @current_page + 1, total: @total_pages
     end
 
-    def mark
-      FFI::NCurses.mvwaddstr @window, @row, 0, current_item.mark
+    def toggle_mark
+      FFI::NCurses.mvwaddstr @window, @row, 0, current_item.toggle_mark
       FFI::NCurses.wrefresh @window
       j
     end
@@ -317,17 +317,21 @@ module Rfd
       File.read path
     end
 
-    def mark
-      @marked = true
-      '*'
+    def toggle_mark
+      @marked = !@marked
+      current_mark
     end
 
     def marked?
       @marked
     end
 
+    def current_mark
+      marked? ? '*' : ' '
+    end
+
     def to_s
-      "#{marked? ? '*' : ' '}#{@name.ljust(43)}#{size}"
+      "#{current_mark}#{@name.ljust(43)}#{size}"
     end
   end
 end

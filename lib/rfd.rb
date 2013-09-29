@@ -126,7 +126,6 @@ module Rfd
       init_colors
 
       @window = FFI::NCurses.stdscr
-      FFI::NCurses.box @window, 0, 0
       @header = HeaderWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
       @command_line = CommandLineWindow.new base: self

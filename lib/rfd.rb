@@ -308,7 +308,7 @@ module Rfd
     end
 
     def to_s
-      "#{@name.ljust(43)}#{size}"
+      " #{@name.ljust(43)}#{size}"
     end
   end
 end

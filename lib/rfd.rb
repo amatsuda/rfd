@@ -120,6 +120,7 @@ module Rfd
       FFI::NCurses.box @window, 0, 0
       @header = HeaderWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
+      @command_line = CommandLineWindow.new base: self
       @main.move_cursor
       @mode = MODE::COMMAND
     end
@@ -176,7 +177,7 @@ module Rfd
 
     def initialize(base: nil, dir: nil)
       @base = base
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 9, base.maxx - 2, 8, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 10, base.maxx - 2, 8, 1
       FFI::NCurses.box @window, 0, 0
       @row = 0
 
@@ -245,11 +246,18 @@ module Rfd
 
   class ViewerWindow < Window
     def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 9, base.maxx - 2, 8, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 10, base.maxx - 2, 8, 1
     end
 
     def close
       FFI::NCurses.wclear @window
+    end
+  end
+
+  class CommandLineWindow < Window
+    def initialize(base: nil)
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, base.maxx, base.maxy - 1, 0
+      FFI::NCurses.box @window, 0, 0
     end
   end
 

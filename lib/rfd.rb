@@ -202,6 +202,10 @@ module Rfd
       @items[@current_page * maxy + @row]
     end
 
+    def selected_items
+      (marked = @items.select(&:marked?)).any? ? marked : Array(current_item)
+    end
+
     def move_cursor(row = nil)
       @base.move_cursor FFI::NCurses.getbegy(@window) + (row || @row)
     end

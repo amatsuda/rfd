@@ -164,6 +164,10 @@ module Rfd
       end
     end
 
+    def space
+      @main.mark
+    end
+
     def q
       @main.q
     end
@@ -250,6 +254,12 @@ module Rfd
     def draw_page_number
       @base.header.draw_page_number current: @current_page + 1, total: @total_pages
     end
+
+    def mark
+      FFI::NCurses.mvwaddstr @window, @row, 0, current_item.mark
+      FFI::NCurses.wrefresh @window
+      j
+    end
   end
 
   class ViewerWindow < SubWindow
@@ -272,7 +282,7 @@ module Rfd
 
   class Item
     def initialize(dir: nil, name: nil)
-      @dir, @name = dir, name
+      @dir, @name, @marked = dir, name, false
     end
 
     def path
@@ -307,8 +317,17 @@ module Rfd
       File.read path
     end
 
+    def mark
+      @marked = true
+      '*'
+    end
+
+    def marked?
+      @marked
+    end
+
     def to_s
-      " #{@name.ljust(43)}#{size}"
+      "#{marked? ? '*' : ' '}#{@name.ljust(43)}#{size}"
     end
   end
 end

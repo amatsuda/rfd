@@ -17,6 +17,8 @@ begin
       rfd.main.enter
     when 27  # esc
       rfd.q
+    when 32  # space
+      rfd.space
     when 127  # BS
       rfd.bs
     when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)

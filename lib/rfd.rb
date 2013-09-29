@@ -38,7 +38,7 @@ module Rfd
     end
 
     def D
-      File.delete current_item.path
+      FileUtils.rm_rf current_item.path
       ls
     end
 

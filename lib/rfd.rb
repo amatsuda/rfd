@@ -18,16 +18,16 @@ module Rfd
       if @row + 1 >= @displayed_items.size
         switch_page last_page? ? 0 : @current_page + 1
       else
-        move_cursor @row += 1
+        move_cursor @row + 1
       end
     end
 
     def k
       if @row == 0
         switch_page (first_page? ? @total_pages - 1 : @current_page - 1)
-        move_cursor (@row = @displayed_items.size - 1)
+        move_cursor @displayed_items.size - 1
       else
-        move_cursor @row -= 1
+        move_cursor @row - 1
       end
     end
 
@@ -48,15 +48,15 @@ module Rfd
     end
 
     def H
-      move_cursor @row = 0
+      move_cursor 0
     end
 
     def L
-      move_cursor @row = @displayed_items.size - 1
+      move_cursor @displayed_items.size - 1
     end
 
     def M
-      move_cursor @row = @displayed_items.size / 2
+      move_cursor @displayed_items.size / 2
     end
 
     def ctrl_n
@@ -207,6 +207,7 @@ module Rfd
     end
 
     def move_cursor(row = nil)
+      @row = row
       @base.move_cursor FFI::NCurses.getbegy(@window) + (row || @row)
     end
 

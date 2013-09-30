@@ -237,6 +237,8 @@ module Rfd
 
     def move_cursor(row = nil)
       prev, @row = @row, row if row
+      @row ||= 0
+
       @base.move_cursor begy + (row || @row)
       if prev
         item = @displayed_items[prev]
@@ -285,7 +287,7 @@ module Rfd
       wrefresh
 
       draw_path_and_page_number
-      move_cursor 0
+      move_cursor (@row = nil)
       @base.header.wrefresh
     end
 

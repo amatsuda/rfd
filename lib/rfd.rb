@@ -207,8 +207,18 @@ module Rfd
     end
 
     def move_cursor(row = nil)
-      @row = row
+      prev, @row = @row, row if row
       @base.move_cursor FFI::NCurses.getbegy(@window) + (row || @row)
+      if prev
+        item = @displayed_items[prev]
+        FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
+        FFI::NCurses.mvwaddstr @window, prev, 0, "#{item.to_s}\n"
+      end
+      item = @displayed_items[row || @row]
+      FFI::NCurses.wattr_set @window, FFI::NCurses::A_UNDERLINE, item.color, nil
+      FFI::NCurses.mvwaddstr @window, @row, 0, "#{item.to_s}\n"
+      FFI::NCurses.wstandend @window
+      FFI::NCurses.wrefresh @window
     end
 
     def switch_mode(mode)
@@ -221,6 +231,7 @@ module Rfd
     end
 
     def cd(dir)
+      @row = nil
       @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
     end
 

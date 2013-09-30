@@ -343,16 +343,19 @@ module Rfd
       @path ||= File.join @dir, @name
     end
 
+    def basename
+      @basename ||= File.basename name, extname
+    end
+
+    def extname
+      @extname ||= File.extname name
+    end
+
     def display_name
-      if @name.length <= 43
+      if mb_size(@name) <= 43
         @name
       else
-        base, ext = @name.scan(/([^.]*)?(?:\.?(.+)?)/).first
-        if ext
-          "#{base[0, 41 - ext.length]}….#{ext}"
-        else
-          "#{base[0, 42]}…"
-        end
+        "#{mb_left(basename, 42 - extname.length)}…#{extname}"
       end
     end
 
@@ -397,8 +400,29 @@ module Rfd
       marked? ? '*' : ' '
     end
 
+    def mb_left(str, size)
+      len = 0
+      index = str.each_char.with_index do |c, i|
+        break i if len + mb_char_size(c) > size
+        len += mb_size c
+      end
+      str[0, index]
+    end
+
+    def mb_char_size(c)
+      c == '…' ? 1 : c.bytesize == 1 ? 1 : 2
+    end
+
+    def mb_size(str)
+      str.each_char.inject(0) {|l, c| l += mb_char_size(c)}
+    end
+
+    def mb_ljust(str, size)
+      "#{str}#{' ' * [0, size - mb_size(str)].max}"
+    end
+
     def to_s
-      "#{current_mark}#{display_name.ljust(43)}#{size.to_s.rjust(10)}"
+      "#{current_mark}#{mb_ljust(display_name, 43)}#{size.to_s.rjust(13)}"
     end
   end
 end

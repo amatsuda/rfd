@@ -343,6 +343,19 @@ module Rfd
       @path ||= File.join @dir, @name
     end
 
+    def display_name
+      if @name.length <= 43
+        @name
+      else
+        base, ext = @name.scan(/([^.]*)?(?:\.?(.+)?)/).first
+        if ext
+          "#{base[0, 41 - ext.length]}….#{ext}"
+        else
+          "#{base[0, 42]}…"
+        end
+      end
+    end
+
     def stat
       @stat ||= File.stat path
     end
@@ -385,7 +398,7 @@ module Rfd
     end
 
     def to_s
-      "#{current_mark}#{@name.ljust(43)}#{size}"
+      "#{current_mark}#{display_name.ljust(43)}#{size.to_s.rjust(10)}"
     end
   end
 end

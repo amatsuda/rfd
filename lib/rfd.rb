@@ -40,6 +40,7 @@ module Rfd
       wclear
       @viewer = ViewerWindow.new base: @base
       @viewer.draw current_item.read
+      wrefresh
     end
 
     def D

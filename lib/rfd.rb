@@ -198,8 +198,17 @@ module Rfd
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
-      FFI::NCurses.wclear @window
-      draw %Q[Page: #{"#{current}/ #{total}".ljust(10)}  Path: #{path}]
+      @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(10)}  Path: #{path}]
+      FFI::NCurses.wmove @window, 0, 0
+      FFI::NCurses.wclrtoeol @window
+      FFI::NCurses.waddstr @window, @path_and_page_number
+    end
+
+    def draw_current_filename(current_file_name)
+      @current_file_name = "File: #{current_file_name}"
+      FFI::NCurses.wmove @window, 1, 0
+      FFI::NCurses.wclrtoeol @window
+      FFI::NCurses.waddstr @window, @current_file_name
     end
   end
 
@@ -238,6 +247,9 @@ module Rfd
       FFI::NCurses.mvwaddstr @window, @row, 0, "#{item.to_s}\n"
       FFI::NCurses.wstandend @window
       wrefresh
+
+      @base.header.draw_current_filename item.name
+      @base.header.wrefresh
     end
 
     def switch_mode(mode)
@@ -270,8 +282,10 @@ module Rfd
       end
       FFI::NCurses.wstandend @window
       wrefresh
+
       draw_path_and_page_number
       move_cursor 0
+      @base.header.wrefresh
     end
 
     def first_page?
@@ -316,6 +330,8 @@ module Rfd
   end
 
   class Item
+    attr_reader :name
+
     def initialize(dir: nil, name: nil)
       @dir, @name, @marked = dir, name, false
     end

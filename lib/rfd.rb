@@ -37,7 +37,7 @@ module Rfd
 
     def v
       switch_mode MODE::MIEL
-      FFI::NCurses.wclear @window
+      wclear
       @viewer = ViewerWindow.new base: @base
       @viewer.draw current_item.read
     end
@@ -93,6 +93,13 @@ module Rfd
     def draw(contents)
       FFI::NCurses.wmove @window, 0, 0
       FFI::NCurses.waddstr @window, contents
+    end
+
+    def wclear
+      FFI::NCurses.wclear @window
+    end
+
+    def wrefresh
       FFI::NCurses.wrefresh @window
     end
 
@@ -207,7 +214,7 @@ module Rfd
 
       cd dir
       ls
-      FFI::NCurses.wrefresh @window
+      wrefresh
     end
 
     def current_item
@@ -230,7 +237,7 @@ module Rfd
       FFI::NCurses.wattr_set @window, FFI::NCurses::A_UNDERLINE, item.color, nil
       FFI::NCurses.mvwaddstr @window, @row, 0, "#{item.to_s}\n"
       FFI::NCurses.wstandend @window
-      FFI::NCurses.wrefresh @window
+      wrefresh
     end
 
     def switch_mode(mode)
@@ -248,7 +255,7 @@ module Rfd
     end
 
     def ls(page = nil)
-      FFI::NCurses.wclear @window
+      wclear
 
       unless page
         @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
@@ -262,7 +269,7 @@ module Rfd
         FFI::NCurses.waddstr @window, "#{item.to_s}\n"
       end
       FFI::NCurses.wstandend @window
-      FFI::NCurses.wrefresh @window
+      wrefresh
       draw_path_and_page_number
       move_cursor 0
     end
@@ -285,7 +292,7 @@ module Rfd
 
     def toggle_mark
       FFI::NCurses.mvwaddstr @window, @row, 0, current_item.toggle_mark
-      FFI::NCurses.wrefresh @window
+      wrefresh
       j
     end
   end
@@ -297,7 +304,7 @@ module Rfd
     end
 
     def close
-      FFI::NCurses.wclear @window
+      wclear
     end
   end
 

@@ -179,8 +179,9 @@ module Rfd
       super
     end
 
-    def draw_page_number(current: 1, total: nil)
-      draw "Page: #{current}/ #{total}"
+    def draw_path_and_page_number(path: nil, current: 1, total: nil)
+      FFI::NCurses.wclear @window
+      draw %Q[Page: #{"#{current}/ #{total}".ljust(10)}  Path: #{path}]
     end
   end
 
@@ -251,7 +252,7 @@ module Rfd
       end
       FFI::NCurses.wstandend @window
       FFI::NCurses.wrefresh @window
-      draw_page_number
+      draw_path_and_page_number
       move_cursor 0
     end
 
@@ -267,8 +268,8 @@ module Rfd
       ls (@current_page = page)
     end
 
-    def draw_page_number
-      @base.header.draw_page_number current: @current_page + 1, total: @total_pages
+    def draw_path_and_page_number
+      @base.header.draw_path_and_page_number path: @dir, current: @current_page + 1, total: @total_pages
     end
 
     def toggle_mark

@@ -107,12 +107,23 @@ module Rfd
       @maxy, @maxx = FFI::NCurses.getmaxyx @window
       @maxy
     end
+
+    def begx
+      return @begx if @begx
+      @begy, @begx = FFI::NCurses.getbegyx @window
+      @begx
+    end
+
+    def begy
+      return @begy if @begy
+      @begy, @begx = FFI::NCurses.getbegyx @window
+      @begy
+    end
   end
 
   # bordered Window
   class SubWindow < Window
     def initialize(*)
-      begy, begx = FFI::NCurses.getbegyx @window
       border_window = FFI::NCurses.derwin FFI::NCurses.stdscr, maxy + 2, maxx + 2, begy - 1, begx - 1
       FFI::NCurses.box border_window, 0, 0
     end
@@ -209,7 +220,7 @@ module Rfd
 
     def move_cursor(row = nil)
       prev, @row = @row, row if row
-      @base.move_cursor FFI::NCurses.getbegy(@window) + (row || @row)
+      @base.move_cursor begy + (row || @row)
       if prev
         item = @displayed_items[prev]
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil

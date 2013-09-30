@@ -5,6 +5,7 @@ require File.expand_path('../../lib/rfd', __FILE__)
 FFI::NCurses.initscr
 FFI::NCurses.raw
 FFI::NCurses.noecho
+FFI::NCurses.curs_set 0
 FFI::NCurses.start_color
 
 begin

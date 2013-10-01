@@ -218,7 +218,7 @@ module Rfd
     end
 
     def draw_stat(item)
-      @stat = "      #{item.size.to_s.ljust(13)}#{item.mtime} #{item.mode}"
+      @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
       FFI::NCurses.wmove @window, 2, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @stat
@@ -384,11 +384,11 @@ module Rfd
     end
 
     def size
-      if directory?
-        '<DIR>'
-      else
-        stat.size
-      end
+      directory? ? 0 : stat.size
+    end
+
+    def size_or_dir
+      directory? ? '<DIR>' : size.to_s
     end
 
     def mtime
@@ -460,7 +460,7 @@ module Rfd
     end
 
     def to_s
-      "#{current_mark}#{mb_ljust(display_name, 43)}#{size.to_s.rjust(13)}"
+      "#{current_mark}#{mb_ljust(display_name, 43)}#{size_or_dir.rjust(13)}"
     end
   end
 end

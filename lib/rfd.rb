@@ -138,7 +138,7 @@ module Rfd
   end
 
   class BaseWindow < Window
-    attr_reader :header_l, :main
+    attr_reader :header_l, :header_r, :main
     attr_writer :mode
 
     def initialize(dir = '.')
@@ -146,6 +146,7 @@ module Rfd
 
       @window = FFI::NCurses.stdscr
       @header_l = HeaderLeftWindow.new base: self
+      @header_r = HeaderRightWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
       @command_line = CommandLineWindow.new base: self
       @main.move_cursor
@@ -194,7 +195,7 @@ module Rfd
 
   class HeaderLeftWindow < SubWindow
     def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, base.maxx - 2, 1, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, base.maxx - 32, 1, 1
       super
     end
 
@@ -222,6 +223,13 @@ module Rfd
       FFI::NCurses.wmove @window, 2, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @stat
+    end
+  end
+
+  class HeaderRightWindow < SubWindow
+    def initialize(base: nil)
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, 29, 1, base.maxx - 30
+      super
     end
   end
 

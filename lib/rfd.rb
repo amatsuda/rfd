@@ -199,10 +199,15 @@ module Rfd
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
-      @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(10)}  Path: #{path}]
+      @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       FFI::NCurses.wmove @window, 0, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @path_and_page_number
+    end
+
+    def draw_current_file_info(current_file)
+      draw_current_filename current_file.name
+      draw_stat current_file
     end
 
     def draw_current_filename(current_file_name)
@@ -210,6 +215,13 @@ module Rfd
       FFI::NCurses.wmove @window, 1, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @current_file_name
+    end
+
+    def draw_stat(item)
+      @stat = "      #{item.size.to_s.ljust(13)}#{item.mtime} #{item.mode}"
+      FFI::NCurses.wmove @window, 2, 0
+      FFI::NCurses.wclrtoeol @window
+      FFI::NCurses.waddstr @window, @stat
     end
   end
 
@@ -251,7 +263,7 @@ module Rfd
       FFI::NCurses.wstandend @window
       wrefresh
 
-      @base.header.draw_current_filename item.name
+      @base.header.draw_current_file_info item
       @base.header.wrefresh
     end
 
@@ -377,6 +389,14 @@ module Rfd
       else
         stat.size
       end
+    end
+
+    def mtime
+      stat.mtime.strftime('%Y-%m-%d %H:%M:%S')
+    end
+
+    def mode
+      sprintf('%o', stat.mode)
     end
 
     def directory?

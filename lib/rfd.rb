@@ -400,6 +400,10 @@ module Rfd
       [(stat.mode & 0700) / 64, (stat.mode & 070) / 8, stat.mode & 07].inject(m) do |ret, s|
         ret << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
       end
+      if stat.mode & 07000 != 0
+        m[-1] = directory? ? 'T' : 't'
+      end
+      m
     end
 
     def directory?

@@ -186,6 +186,9 @@ module Rfd
 
     def space
       @main.toggle_mark
+      items = @main.marked_items
+      @header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
+      @header_r.wrefresh
     end
 
     def q
@@ -232,6 +235,12 @@ module Rfd
       super
     end
 
+    def draw_marked_items(count: 0, size: 0)
+      FFI::NCurses.wmove @window, 1, 0
+      FFI::NCurses.wclrtoeol @window
+      FFI::NCurses.waddstr @window, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+    end
+
     def draw_total_items(count: 0, size: 0)
       FFI::NCurses.wmove @window, 2, 0
       FFI::NCurses.wclrtoeol @window
@@ -257,8 +266,12 @@ module Rfd
       @items[@current_page * maxy + @row]
     end
 
+    def marked_items
+      @items.select(&:marked?)
+    end
+
     def selected_items
-      (marked = @items.select(&:marked?)).any? ? marked : Array(current_item)
+      (m = marked_items.any?) ? marked_items : Array(current_item)
     end
 
     def move_cursor(row = nil)
@@ -316,6 +329,7 @@ module Rfd
       move_cursor (@row = nil)
       @base.header_l.wrefresh
 
+      draw_marked_items count: 0, size: 0
       draw_total_items count: @items.length, size: @items.inject(0) {|sum, i| sum += i.size}
       @base.header_r.wrefresh
     end
@@ -334,6 +348,10 @@ module Rfd
 
     def draw_path_and_page_number
       @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: @total_pages
+    end
+
+    def draw_marked_items(count: 0, size: 0)
+      @base.header_r.draw_marked_items count: count, size: size
     end
 
     def draw_total_items(count: 0, size: 0)

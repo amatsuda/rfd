@@ -138,14 +138,14 @@ module Rfd
   end
 
   class BaseWindow < Window
-    attr_reader :header, :main
+    attr_reader :header_l, :main
     attr_writer :mode
 
     def initialize(dir = '.')
       init_colors
 
       @window = FFI::NCurses.stdscr
-      @header = HeaderWindow.new base: self
+      @header_l = HeaderLeftWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
       @command_line = CommandLineWindow.new base: self
       @main.move_cursor
@@ -192,7 +192,7 @@ module Rfd
     end
   end
 
-  class HeaderWindow < SubWindow
+  class HeaderLeftWindow < SubWindow
     def initialize(base: nil)
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, base.maxx - 2, 1, 1
       super
@@ -263,8 +263,8 @@ module Rfd
       FFI::NCurses.wstandend @window
       wrefresh
 
-      @base.header.draw_current_file_info item
-      @base.header.wrefresh
+      @base.header_l.draw_current_file_info item
+      @base.header_l.wrefresh
     end
 
     def switch_mode(mode)
@@ -300,7 +300,7 @@ module Rfd
 
       draw_path_and_page_number
       move_cursor (@row = nil)
-      @base.header.wrefresh
+      @base.header_l.wrefresh
     end
 
     def first_page?
@@ -316,7 +316,7 @@ module Rfd
     end
 
     def draw_path_and_page_number
-      @base.header.draw_path_and_page_number path: @dir, current: @current_page + 1, total: @total_pages
+      @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: @total_pages
     end
 
     def toggle_mark

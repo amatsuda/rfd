@@ -231,6 +231,12 @@ module Rfd
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, 29, 1, base.maxx - 30
       super
     end
+
+    def draw_total_items(count: 0, size: 0)
+      FFI::NCurses.wmove @window, 2, 0
+      FFI::NCurses.wclrtoeol @window
+      FFI::NCurses.waddstr @window, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+    end
   end
 
   class MainWindow < SubWindow
@@ -309,6 +315,9 @@ module Rfd
       draw_path_and_page_number
       move_cursor (@row = nil)
       @base.header_l.wrefresh
+
+      draw_total_items count: @items.length, size: @items.inject(0) {|sum, i| sum += i.size}
+      @base.header_r.wrefresh
     end
 
     def first_page?
@@ -325,6 +334,10 @@ module Rfd
 
     def draw_path_and_page_number
       @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: @total_pages
+    end
+
+    def draw_total_items(count: 0, size: 0)
+      @base.header_r.draw_total_items count: count, size: size
     end
 
     def toggle_mark

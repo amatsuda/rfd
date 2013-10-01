@@ -396,14 +396,21 @@ module Rfd
     end
 
     def mode
-      m = directory? ? 'd' : symlink? ? 'l' : '-'
-      [(stat.mode & 0700) / 64, (stat.mode & 070) / 8, stat.mode & 07].inject(m) do |ret, s|
-        ret << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
+      m = stat.mode
+      ret = directory? ? 'd' : symlink? ? 'l' : '-'
+      [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ret) do |str, s|
+        str << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
       end
-      if stat.mode & 07000 != 0
-        m[-1] = directory? ? 'T' : 't'
+      if m & 04000 != 0
+        ret[3] = directory? ? 's' : 'S'
       end
-      m
+      if m & 02000 != 0
+        ret[6] = directory? ? 's' : 'S'
+      end
+      if m & 01000 == 512
+        ret[-1] = directory? ? 't' : 'T'
+      end
+      ret
     end
 
     def directory?

@@ -396,11 +396,18 @@ module Rfd
     end
 
     def mode
-      sprintf('%o', stat.mode)
+      m = directory? ? 'd' : symlink? ? 'l' : '-'
+      [(stat.mode & 0700) / 64, (stat.mode & 070) / 8, stat.mode & 07].inject(m) do |ret, s|
+        ret << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
+      end
     end
 
     def directory?
       stat.directory?
+    end
+
+    def symlink?
+      stat.symlink?
     end
 
     def read

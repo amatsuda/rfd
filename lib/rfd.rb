@@ -421,6 +421,7 @@ module Rfd
   end
 
   class Item
+    include Comparable
     attr_reader :name
 
     def initialize(dir: nil, name: nil)
@@ -537,6 +538,16 @@ module Rfd
 
     def to_s
       "#{current_mark}#{mb_ljust(display_name, 43)}#{size_or_dir.rjust(13)}"
+    end
+
+    def <=>(o)
+      if directory? && !o.directory?
+        1
+      elsif !directory? && o.directory?
+        -1
+      else
+        name <=> o.name
+      end
     end
   end
 end

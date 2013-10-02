@@ -364,6 +364,8 @@ module Rfd
       case @direction
       when nil
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map(&:sort)
+      when 'r'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
       end
     end
 

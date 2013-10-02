@@ -366,6 +366,8 @@ module Rfd
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map(&:sort)
       when 'r'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
+      when 'S'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| i.size}}
       end
     end
 

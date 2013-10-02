@@ -175,9 +175,9 @@ module Rfd
     def colon
       @command_line.draw ':'
 
-      cmd = @command_line.get_command
+      cmd, *args = @command_line.get_command.split(' ')
       if @main.respond_to? cmd
-        @main.public_send cmd
+        @main.public_send cmd, *args
         @command_line.wclear
         @command_line.wrefresh
       end

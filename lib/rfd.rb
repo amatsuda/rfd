@@ -383,7 +383,6 @@ module Rfd
   class CommandLineWindow < Window
     def initialize(base: nil)
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, base.maxx, base.maxy - 1, 0
-      FFI::NCurses.box @window, 0, 0
     end
   end
 

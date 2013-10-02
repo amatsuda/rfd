@@ -172,6 +172,13 @@ module Rfd
       @header_r.debug str
     end
 
+    def colon
+      @command_line.draw ':'
+
+      cmd = @command_line.get_command
+      @main.public_send cmd if @main.respond_to? cmd
+    end
+
     def bs
       if command_mode? && (@dir != '/')
         @main.cd '..'
@@ -383,6 +390,15 @@ module Rfd
   class CommandLineWindow < Window
     def initialize(base: nil)
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, base.maxx, base.maxy - 1, 0
+    end
+
+    def get_command
+      FFI::NCurses.echo
+      s = ' ' * 100
+      FFI::NCurses.mvwgetstr @window, 0, 1, s
+      s.strip
+    ensure
+      FFI::NCurses.noecho
     end
   end
 

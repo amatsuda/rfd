@@ -20,6 +20,8 @@ begin
       rfd.q
     when 32  # space
       rfd.space
+    when 58  # :
+      rfd.colon
     when 127  # BS
       rfd.bs
     when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)

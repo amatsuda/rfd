@@ -169,7 +169,7 @@ module Rfd
     end
 
     def debug(str)
-      p str
+      @header_r.debug str
     end
 
     def bs
@@ -244,6 +244,10 @@ module Rfd
       FFI::NCurses.wmove @window, 2, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+    end
+
+    def debug(s)
+      FFI::NCurses.mvwaddstr @window, 0, 0, s.to_s
     end
   end
 

@@ -341,7 +341,8 @@ module Rfd
 
     def sort(direction = nil)
       @direction, @current_page = direction, 0
-      draw_items
+      sort_items_according_to_current_direction
+      switch_page 0
     end
 
     def draw_items

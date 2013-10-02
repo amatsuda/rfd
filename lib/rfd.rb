@@ -92,8 +92,7 @@ module Rfd
 
   class Window
     def draw(contents)
-      FFI::NCurses.wmove @window, 0, 0
-      FFI::NCurses.waddstr @window, contents
+      FFI::NCurses.mvwaddstr @window, 0, 0, contents
     end
 
     def wclear

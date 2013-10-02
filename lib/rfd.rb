@@ -303,19 +303,19 @@ module Rfd
     end
 
     def cd(dir)
+      wclear
       @row = nil
       @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
     end
 
     def ls(page = nil)
-      wclear
-
       unless page
         @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
         @total_pages = @items.size / maxy + 1
       end
       @current_page = page ? page : 0
 
+      FFI::NCurses.wmove @window, 0, 0
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
@@ -342,7 +342,8 @@ module Rfd
     end
 
     def switch_page(page)
-      ls (@current_page = page)
+      wclear if page != @current_page
+      ls page
     end
 
     def draw_path_and_page_number

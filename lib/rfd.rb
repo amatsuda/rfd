@@ -176,7 +176,11 @@ module Rfd
       @command_line.draw ':'
 
       cmd = @command_line.get_command
-      @main.public_send cmd if @main.respond_to? cmd
+      if @main.respond_to? cmd
+        @main.public_send cmd
+        @command_line.wclear
+        @command_line.wrefresh
+      end
     end
 
     def bs

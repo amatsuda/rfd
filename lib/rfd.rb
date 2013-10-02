@@ -328,6 +328,7 @@ module Rfd
       unless page
         @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
         @total_pages = @items.size / maxy + 1
+        sort_items_according_to_current_direction
       end
       @current_page = page ? page : 0
 
@@ -356,6 +357,13 @@ module Rfd
       draw_path_and_page_number
       move_cursor (@row = nil)
       @base.header_l.wrefresh
+    end
+
+    def sort_items_according_to_current_direction
+      case @direction
+      when nil
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map(&:sort)
+      end
     end
 
     def first_page?

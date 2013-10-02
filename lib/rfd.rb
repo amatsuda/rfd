@@ -348,6 +348,23 @@ module Rfd
       @base.header_r.wrefresh
     end
 
+    def sort(direction = nil)
+      @direction, @current_page = direction, 0
+
+      FFI::NCurses.wmove @window, 0, 0
+      @displayed_items = @items[@current_page * maxy, maxy]
+      @displayed_items.each do |item|
+        FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
+        FFI::NCurses.waddstr @window, "#{item.to_s}\n"
+      end
+      FFI::NCurses.wstandend @window
+      wrefresh
+
+      draw_path_and_page_number
+      move_cursor (@row = nil)
+      @base.header_l.wrefresh
+    end
+
     def first_page?
       @current_page == 0
     end

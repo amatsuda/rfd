@@ -169,6 +169,7 @@ module Rfd
     end
 
     def debug(str)
+      @header_r.wclear
       @header_r.debug str
     end
 
@@ -386,6 +387,10 @@ module Rfd
       FFI::NCurses.mvwaddstr @window, @row, 0, current_item.toggle_mark
       wrefresh
       j
+    end
+
+    def debug(str)
+      @base.debug str
     end
   end
 

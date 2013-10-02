@@ -330,18 +330,7 @@ module Rfd
       end
       @current_page = page ? page : 0
 
-      FFI::NCurses.wmove @window, 0, 0
-      @displayed_items = @items[@current_page * maxy, maxy]
-      @displayed_items.each do |item|
-        FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
-        FFI::NCurses.waddstr @window, "#{item.to_s}\n"
-      end
-      FFI::NCurses.wstandend @window
-      wrefresh
-
-      draw_path_and_page_number
-      move_cursor (@row = nil)
-      @base.header_l.wrefresh
+      draw_items
 
       draw_marked_items count: 0, size: 0
       draw_total_items count: @items.length, size: @items.inject(0) {|sum, i| sum += i.size}
@@ -350,7 +339,10 @@ module Rfd
 
     def sort(direction = nil)
       @direction, @current_page = direction, 0
+      draw_items
+    end
 
+    def draw_items
       FFI::NCurses.wmove @window, 0, 0
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|

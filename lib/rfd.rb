@@ -198,7 +198,7 @@ module Rfd
 
   class HeaderLeftWindow < SubWindow
     def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, base.maxx - 32, 1, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, base.maxx - 32, 1, 1
       super
     end
 
@@ -231,7 +231,7 @@ module Rfd
 
   class HeaderRightWindow < SubWindow
     def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 6, 29, 1, base.maxx - 30
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, 29, 1, base.maxx - 30
       super
     end
 
@@ -253,7 +253,7 @@ module Rfd
 
     def initialize(base: nil, dir: nil)
       @base = base
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 10, base.maxx - 2, 8, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 7, base.maxx - 2, 5, 1
       @row = 0
       super
 

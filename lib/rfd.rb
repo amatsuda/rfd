@@ -372,6 +372,12 @@ module Rfd
       move_cursor 0
     end
 
+    def chmod(mode)
+      FileUtils.chmod mode, selected_items.map(&:path)
+      fetch_items_from_filesystem
+      move_cursor @row
+    end
+
     def fetch_items_from_filesystem
       @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
     end

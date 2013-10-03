@@ -369,6 +369,11 @@ module Rfd
       move_cursor index if index
     end
 
+    def find_reverse(str)
+      index = @items.reverse.index {|i| i.basename.start_with? str}
+      move_cursor @items.length - index - 1 if index
+    end
+
     def draw_items
       FFI::NCurses.wmove @window, 0, 0
       @displayed_items = @items[@current_page * maxy, maxy]

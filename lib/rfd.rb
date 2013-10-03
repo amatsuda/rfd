@@ -354,6 +354,13 @@ module Rfd
       switch_page 0
     end
 
+    def find(str)
+      index = @items.index {|i| i.basename.start_with? str}
+      page = index / maxy
+      ls page if page != @current_page
+      move_cursor index % maxy
+    end
+
     def draw_items
       FFI::NCurses.wmove @window, 0, 0
       @displayed_items = @items[@current_page * maxy, maxy]

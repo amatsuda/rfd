@@ -97,6 +97,10 @@ module Rfd
       end
     end
 
+    def ctrl_r
+      ls
+    end
+
     def /
       @base.process_command_line prompt: ':grep '
     end

@@ -174,14 +174,18 @@ module Rfd
     end
 
     def colon
-      @command_line.draw ':'
+      process_command_line
+    end
 
+    def process_command_line(prompt: ':')
+      @command_line.set_prompt prompt
       cmd, *args = @command_line.get_command.split(' ')
       if @main.respond_to? cmd
         @main.public_send cmd, *args
         @command_line.wclear
         @command_line.wrefresh
       end
+      FFI::NCurses.wstandend @window
     end
 
     def bs
@@ -423,6 +427,12 @@ module Rfd
   class CommandLineWindow < Window
     def initialize(base: nil)
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, base.maxx, base.maxy - 1, 0
+    end
+
+    def set_prompt(str)
+      FFI::NCurses.wattr_set @window, FFI::NCurses::A_BOLD, FFI::NCurses::COLOR_WHITE, nil
+      FFI::NCurses.mvwaddstr @window, 0, 0, str
+      FFI::NCurses.wstandend @window
     end
 
     def get_command

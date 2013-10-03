@@ -35,6 +35,10 @@ module Rfd
       raise StopIteration
     end
 
+    def s
+      @base.process_command_line prompt: ':sort '
+    end
+
     def v
       switch_mode MODE::MIEL
       wclear

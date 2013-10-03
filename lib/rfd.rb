@@ -299,6 +299,12 @@ module Rfd
     end
 
     def move_cursor(row = nil)
+      if row
+        page = row / maxy
+        switch_page page if page != @current_page
+        row = row % maxy
+      end
+
       prev, @row = @row, row if row
       @row ||= 0
 
@@ -355,10 +361,8 @@ module Rfd
     end
 
     def find(str)
-      return unless (index = @items.index {|i| i.basename.start_with? str})
-      page = index / maxy
-      ls page if page != @current_page
-      move_cursor index % maxy
+      index = @items.index {|i| i.basename.start_with? str}
+      move_cursor index if index
     end
 
     def draw_items

@@ -18,6 +18,10 @@ module Rfd
       @base.process_command_line prompt: ':find '
     end
 
+    def F
+      @base.process_command_line prompt: ':find_reverse '
+    end
+
     def j
       if @row + 1 >= @displayed_items.size
         switch_page last_page? ? 0 : @current_page + 1

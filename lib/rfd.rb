@@ -73,8 +73,8 @@ module Rfd
     end
 
     def ctrl_n
-      if @total_pages > 1
-        if @current_page + 1 < @total_pages
+      if total_pages > 1
+        if @current_page + 1 < total_pages
           switch_page @current_page + 1
         else
           switch_page 0
@@ -83,7 +83,7 @@ module Rfd
     end
 
     def ctrl_p
-      if @total_pages > 1
+      if total_pages > 1
         if @current_page > 0
           switch_page @current_page - 1
         else
@@ -354,7 +354,6 @@ module Rfd
     def ls(page = nil)
       unless page
         fetch_items_from_filesystem
-        @total_pages = @items.size / maxy + 1
         sort_items_according_to_current_direction
       end
       @current_page = page ? page : 0
@@ -444,7 +443,11 @@ module Rfd
     end
 
     def last_page?
-      @current_page == @total_pages - 1
+      @current_page == total_pages - 1
+    end
+
+    def total_pages
+      @items.length / maxy + 1
     end
 
     def switch_page(page)
@@ -453,7 +456,7 @@ module Rfd
     end
 
     def draw_path_and_page_number
-      @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: @total_pages
+      @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: total_pages
     end
 
     def draw_marked_items(count: 0, size: 0)

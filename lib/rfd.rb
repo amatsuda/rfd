@@ -363,7 +363,7 @@ module Rfd
       move_cursor (@row = nil)
 
       draw_marked_items
-      draw_total_items count: @items.length, size: @items.inject(0) {|sum, i| sum += i.size}
+      draw_total_items
       @base.header_r.wrefresh
     end
 
@@ -467,8 +467,8 @@ module Rfd
       @base.header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 
-    def draw_total_items(count: 0, size: 0)
-      @base.header_r.draw_total_items count: count, size: size
+    def draw_total_items
+      @base.header_r.draw_total_items count: @items.size, size: @items.inject(0) {|sum, i| sum += i.size}
     end
 
     def toggle_mark

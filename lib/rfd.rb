@@ -217,7 +217,7 @@ module Rfd
 
     def space
       @main.toggle_mark
-      @header_r.draw_marked_items
+      @main.draw_marked_items
       @header_r.wrefresh
     end
 
@@ -463,7 +463,7 @@ module Rfd
     end
 
     def draw_marked_items
-      items = @main.marked_items
+      items = marked_items
       @base.header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 

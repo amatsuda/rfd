@@ -9,6 +9,10 @@ module Rfd
   end
 
   module Commands
+    def a
+      @base.process_command_line prompt: ':chmod '
+    end
+
     def d
       FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
       ls

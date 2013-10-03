@@ -179,7 +179,7 @@ module Rfd
 
     def process_command_line(prompt: ':')
       @command_line.set_prompt prompt
-      cmd, *args = @command_line.get_command.split(' ')
+      cmd, *args = @command_line.get_command(prompt: prompt).split(' ')
       if @main.respond_to? cmd
         @main.public_send cmd, *args
         @command_line.wclear
@@ -435,11 +435,12 @@ module Rfd
       FFI::NCurses.wstandend @window
     end
 
-    def get_command
+    def get_command(prompt: nil)
       FFI::NCurses.echo
+      startx = prompt ? prompt.length : 1
       s = ' ' * 100
-      FFI::NCurses.mvwgetstr @window, 0, 1, s
-      s.strip
+      FFI::NCurses.mvwgetstr @window, 0, startx, s
+      "#{prompt[1..-1] if prompt}#{s.strip}"
     ensure
       FFI::NCurses.noecho
     end

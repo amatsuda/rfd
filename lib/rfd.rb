@@ -293,7 +293,6 @@ module Rfd
 
       cd dir
       ls
-      wrefresh
     end
 
     def current_item

@@ -364,7 +364,7 @@ module Rfd
 
       wclear
       draw_items
-      move_cursor (@row = nil)
+      move_cursor @row
 
       draw_marked_items
       draw_total_items

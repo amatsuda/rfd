@@ -380,8 +380,7 @@ module Rfd
 
     def chmod(mode)
       FileUtils.chmod mode, selected_items.map(&:path)
-      fetch_items_from_filesystem
-      move_cursor @row
+      ls
     end
 
     def fetch_items_from_filesystem

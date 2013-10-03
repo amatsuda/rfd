@@ -383,6 +383,10 @@ module Rfd
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.mtime <=> x.mtime}}
       when 'tr'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:mtime)}
+      when 'c'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.ctime <=> x.ctime}}
+      when 'cr'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:ctime)}
       when 'u'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.atime <=> x.atime}}
       when 'ur'
@@ -513,6 +517,10 @@ module Rfd
 
     def atime
       stat.atime.strftime('%Y-%m-%d %H:%M:%S')
+    end
+
+    def ctime
+      stat.ctime.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def mtime

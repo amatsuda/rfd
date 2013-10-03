@@ -23,8 +23,8 @@ module Rfd
     end
 
     def j
-      if @row + 1 >= @displayed_items.size
-        switch_page last_page? ? 0 : @current_page + 1
+      if @row + 1 >= @items.size
+        move_cursor 0
       else
         move_cursor @row + 1
       end
@@ -32,8 +32,7 @@ module Rfd
 
     def k
       if @row == 0
-        switch_page (first_page? ? @total_pages - 1 : @current_page - 1)
-        move_cursor @displayed_items.size - 1
+        move_cursor @items.size - 1
       else
         move_cursor @row - 1
       end
@@ -61,23 +60,23 @@ module Rfd
     end
 
     def H
-      move_cursor 0
+      move_cursor @current_page * maxy
     end
 
     def L
-      move_cursor @displayed_items.size - 1
+      move_cursor @current_page * maxy + @displayed_items.size - 1
     end
 
     def M
-      move_cursor @displayed_items.size / 2
+      move_cursor @current_page * maxy + @displayed_items.size / 2
     end
 
     def ctrl_n
       if total_pages > 1
         if @current_page + 1 < total_pages
-          switch_page @current_page + 1
+          move_cursor (@current_page + 1) * maxy
         else
-          switch_page 0
+          move_cursor 0
         end
       end
     end
@@ -85,9 +84,9 @@ module Rfd
     def ctrl_p
       if total_pages > 1
         if @current_page > 0
-          switch_page @current_page - 1
+          move_cursor (@current_page - 1) * maxy
         else
-          switch_page @total_pages - 1
+          move_cursor (total_pages - 1) * maxy
         end
       end
     end
@@ -299,7 +298,7 @@ module Rfd
     end
 
     def current_item
-      @items[@current_page * maxy + @row]
+      @items[@row]
     end
 
     def marked_items
@@ -313,22 +312,25 @@ module Rfd
     def move_cursor(row = nil)
       if row
         page = row / maxy
-        switch_page page if page != @current_page
-        row = row % maxy
+        if page != @current_page
+          switch_page page
+          @row = row
+        else
+          prev, @row = @row, row
+        end
       end
 
-      prev, @row = @row, row if row
       @row ||= 0
 
-      @base.move_cursor begy + (row || @row)
+      @base.move_cursor (begy + (row || @row)) % maxy
       if prev
-        item = @displayed_items[prev]
+        item = @items[prev]
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
-        FFI::NCurses.mvwaddstr @window, prev, 0, "#{item.to_s}\n"
+        FFI::NCurses.mvwaddstr @window, prev % maxy, 0, "#{item.to_s}\n"
       end
-      item = @displayed_items[row || @row]
+      item = @items[row || @row]
       FFI::NCurses.wattr_set @window, FFI::NCurses::A_UNDERLINE, item.color, nil
-      FFI::NCurses.mvwaddstr @window, @row, 0, "#{item.to_s}\n"
+      FFI::NCurses.mvwaddstr @window, @row % maxy, 0, "#{item.to_s}\n"
       FFI::NCurses.wstandend @window
       wrefresh
 
@@ -359,6 +361,7 @@ module Rfd
       @current_page = page ? page : 0
 
       draw_items
+      move_cursor (@row = nil)
 
       draw_marked_items count: 0, size: 0
       draw_total_items count: @items.length, size: @items.inject(0) {|sum, i| sum += i.size}
@@ -369,6 +372,7 @@ module Rfd
       @direction, @current_page = direction, 0
       sort_items_according_to_current_direction
       switch_page 0
+      move_cursor 0
     end
 
     def fetch_items_from_filesystem
@@ -396,7 +400,6 @@ module Rfd
       wrefresh
 
       draw_path_and_page_number
-      move_cursor (@row = nil)
       @base.header_l.wrefresh
     end
 
@@ -434,8 +437,8 @@ module Rfd
       fetch_items_from_filesystem
       @items = @items.shift(2) + @items.select {|i| i.name =~ regexp}
       sort_items_according_to_current_direction
-      wclear
       switch_page 0
+      move_cursor 0
     end
 
     def first_page?
@@ -451,8 +454,9 @@ module Rfd
     end
 
     def switch_page(page)
-      wclear if page != @current_page
-      ls page
+      @current_page = page
+      wclear
+      draw_items
     end
 
     def draw_path_and_page_number
@@ -468,7 +472,7 @@ module Rfd
     end
 
     def toggle_mark
-      FFI::NCurses.mvwaddstr @window, @row, 0, current_item.toggle_mark
+      FFI::NCurses.mvwaddstr @window, @row % maxy, 0, current_item.toggle_mark
       wrefresh
       j
     end

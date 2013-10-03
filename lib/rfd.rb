@@ -349,7 +349,7 @@ module Rfd
 
     def ls(page = nil)
       unless page
-        @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
+        fetch_items_from_filesystem
         @total_pages = @items.size / maxy + 1
         sort_items_according_to_current_direction
       end
@@ -366,6 +366,10 @@ module Rfd
       @direction, @current_page = direction, 0
       sort_items_according_to_current_direction
       switch_page 0
+    end
+
+    def fetch_items_from_filesystem
+      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
     end
 
     def find(str)

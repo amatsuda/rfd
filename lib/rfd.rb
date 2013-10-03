@@ -428,6 +428,7 @@ module Rfd
 
     def grep(pattern)
       regexp = Regexp.new(pattern)
+      fetch_items_from_filesystem
       @items = @items.shift(2) + @items.select {|i| i.name =~ regexp}
       wclear
       switch_page 0

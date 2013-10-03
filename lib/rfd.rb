@@ -422,6 +422,13 @@ module Rfd
       end
     end
 
+    def grep(pattern)
+      regexp = Regexp.new(pattern)
+      @items = @items.shift(2) + @items.select {|i| i.name =~ regexp}
+      wclear
+      switch_page 0
+    end
+
     def first_page?
       @current_page == 0
     end

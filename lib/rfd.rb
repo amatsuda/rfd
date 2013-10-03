@@ -355,7 +355,7 @@ module Rfd
     end
 
     def find(str)
-      index = @items.index {|i| i.basename.start_with? str}
+      return unless (index = @items.index {|i| i.basename.start_with? str})
       page = index / maxy
       ls page if page != @current_page
       move_cursor index % maxy

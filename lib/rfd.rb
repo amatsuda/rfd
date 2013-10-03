@@ -383,6 +383,10 @@ module Rfd
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.mtime <=> x.mtime}}
       when 'tr'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:mtime)}
+      when 'u'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.atime <=> x.atime}}
+      when 'ur'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:atime)}
       when 'e'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.extname <=> x.extname}}
       when 'er'
@@ -505,6 +509,10 @@ module Rfd
 
     def size_or_dir
       directory? ? '<DIR>' : size.to_s
+    end
+
+    def atime
+      stat.atime.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def mtime

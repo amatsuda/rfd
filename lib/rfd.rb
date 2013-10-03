@@ -92,6 +92,10 @@ module Rfd
       end
     end
 
+    def /
+      @base.process_command_line prompt: ':grep '
+    end
+
     def enter
       if current_item.directory?
         cd current_item

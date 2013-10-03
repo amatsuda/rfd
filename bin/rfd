@@ -20,6 +20,8 @@ begin
       rfd.q
     when 32  # space
       rfd.space
+    when 47  # slash
+      rfd.main.public_send :/
     when 58  # :
       rfd.colon
     when 127  # BS

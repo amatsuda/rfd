@@ -437,6 +437,7 @@ module Rfd
       when 'er'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:extname)}
       end
+      @items.each.with_index {|item, index| item.index = index}
     end
 
     def grep(pattern)
@@ -529,6 +530,7 @@ module Rfd
   class Item
     include Comparable
     attr_reader :name
+    attr_accessor :index
 
     def initialize(dir: nil, name: nil)
       @dir, @name, @marked = dir, name, false

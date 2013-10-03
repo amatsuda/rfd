@@ -15,6 +15,7 @@ module Rfd
 
     def d
       FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+      @row -= selected_items.count {|i| i.index <= @row}
       ls
     end
 
@@ -60,6 +61,7 @@ module Rfd
 
     def D
       FileUtils.rm_rf selected_items.map(&:path)
+      @row -= selected_items.count {|i| i.index <= @row}
       ls
     end
 

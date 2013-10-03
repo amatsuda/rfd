@@ -217,8 +217,7 @@ module Rfd
 
     def space
       @main.toggle_mark
-      items = @main.marked_items
-      @header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
+      @header_r.draw_marked_items
       @header_r.wrefresh
     end
 
@@ -363,7 +362,7 @@ module Rfd
       draw_items
       move_cursor (@row = nil)
 
-      draw_marked_items count: 0, size: 0
+      draw_marked_items
       draw_total_items count: @items.length, size: @items.inject(0) {|sum, i| sum += i.size}
       @base.header_r.wrefresh
     end
@@ -463,8 +462,9 @@ module Rfd
       @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: total_pages
     end
 
-    def draw_marked_items(count: 0, size: 0)
-      @base.header_r.draw_marked_items count: count, size: size
+    def draw_marked_items
+      items = @main.marked_items
+      @base.header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 
     def draw_total_items(count: 0, size: 0)

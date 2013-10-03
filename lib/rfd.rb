@@ -438,6 +438,9 @@ module Rfd
       sort_items_according_to_current_direction
       switch_page 0
       move_cursor 0
+
+      draw_total_items
+      @base.header_r.wrefresh
     end
 
     def first_page?

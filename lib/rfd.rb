@@ -369,12 +369,12 @@ module Rfd
     end
 
     def find(str)
-      index = @items.index {|i| i.basename.start_with? str}
+      index = @items.index {|i| i.name.start_with? str}
       move_cursor index if index
     end
 
     def find_reverse(str)
-      index = @items.reverse.index {|i| i.basename.start_with? str}
+      index = @items.reverse.index {|i| i.name.start_with? str}
       move_cursor @items.length - index - 1 if index
     end
 

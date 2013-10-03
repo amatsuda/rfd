@@ -346,7 +346,6 @@ module Rfd
     end
 
     def cd(dir)
-      wclear
       @row = nil
       @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
     end
@@ -358,6 +357,7 @@ module Rfd
       end
       @current_page = page ? page : 0
 
+      wclear
       draw_items
       move_cursor (@row = nil)
 

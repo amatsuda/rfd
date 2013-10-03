@@ -379,6 +379,8 @@ module Rfd
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| i.size}}
       when 'Sr'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| -i.size}}
+      when 'e'
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| i.extname}}
       end
     end
 

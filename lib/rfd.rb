@@ -376,11 +376,11 @@ module Rfd
       when 'r'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
       when 'S'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| i.size}}
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:size)}
       when 'Sr'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| -i.size}}
       when 'e'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| i.extname}}
+        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:extname)}
       when 'er'
         @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.extname <=> x.extname}}
       end

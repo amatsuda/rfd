@@ -430,6 +430,7 @@ module Rfd
       regexp = Regexp.new(pattern)
       fetch_items_from_filesystem
       @items = @items.shift(2) + @items.select {|i| i.name =~ regexp}
+      sort_items_according_to_current_direction
       wclear
       switch_page 0
     end

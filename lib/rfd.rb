@@ -362,6 +362,12 @@ module Rfd
       @base.header_r.wrefresh
     end
 
+    def cp(dest)
+      src = (m = marked_items).any? ? m.map(&:path) : current_item.path
+      FileUtils.cp_r src, File.join(@dir, dest)
+      ls
+    end
+
     def mkdir(dir)
       FileUtils.mkdir_p File.join(@dir, dir)
       ls

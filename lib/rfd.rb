@@ -6,6 +6,12 @@ module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
   def self.start(dir = '.')
+    FFI::NCurses.init_pair FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_BLACK
+    FFI::NCurses.init_pair FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_BLACK
+    FFI::NCurses.init_pair FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_BLACK
+    FFI::NCurses.init_pair FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_BLACK
+    FFI::NCurses.init_pair FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_BLACK
+
     Rfd::BaseWindow.new dir
   end
 
@@ -63,18 +69,8 @@ module Rfd
     attr_reader :main
 
     def initialize(dir = '.')
-      init_colors
-
       @window = FFI::NCurses.stdscr
       @main = MainWindow.new base: self, dir: dir
-    end
-
-    def init_colors
-      FFI::NCurses.init_pair FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_BLACK
-      FFI::NCurses.init_pair FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_BLACK
-      FFI::NCurses.init_pair FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_BLACK
-      FFI::NCurses.init_pair FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_BLACK
-      FFI::NCurses.init_pair FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_BLACK
     end
 
     def run

@@ -640,6 +640,10 @@ module Rfd
       name.start_with?('.') && (name != '.') && (name != '..')
     end
 
+    def executable?
+      stat.executable?
+    end
+
     def target
       File.readlink path if symlink?
     end

@@ -209,8 +209,8 @@ module Rfd
     def process_command_line(prompt: ':')
       @command_line.set_prompt prompt
       cmd, *args = @command_line.get_command(prompt: prompt).split(' ')
-      if @main.respond_to? cmd
-        @main.public_send cmd, *args
+      if main.respond_to? cmd
+        main.public_send cmd, *args
         @command_line.wclear
         @command_line.wrefresh
       end
@@ -219,23 +219,23 @@ module Rfd
 
     def bs
       if command_mode? && (@dir != '/')
-        @main.cd '..'
-        @main.ls
+        main.cd '..'
+        main.ls
       elsif miel_mode?
         @mode = MODE::COMMAND
-        @main.close_viewer
-        @main.move_cursor
+        main.close_viewer
+        main.move_cursor
       end
     end
 
     def space
-      @main.toggle_mark
-      @main.draw_marked_items
+      main.toggle_mark
+      main.draw_marked_items
       @header_r.wrefresh
     end
 
     def q
-      @main.q
+      main.q
     end
   end
 

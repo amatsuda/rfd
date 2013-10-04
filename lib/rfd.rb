@@ -251,7 +251,7 @@ module Rfd
     end
 
     def draw_current_file_info(current_file)
-      draw_current_filename current_file.name
+      draw_current_filename current_file.full_display_name
       draw_stat current_file
     end
 
@@ -554,9 +554,14 @@ module Rfd
       @extname ||= File.extname name
     end
 
-    def display_name
+    def full_display_name
       n = @name.dup
       n << " -> #{target}" if symlink?
+      n
+    end
+
+    def display_name
+      n = full_display_name
       if mb_size(n) <= 43
         n
       else

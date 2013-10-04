@@ -210,11 +210,6 @@ module Rfd
       header_l.wrefresh
     end
 
-    def close_viewer
-      @viewer.close
-      ls
-    end
-
     def cd(dir)
       @row = nil
       @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
@@ -400,17 +395,6 @@ module Rfd
     def debug(str)
       header_r.wclear
       header_r.debug str
-    end
-  end
-
-  class ViewerWindow < SubWindow
-    def initialize
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 10, Rfd.maxx - 2, 8, 1
-      super
-    end
-
-    def close
-      wclear
     end
   end
 

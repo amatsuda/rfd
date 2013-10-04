@@ -424,7 +424,8 @@ module Rfd
     def view
       FFI::NCurses.def_prog_mode
       FFI::NCurses.endwin
-      system "less #{current_item.path}"
+      pager = ENV['PAGER'] || 'less'
+      system "#{pager} #{current_item.path}"
       FFI::NCurses.reset_prog_mode
       FFI::NCurses.refresh
     end

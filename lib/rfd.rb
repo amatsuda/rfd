@@ -12,7 +12,8 @@ module Rfd
     FFI::NCurses.init_pair FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_BLACK
     FFI::NCurses.init_pair FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_BLACK
 
-    Rfd::BaseWindow.new dir
+    main = Rfd::MainWindow.new dir
+    main.base
   end
 
   class Window
@@ -68,9 +69,9 @@ module Rfd
   class BaseWindow < Window
     attr_reader :main
 
-    def initialize(dir = '.')
+    def initialize(main)
       @window = FFI::NCurses.stdscr
-      @main = MainWindow.new base: self, dir: dir
+      @main = main
     end
 
     def run
@@ -157,10 +158,10 @@ module Rfd
   class MainWindow < SubWindow
     include Rfd::Commands
 
-    attr_reader :header_l, :header_r, :command_line
+    attr_reader :header_l, :header_r, :command_line, :base
 
-    def initialize(base: nil, dir: nil)
-      @base = base
+    def initialize(dir = '.')
+      @base = base = BaseWindow.new self
 
       @header_l = HeaderLeftWindow.new base: base
       @header_r = HeaderRightWindow.new base: base

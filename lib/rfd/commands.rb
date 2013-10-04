@@ -121,6 +121,12 @@ module Rfd
       end
     end
 
+    def space
+      toggle_mark
+      draw_marked_items
+      header_r.wrefresh
+    end
+
     def del
       if @dir != '/'
         cd '..'

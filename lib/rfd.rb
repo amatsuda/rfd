@@ -82,7 +82,7 @@ module Rfd
         when 27  # esc
           main.q
         when 32  # space
-          space
+          main.space
         when 127  # DEL
           main.del
         when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
@@ -107,12 +107,6 @@ module Rfd
         main.command_line.wrefresh
       end
       FFI::NCurses.wstandend @window
-    end
-
-    def space
-      main.toggle_mark
-      main.draw_marked_items
-      main.header_r.wrefresh
     end
   end
 

@@ -362,6 +362,11 @@ module Rfd
       @base.header_r.wrefresh
     end
 
+    def mkdir(dir)
+      FileUtils.mkdir_p File.join(@dir, dir)
+      ls
+    end
+
     def first_page?
       @current_page == 0
     end

@@ -38,6 +38,10 @@ module Rfd
       end
     end
 
+    def m
+      @base.process_command_line prompt: ':mv '
+    end
+
     def q
       raise StopIteration
     end

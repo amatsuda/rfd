@@ -39,27 +39,19 @@ module Rfd
     end
 
     def maxx
-      return @maxx if @maxx
-      @maxy, @maxx = FFI::NCurses.getmaxyx @window
-      @maxx
+      FFI::NCurses.getmaxx @window
     end
 
     def maxy
-      return @maxy if @maxy
-      @maxy, @maxx = FFI::NCurses.getmaxyx @window
-      @maxy
+      FFI::NCurses.getmaxy @window
     end
 
     def begx
-      return @begx if @begx
-      @begy, @begx = FFI::NCurses.getbegyx @window
-      @begx
+      FFI::NCurses.getbegx @window
     end
 
     def begy
-      return @begy if @begy
-      @begy, @begx = FFI::NCurses.getbegyx @window
-      @begy
+      FFI::NCurses.getbegy @window
     end
   end
 

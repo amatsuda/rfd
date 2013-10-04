@@ -56,13 +56,12 @@ module Rfd
   end
 
   class BaseWindow < Window
-    attr_reader :header_r, :main
+    attr_reader :main
 
     def initialize(dir = '.')
       init_colors
 
       @window = FFI::NCurses.stdscr
-      @header_r = HeaderRightWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
       @command_line = CommandLineWindow.new base: self
       @main.move_cursor
@@ -101,8 +100,8 @@ module Rfd
     end
 
     def debug(str)
-      @header_r.wclear
-      @header_r.debug str
+      main.header_r.wclear
+      main.header_r.debug str
     end
 
     def process_command_line(prompt: ':')
@@ -119,7 +118,7 @@ module Rfd
     def space
       main.toggle_mark
       main.draw_marked_items
-      @header_r.wrefresh
+      main.header_r.wrefresh
     end
   end
 
@@ -182,12 +181,13 @@ module Rfd
   class MainWindow < SubWindow
     include Rfd::Commands
 
-    attr_reader :header_l
+    attr_reader :header_l, :header_r
 
     def initialize(base: nil, dir: nil)
       @base = base
 
       @header_l = HeaderLeftWindow.new base: base
+      @header_r = HeaderRightWindow.new base: base
 
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 7, base.maxx - 2, 5, 1
       @row = 0
@@ -259,7 +259,7 @@ module Rfd
 
       draw_marked_items
       draw_total_items
-      @base.header_r.wrefresh
+      header_r.wrefresh
     end
 
     def sort(direction = nil)
@@ -341,7 +341,7 @@ module Rfd
       move_cursor 0
 
       draw_total_items
-      @base.header_r.wrefresh
+      header_r.wrefresh
     end
 
     def cp(dest)
@@ -390,11 +390,11 @@ module Rfd
 
     def draw_marked_items
       items = marked_items
-      @base.header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
+      header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 
     def draw_total_items
-      @base.header_r.draw_total_items count: @items.size, size: @items.inject(0) {|sum, i| sum += i.size}
+      header_r.draw_total_items count: @items.size, size: @items.inject(0) {|sum, i| sum += i.size}
     end
 
     def toggle_mark

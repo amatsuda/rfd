@@ -422,11 +422,11 @@ module Rfd
     end
 
     def view
-      switch_mode MODE::MIEL
-      wclear
-      @viewer = ViewerWindow.new base: @base
-      @viewer.draw current_item.read
-      wrefresh
+      FFI::NCurses.def_prog_mode
+      FFI::NCurses.endwin
+      system "less #{current_item.path}"
+      FFI::NCurses.reset_prog_mode
+      FFI::NCurses.refresh
     end
 
     def debug(str)

@@ -63,7 +63,6 @@ module Rfd
 
       @window = FFI::NCurses.stdscr
       @main = MainWindow.new base: self, dir: dir
-      @main.move_cursor
     end
 
     def init_colors

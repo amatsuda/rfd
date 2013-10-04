@@ -555,10 +555,16 @@ module Rfd
     end
 
     def display_name
-      if mb_size(@name) <= 43
-        @name
+      n = @name.dup
+      n << " -> #{target}" if symlink?
+      if mb_size(n) <= 43
+        n
       else
-        "#{mb_left(basename, 42 - extname.length)}…#{extname}"
+        if symlink?
+          mb_left n, 42
+        else
+          "#{mb_left(basename, 42 - extname.length)}…#{extname}"
+        end
       end
     end
 

@@ -93,8 +93,8 @@ module Rfd
           main.public_send :/
         when 58  # :
           main.public_send :':'
-        when 127  # BS
-          main.bs
+        when 127  # DEL
+          main.del
         when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
           main.public_send c.chr if command_mode? && main.respond_to?(c.chr)
         when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z

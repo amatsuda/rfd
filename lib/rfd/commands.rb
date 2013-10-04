@@ -109,7 +109,7 @@ module Rfd
       end
     end
 
-    def bs
+    def del
       if @base.command_mode? && (@dir != '/')
         cd '..'
         ls

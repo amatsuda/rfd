@@ -4,6 +4,10 @@ module Rfd
       @base.process_command_line prompt: ':chmod '
     end
 
+    def c
+      @base.process_command_line prompt: ':cp '
+    end
+
     def d
       FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
       @row -= selected_items.count {|i| i.index <= @row}

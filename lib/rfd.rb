@@ -421,6 +421,14 @@ module Rfd
       j
     end
 
+    def view
+      switch_mode MODE::MIEL
+      wclear
+      @viewer = ViewerWindow.new base: @base
+      @viewer.draw current_item.read
+      wrefresh
+    end
+
     def debug(str)
       @base.debug str
     end

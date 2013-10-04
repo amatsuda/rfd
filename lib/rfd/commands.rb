@@ -55,11 +55,7 @@ module Rfd
     end
 
     def v
-      switch_mode MODE::MIEL
-      wclear
-      @viewer = ViewerWindow.new base: @base
-      @viewer.draw current_item.read
-      wrefresh
+      view
     end
 
     def D

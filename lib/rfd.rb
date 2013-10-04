@@ -89,19 +89,19 @@ module Rfd
           main.q
         when 32  # space
           space
-        when 47  # slash
-          main.public_send :/
-        when 58  # :
-          main.public_send :':'
         when 127  # DEL
           main.del
-        when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
-          main.public_send c.chr if command_mode? && main.respond_to?(c.chr)
         when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
           chr = ((c - 1 + 65) ^ 0b0100000).chr
           main.public_send "ctrl_#{chr}" if command_mode? && main.respond_to?("ctrl_#{chr}")
         else
-          p c
+          if command_mode?
+            if main.respond_to? c.chr
+              main.public_send c.chr
+            else
+              p c
+            end
+          end
         end
       end
     end

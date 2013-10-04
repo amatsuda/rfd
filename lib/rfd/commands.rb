@@ -1,11 +1,11 @@
 module Rfd
   module Commands
     def a
-      @base.process_command_line prompt: ':chmod '
+      process_command_line prompt: ':chmod '
     end
 
     def c
-      @base.process_command_line prompt: ':cp '
+      process_command_line prompt: ':cp '
     end
 
     def d
@@ -15,11 +15,11 @@ module Rfd
     end
 
     def f
-      @base.process_command_line prompt: ':find '
+      process_command_line prompt: ':find '
     end
 
     def F
-      @base.process_command_line prompt: ':find_reverse '
+      process_command_line prompt: ':find_reverse '
     end
 
     def j
@@ -39,7 +39,7 @@ module Rfd
     end
 
     def m
-      @base.process_command_line prompt: ':mv '
+      process_command_line prompt: ':mv '
     end
 
     def q
@@ -47,11 +47,11 @@ module Rfd
     end
 
     def s
-      @base.process_command_line prompt: ':sort '
+      process_command_line prompt: ':sort '
     end
 
     def t
-      @base.process_command_line prompt: ':touch '
+      process_command_line prompt: ':touch '
     end
 
     def v
@@ -69,7 +69,7 @@ module Rfd
     end
 
     def K
-      @base.process_command_line prompt: ':mkdir '
+      process_command_line prompt: ':mkdir '
     end
 
     def L
@@ -105,11 +105,11 @@ module Rfd
     end
 
     def /
-      @base.process_command_line prompt: ':grep '
+      process_command_line prompt: ':grep '
     end
 
     define_method(':') do
-      @base.process_command_line
+      process_command_line
     end
 
     def enter

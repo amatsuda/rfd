@@ -97,17 +97,6 @@ module Rfd
         end
       end
     end
-
-    def process_command_line(prompt: ':')
-      main.command_line.set_prompt prompt
-      cmd, *args = main.command_line.get_command(prompt: prompt).split(' ')
-      if main.respond_to? cmd
-        main.public_send cmd, *args
-        main.command_line.wclear
-        main.command_line.wrefresh
-      end
-      FFI::NCurses.wstandend @window
-    end
   end
 
   class HeaderLeftWindow < SubWindow
@@ -390,6 +379,17 @@ module Rfd
       FFI::NCurses.mvwaddstr @window, @row % maxy, 0, current_item.toggle_mark
       wrefresh
       j
+    end
+
+    def process_command_line(prompt: ':')
+      command_line.set_prompt prompt
+      cmd, *args = command_line.get_command(prompt: prompt).split(' ')
+      if respond_to? cmd
+        self.public_send cmd, *args
+        command_line.wclear
+        command_line.wrefresh
+      end
+      FFI::NCurses.wstandend @window
     end
 
     def view

@@ -101,10 +101,6 @@ module Rfd
       end
     end
 
-    def move_cursor(row)
-      wmove row, 1
-    end
-
     def debug(str)
       @header_r.wclear
       @header_r.debug str

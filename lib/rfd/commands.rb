@@ -46,6 +46,10 @@ module Rfd
       @base.process_command_line prompt: ':sort '
     end
 
+    def t
+      @base.process_command_line prompt: ':touch '
+    end
+
     def v
       switch_mode MODE::MIEL
       wclear

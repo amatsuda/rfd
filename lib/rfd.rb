@@ -80,6 +80,32 @@ module Rfd
       FFI::NCurses.init_pair FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_BLACK
     end
 
+    def run
+      loop do
+        case (c = FFI::NCurses.getch)
+        when 10  # enter
+          main.enter
+        when 27  # esc
+          q
+        when 32  # space
+          space
+        when 47  # slash
+          main.public_send :/
+        when 58  # :
+          colon
+        when 127  # BS
+          bs
+        when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
+          main.public_send c.chr if command_mode? && main.respond_to?(c.chr)
+        when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
+          chr = ((c - 1 + 65) ^ 0b0100000).chr
+          main.public_send "ctrl_#{chr}" if command_mode? && main.respond_to?("ctrl_#{chr}")
+        else
+          p c
+        end
+      end
+    end
+
     def command_mode?
       @mode == MODE::COMMAND
     end

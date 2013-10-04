@@ -622,6 +622,10 @@ module Rfd
       stat.symlink?
     end
 
+    def target
+      File.readlink path if symlink?
+    end
+
     def read
       File.read path
     end

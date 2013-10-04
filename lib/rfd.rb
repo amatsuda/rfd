@@ -119,7 +119,7 @@ module Rfd
     end
   end
 
-  class MainWindow < SubWindow
+  class MainWindow < Window
     include Rfd::Commands
 
     attr_reader :header_l, :header_r, :command_line
@@ -130,8 +130,9 @@ module Rfd
       @command_line = CommandLineWindow.new
 
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
+      border_window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 5, Rfd.maxx, 4, 0
+      FFI::NCurses.box border_window, 0, 0
       @row = 0
-      super
 
       cd dir
       ls

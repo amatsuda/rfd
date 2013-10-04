@@ -5,11 +5,6 @@ require_relative 'rfd/item'
 module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
-  module MODE
-    COMMAND = :command
-    MIEL = :miel
-  end
-
   class Window
     def draw(contents)
       FFI::NCurses.mvwaddstr @window, 0, 0, contents
@@ -58,7 +53,6 @@ module Rfd
 
   class BaseWindow < Window
     attr_reader :header_l, :header_r, :main
-    attr_writer :mode
 
     def initialize(dir = '.')
       init_colors
@@ -69,7 +63,6 @@ module Rfd
       @main = MainWindow.new base: self, dir: dir
       @command_line = CommandLineWindow.new base: self
       @main.move_cursor
-      @mode = MODE::COMMAND
     end
 
     def init_colors
@@ -93,25 +86,15 @@ module Rfd
           main.del
         when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
           chr = ((c - 1 + 65) ^ 0b0100000).chr
-          main.public_send "ctrl_#{chr}" if command_mode? && main.respond_to?("ctrl_#{chr}")
+          main.public_send "ctrl_#{chr}" if main.respond_to?("ctrl_#{chr}")
         else
-          if command_mode?
-            if main.respond_to? c.chr
-              main.public_send c.chr
-            else
-              p c
-            end
+          if main.respond_to? c.chr
+            main.public_send c.chr
+          else
+            p c
           end
         end
       end
-    end
-
-    def command_mode?
-      @mode == MODE::COMMAND
-    end
-
-    def miel_mode?
-      @mode == MODE::MIEL
     end
 
     def move_cursor(row)
@@ -248,10 +231,6 @@ module Rfd
 
       @base.header_l.draw_current_file_info item
       @base.header_l.wrefresh
-    end
-
-    def switch_mode(mode)
-      @base.mode = mode
     end
 
     def close_viewer

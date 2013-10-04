@@ -122,13 +122,9 @@ module Rfd
     end
 
     def del
-      if @base.command_mode? && (@dir != '/')
+      if @dir != '/'
         cd '..'
         ls
-      elsif @base.miel_mode?
-        switch_mode MODE::COMMAND
-        close_viewer
-        move_cursor
       end
     end
   end

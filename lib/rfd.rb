@@ -10,6 +10,10 @@ module Rfd
       FFI::NCurses.mvwaddstr @window, 0, 0, contents
     end
 
+    def wmove(y, x)
+      FFI::NCurses.wmove @window, y, x
+    end
+
     def wclear
       FFI::NCurses.wclear @window
     end
@@ -98,7 +102,7 @@ module Rfd
     end
 
     def move_cursor(row)
-      FFI::NCurses.wmove @window, row, 1
+      wmove row, 1
     end
 
     def debug(str)
@@ -132,7 +136,7 @@ module Rfd
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
-      FFI::NCurses.wmove @window, 0, 0
+      wmove 0, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @path_and_page_number
     end
@@ -144,14 +148,14 @@ module Rfd
 
     def draw_current_filename(current_file_name)
       @current_file_name = "File: #{current_file_name}"
-      FFI::NCurses.wmove @window, 1, 0
+      wmove 1, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @current_file_name
     end
 
     def draw_stat(item)
       @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
-      FFI::NCurses.wmove @window, 2, 0
+      wmove 2, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, @stat
     end
@@ -164,13 +168,13 @@ module Rfd
     end
 
     def draw_marked_items(count: 0, size: 0)
-      FFI::NCurses.wmove @window, 1, 0
+      wmove 1, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
-      FFI::NCurses.wmove @window, 2, 0
+      wmove 2, 0
       FFI::NCurses.wclrtoeol @window
       FFI::NCurses.waddstr @window, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
     end
@@ -285,7 +289,7 @@ module Rfd
     end
 
     def draw_items
-      FFI::NCurses.wmove @window, 0, 0
+      wmove 0, 0
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil

@@ -56,13 +56,12 @@ module Rfd
   end
 
   class BaseWindow < Window
-    attr_reader :header_l, :header_r, :main
+    attr_reader :header_r, :main
 
     def initialize(dir = '.')
       init_colors
 
       @window = FFI::NCurses.stdscr
-      @header_l = HeaderLeftWindow.new base: self
       @header_r = HeaderRightWindow.new base: self
       @main = MainWindow.new base: self, dir: dir
       @command_line = CommandLineWindow.new base: self
@@ -183,8 +182,13 @@ module Rfd
   class MainWindow < SubWindow
     include Rfd::Commands
 
+    attr_reader :header_l
+
     def initialize(base: nil, dir: nil)
       @base = base
+
+      @header_l = HeaderLeftWindow.new base: base
+
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 7, base.maxx - 2, 5, 1
       @row = 0
       super
@@ -228,8 +232,8 @@ module Rfd
       FFI::NCurses.wstandend @window
       wrefresh
 
-      @base.header_l.draw_current_file_info item
-      @base.header_l.wrefresh
+      header_l.draw_current_file_info item
+      header_l.wrefresh
     end
 
     def close_viewer
@@ -295,7 +299,7 @@ module Rfd
       wrefresh
 
       draw_path_and_page_number
-      @base.header_l.wrefresh
+      header_l.wrefresh
     end
 
     def sort_items_according_to_current_direction
@@ -381,7 +385,7 @@ module Rfd
     end
 
     def draw_path_and_page_number
-      @base.header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: total_pages
+      header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: total_pages
     end
 
     def draw_marked_items

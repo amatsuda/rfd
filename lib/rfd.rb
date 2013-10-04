@@ -5,6 +5,10 @@ require_relative 'rfd/item'
 module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
+  def self.start(dir = '.')
+    Rfd::BaseWindow.new dir
+  end
+
   class Window
     def draw(contents)
       FFI::NCurses.mvwaddstr @window, 0, 0, contents

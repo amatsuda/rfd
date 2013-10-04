@@ -9,7 +9,7 @@ FFI::NCurses.curs_set 0
 FFI::NCurses.start_color
 
 begin
-  rfd = Rfd::BaseWindow.new ARGV[0] || '.'
+  rfd = Rfd.start ARGV[0] || '.'
   rfd.run
 ensure
   FFI::NCurses.endwin

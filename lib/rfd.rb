@@ -12,8 +12,7 @@ module Rfd
     FFI::NCurses.init_pair FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_BLACK
     FFI::NCurses.init_pair FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_BLACK
 
-    main = Rfd::MainWindow.new dir
-    main.base
+    Rfd::MainWindow.new dir
   end
 
   class Window
@@ -72,30 +71,6 @@ module Rfd
     def initialize(main)
       @window = FFI::NCurses.stdscr
       @main = main
-    end
-
-    def run
-      loop do
-        case (c = FFI::NCurses.getch)
-        when 10  # enter
-          main.enter
-        when 27  # esc
-          main.q
-        when 32  # space
-          main.space
-        when 127  # DEL
-          main.del
-        when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
-          chr = ((c - 1 + 65) ^ 0b0100000).chr
-          main.public_send "ctrl_#{chr}" if main.respond_to?("ctrl_#{chr}")
-        else
-          if main.respond_to? c.chr
-            main.public_send c.chr
-          else
-            p c
-          end
-        end
-      end
     end
   end
 
@@ -173,6 +148,30 @@ module Rfd
 
       cd dir
       ls
+    end
+
+    def run
+      loop do
+        case (c = FFI::NCurses.getch)
+        when 10  # enter
+          enter
+        when 27  # esc
+          q
+        when 32  # space
+          space
+        when 127  # DEL
+          del
+        when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
+          chr = ((c - 1 + 65) ^ 0b0100000).chr
+          public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
+        else
+          if respond_to? c.chr
+            public_send c.chr
+          else
+            p c
+          end
+        end
+      end
     end
 
     def current_item

@@ -367,6 +367,11 @@ module Rfd
       ls
     end
 
+    def touch(filename)
+      FileUtils.touch File.join(@dir, filename)
+      ls
+    end
+
     def first_page?
       @current_page == 0
     end

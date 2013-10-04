@@ -98,11 +98,6 @@ module Rfd
       end
     end
 
-    def debug(str)
-      main.header_r.wclear
-      main.header_r.debug str
-    end
-
     def process_command_line(prompt: ':')
       main.command_line.set_prompt prompt
       cmd, *args = main.command_line.get_command(prompt: prompt).split(' ')
@@ -413,7 +408,8 @@ module Rfd
     end
 
     def debug(str)
-      @base.debug str
+      header_r.wclear
+      header_r.debug str
     end
   end
 

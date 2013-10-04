@@ -66,11 +66,8 @@ module Rfd
   end
 
   class BaseWindow < Window
-    attr_reader :main
-
-    def initialize(main)
+    def initialize
       @window = FFI::NCurses.stdscr
-      @main = main
     end
   end
 
@@ -133,10 +130,10 @@ module Rfd
   class MainWindow < SubWindow
     include Rfd::Commands
 
-    attr_reader :header_l, :header_r, :command_line, :base
+    attr_reader :header_l, :header_r, :command_line
 
     def initialize(dir = '.')
-      @base = base = BaseWindow.new self
+      @base = base = BaseWindow.new
 
       @header_l = HeaderLeftWindow.new base: base
       @header_r = HeaderRightWindow.new base: base

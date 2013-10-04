@@ -633,6 +633,10 @@ module Rfd
       stat.symlink?
     end
 
+    def hidden?
+      name.start_with?('.') && (name != '.') && (name != '..')
+    end
+
     def target
       File.readlink path if symlink?
     end

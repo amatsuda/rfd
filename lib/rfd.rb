@@ -219,7 +219,7 @@ module Rfd
     end
 
     def selected_items
-      (m = marked_items.any?) ? marked_items : Array(current_item)
+      (m = marked_items).any? ? m : Array(current_item)
     end
 
     def move_cursor(row = nil)

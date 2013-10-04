@@ -86,7 +86,7 @@ module Rfd
         when 10  # enter
           main.enter
         when 27  # esc
-          q
+          main.q
         when 32  # space
           space
         when 47  # slash
@@ -153,10 +153,6 @@ module Rfd
       main.toggle_mark
       main.draw_marked_items
       @header_r.wrefresh
-    end
-
-    def q
-      main.q
     end
   end
 

@@ -181,6 +181,7 @@ module Rfd
       FFI::NCurses.init_pair FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_BLACK
       FFI::NCurses.init_pair FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_BLACK
       FFI::NCurses.init_pair FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_BLACK
+      FFI::NCurses.init_pair FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_BLACK
     end
 
     def command_mode?
@@ -580,6 +581,8 @@ module Rfd
     def color
       if symlink?
         FFI::NCurses::COLOR_MAGENTA
+      elsif hidden?
+        FFI::NCurses::COLOR_GREEN
       elsif directory?
         FFI::NCurses::COLOR_CYAN
       else

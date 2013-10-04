@@ -218,7 +218,6 @@ module Rfd
 
       @row ||= 0
 
-      @base.move_cursor (begy + (row || @row)) % maxy
       if prev && (item = @items[prev])
         FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
         FFI::NCurses.mvwaddstr @window, prev % maxy, 0, "#{item.to_s}\n"

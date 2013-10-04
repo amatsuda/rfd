@@ -34,6 +34,10 @@ module Rfd
       end
     end
 
+    def m
+      @base.process_command_line prompt: ':mkdir '
+    end
+
     def q
       raise StopIteration
     end

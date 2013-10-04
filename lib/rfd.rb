@@ -368,6 +368,12 @@ module Rfd
       ls
     end
 
+    def mv(dest)
+      src = (m = marked_items).any? ? m.map(&:path) : current_item.path
+      FileUtils.mv src, File.join(@dir, dest)
+      ls
+    end
+
     def mkdir(dir)
       FileUtils.mkdir_p File.join(@dir, dir)
       ls

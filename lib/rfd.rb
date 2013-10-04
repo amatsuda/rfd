@@ -15,6 +15,14 @@ module Rfd
     Rfd::MainWindow.new dir
   end
 
+  def self.maxx
+    FFI::NCurses.getmaxx FFI::NCurses.stdscr
+  end
+
+  def self.maxy
+    FFI::NCurses.getmaxy FFI::NCurses.stdscr
+  end
+
   class Window
     def draw(contents)
       FFI::NCurses.mvwaddstr @window, 0, 0, contents
@@ -72,8 +80,8 @@ module Rfd
   end
 
   class HeaderLeftWindow < SubWindow
-    def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, base.maxx - 32, 1, 1
+    def initialize
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, Rfd.maxx - 32, 1, 1
       super
     end
 
@@ -105,8 +113,8 @@ module Rfd
   end
 
   class HeaderRightWindow < SubWindow
-    def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, 29, 1, base.maxx - 30
+    def initialize
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, 29, 1, Rfd.maxx - 30
       super
     end
 
@@ -135,11 +143,11 @@ module Rfd
     def initialize(dir = '.')
       @base = base = BaseWindow.new
 
-      @header_l = HeaderLeftWindow.new base: base
-      @header_r = HeaderRightWindow.new base: base
-      @command_line = CommandLineWindow.new base: base
+      @header_l = HeaderLeftWindow.new
+      @header_r = HeaderRightWindow.new
+      @command_line = CommandLineWindow.new
 
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 7, base.maxx - 2, 5, 1
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
       @row = 0
       super
 
@@ -404,8 +412,8 @@ module Rfd
   end
 
   class ViewerWindow < SubWindow
-    def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 10, base.maxx - 2, 8, 1
+    def initialize
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 10, Rfd.maxx - 2, 8, 1
       super
     end
 
@@ -415,8 +423,8 @@ module Rfd
   end
 
   class CommandLineWindow < Window
-    def initialize(base: nil)
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, base.maxx, base.maxy - 1, 0
+    def initialize
+      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, Rfd.maxx, Rfd.maxy - 1, 0
     end
 
     def set_prompt(str)

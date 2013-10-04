@@ -6,11 +6,9 @@ module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
   def self.start(dir = '.')
-    FFI::NCurses.init_pair FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_BLACK
-    FFI::NCurses.init_pair FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_BLACK
-    FFI::NCurses.init_pair FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_BLACK
-    FFI::NCurses.init_pair FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_BLACK
-    FFI::NCurses.init_pair FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_RED, FFI::NCurses::COLOR_BLACK
+    [FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_RED].each do |c|
+      FFI::NCurses.init_pair c, c, FFI::NCurses::COLOR_BLACK
+    end
 
     Rfd::MainWindow.new dir
   end

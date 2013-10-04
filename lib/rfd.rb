@@ -73,12 +73,6 @@ module Rfd
     end
   end
 
-  class BaseWindow < Window
-    def initialize
-      @window = FFI::NCurses.stdscr
-    end
-  end
-
   class HeaderLeftWindow < SubWindow
     def initialize
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, Rfd.maxx - 32, 1, 1
@@ -141,8 +135,6 @@ module Rfd
     attr_reader :header_l, :header_r, :command_line
 
     def initialize(dir = '.')
-      @base = base = BaseWindow.new
-
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new

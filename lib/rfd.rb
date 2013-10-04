@@ -63,7 +63,6 @@ module Rfd
 
       @window = FFI::NCurses.stdscr
       @main = MainWindow.new base: self, dir: dir
-      @command_line = CommandLineWindow.new base: self
       @main.move_cursor
     end
 
@@ -105,12 +104,12 @@ module Rfd
     end
 
     def process_command_line(prompt: ':')
-      @command_line.set_prompt prompt
-      cmd, *args = @command_line.get_command(prompt: prompt).split(' ')
+      main.command_line.set_prompt prompt
+      cmd, *args = main.command_line.get_command(prompt: prompt).split(' ')
       if main.respond_to? cmd
         main.public_send cmd, *args
-        @command_line.wclear
-        @command_line.wrefresh
+        main.command_line.wclear
+        main.command_line.wrefresh
       end
       FFI::NCurses.wstandend @window
     end
@@ -181,13 +180,14 @@ module Rfd
   class MainWindow < SubWindow
     include Rfd::Commands
 
-    attr_reader :header_l, :header_r
+    attr_reader :header_l, :header_r, :command_line
 
     def initialize(base: nil, dir: nil)
       @base = base
 
       @header_l = HeaderLeftWindow.new base: base
       @header_r = HeaderRightWindow.new base: base
+      @command_line = CommandLineWindow.new base: base
 
       @window = FFI::NCurses.derwin FFI::NCurses.stdscr, base.maxy - 7, base.maxx - 2, 5, 1
       @row = 0

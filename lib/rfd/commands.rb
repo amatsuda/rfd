@@ -38,10 +38,6 @@ module Rfd
       end
     end
 
-    def m
-      @base.process_command_line prompt: ':mkdir '
-    end
-
     def q
       raise StopIteration
     end
@@ -70,6 +66,10 @@ module Rfd
 
     def H
       move_cursor @current_page * maxy
+    end
+
+    def K
+      @base.process_command_line prompt: ':mkdir '
     end
 
     def L

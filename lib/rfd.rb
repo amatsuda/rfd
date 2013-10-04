@@ -92,7 +92,7 @@ module Rfd
         when 47  # slash
           main.public_send :/
         when 58  # :
-          colon
+          main.public_send :':'
         when 127  # BS
           bs
         when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
@@ -121,10 +121,6 @@ module Rfd
     def debug(str)
       @header_r.wclear
       @header_r.debug str
-    end
-
-    def colon
-      process_command_line
     end
 
     def process_command_line(prompt: ':')

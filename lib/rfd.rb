@@ -94,7 +94,7 @@ module Rfd
         when 58  # :
           main.public_send :':'
         when 127  # BS
-          bs
+          main.bs
         when (?a.ord)..(?z.ord), (?A.ord)..(?Z.ord)
           main.public_send c.chr if command_mode? && main.respond_to?(c.chr)
         when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
@@ -132,17 +132,6 @@ module Rfd
         @command_line.wrefresh
       end
       FFI::NCurses.wstandend @window
-    end
-
-    def bs
-      if command_mode? && (@dir != '/')
-        main.cd '..'
-        main.ls
-      elsif miel_mode?
-        @mode = MODE::COMMAND
-        main.close_viewer
-        main.move_cursor
-      end
     end
 
     def space

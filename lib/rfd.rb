@@ -562,7 +562,7 @@ module Rfd
     end
 
     def stat
-      @stat ||= File.stat path
+      @stat ||= File.lstat path
     end
 
     def color

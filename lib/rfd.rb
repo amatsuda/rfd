@@ -410,7 +410,7 @@ module Rfd
     end
 
     def toggle_mark
-      mvwaddstr @row % maxy, 0, current_item.toggle_mark
+      mvwaddstr @row % maxy, 0, current_item.toggle_mark unless %w(. ..).include? current_item.name
       j
     end
 

@@ -164,7 +164,7 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
 
-      spawn_panes 1
+      spawn_panes 2
       border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
       Curses.box border_window, 0, 0
       @row = 0

@@ -218,16 +218,20 @@ module Rfd
 
     def move_cursor(row = nil)
       if row
-        page = row / max_items
+        page, item_index_in_page = row.divmod max_items
+        pane_index = item_index_in_page / maxy
         if page != @current_page
           switch_page page
+          @window.switch pane_index
           @row = row
         else
           if (prev_item = @items[@row])
             Curses.wattr_set window, Curses::A_NORMAL, prev_item.color, nil
             mvwaddstr @row % maxy, 0, "#{prev_item.to_s}\n"
+            wrefresh
           end
           @row = row
+          @window.switch pane_index
         end
       else
         @row = 0

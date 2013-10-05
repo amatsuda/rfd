@@ -429,6 +429,12 @@ module Rfd
       Curses.wstandend window
     end
 
+    def ask(prompt = '(y/n)')
+      command_line.set_prompt prompt
+      command_line.wrefresh
+      Curses.getch
+    end
+
     def view
       Curses.def_prog_mode
       Curses.endwin

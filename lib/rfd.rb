@@ -261,7 +261,6 @@ module Rfd
 
       draw_items
       @panes.switch 0
-      wmove 0
       move_cursor @row
 
       draw_marked_items

@@ -213,7 +213,7 @@ module Rfd
     end
 
     def selected_items
-      (m = marked_items).any? ? m : Array(current_item)
+      ((m = marked_items).any? ? m : Array(current_item)).reject {|i| %w(. ..).include? i.name}
     end
 
     def move_cursor(row = nil)

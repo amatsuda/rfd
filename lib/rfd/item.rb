@@ -4,8 +4,8 @@ module Rfd
     attr_reader :name
     attr_accessor :index
 
-    def initialize(dir: nil, name: nil)
-      @dir, @name, @marked = dir, name, false
+    def initialize(dir: nil, name: nil, window_width: nil)
+      @dir, @name, @window_width, @marked = dir, name, window_width, false
     end
 
     def path
@@ -28,13 +28,13 @@ module Rfd
 
     def display_name
       n = full_display_name
-      if mb_size(n) <= 43
+      if mb_size(n) <= @window_width - 15
         n
       else
         if symlink?
-          mb_left n, 42
+          mb_left n, @window_width - 16
         else
-          "#{mb_left(basename, 42 - extname.length)}…#{extname}"
+          "#{mb_left(basename, @window_width - 16 - extname.length)}…#{extname}"
         end
       end
     end
@@ -154,7 +154,7 @@ module Rfd
     end
 
     def to_s
-      "#{current_mark}#{mb_ljust(display_name, 43)}#{size_or_dir.rjust(13)}"
+      "#{current_mark}#{mb_ljust(display_name, @window_width - 15)}#{size_or_dir.rjust(13)}"
     end
 
     def <=>(o)

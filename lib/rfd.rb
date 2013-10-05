@@ -282,7 +282,7 @@ module Rfd
     end
 
     def fetch_items_from_filesystem
-      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn}.to_a
+      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn, window_width: maxx}.to_a
     end
 
     def find(str)

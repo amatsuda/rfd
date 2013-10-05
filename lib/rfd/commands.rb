@@ -53,7 +53,7 @@ module Rfd
     end
 
     def q
-      raise StopIteration
+      raise StopIteration if ask('Are your sure want to exit? (y/n)') == ?y.ord
     end
 
     def s

@@ -49,19 +49,23 @@ module Rfd
     def begy
       Curses.getbegy @window
     end
+
+    def subwin(height, width, top, left)
+      Curses.derwin Curses.stdscr, height, width, top, left
+    end
   end
 
   # bordered Window
   class SubWindow < Window
     def initialize(*)
-      border_window = Curses.derwin Curses.stdscr, maxy + 2, maxx + 2, begy - 1, begx - 1
+      border_window = subwin maxy + 2, maxx + 2, begy - 1, begx - 1
       Curses.box border_window, 0, 0
     end
   end
 
   class HeaderLeftWindow < SubWindow
     def initialize
-      @window = Curses.derwin Curses.stdscr, 3, Rfd.maxx - 32, 1, 1
+      @window = subwin 3, Rfd.maxx - 32, 1, 1
       super
     end
 
@@ -94,7 +98,7 @@ module Rfd
 
   class HeaderRightWindow < SubWindow
     def initialize
-      @window = Curses.derwin Curses.stdscr, 3, 29, 1, Rfd.maxx - 30
+      @window = subwin 3, 29, 1, Rfd.maxx - 30
       super
     end
 
@@ -125,8 +129,8 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
 
-      @window = Curses.derwin Curses.stdscr, Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
-      border_window = Curses.derwin Curses.stdscr, Rfd.maxy - 5, Rfd.maxx, 4, 0
+      @window = subwin Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
+      border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
       Curses.box border_window, 0, 0
       @row = 0
 
@@ -387,7 +391,7 @@ module Rfd
 
   class CommandLineWindow < Window
     def initialize
-      @window = Curses.derwin Curses.stdscr, 1, Rfd.maxx, Rfd.maxy - 1, 0
+      @window = subwin 1, Rfd.maxx, Rfd.maxy - 1, 0
     end
 
     def set_prompt(str)

@@ -255,7 +255,6 @@ module Rfd
       end
       @current_page = page ? page : 0
 
-      wclear
       draw_items
       wmove 0
       move_cursor @row
@@ -295,6 +294,7 @@ module Rfd
       @displayed_items = @items[@current_page * max_items, max_items]
       0.upto(@window.size - 1) do |index|
         @window.switch index
+        wclear
         wmove 0
         if (items = @displayed_items[maxy * index, maxy * (index + 1)])
           items.each do |item|
@@ -388,7 +388,6 @@ module Rfd
 
     def switch_page(page)
       @current_page = page
-      wclear
       draw_items
     end
 

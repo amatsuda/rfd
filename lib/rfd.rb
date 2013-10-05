@@ -411,7 +411,6 @@ module Rfd
 
     def toggle_mark
       mvwaddstr @row % maxy, 0, current_item.toggle_mark
-      wrefresh
       j
     end
 

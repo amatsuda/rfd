@@ -223,16 +223,16 @@ module Rfd
           switch_page page
           @row = row
         else
-          prev, @row = @row, row
+          if (prev_item = @items[@row])
+            Curses.wattr_set window, Curses::A_NORMAL, prev_item.color, nil
+            mvwaddstr @row % maxy, 0, "#{prev_item.to_s}\n"
+          end
+          @row = row
         end
       end
 
       @row ||= 0
 
-      if prev && (item = @items[prev])
-        Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
-        mvwaddstr prev % maxy, 0, "#{item.to_s}\n"
-      end
       item = @items[row || @row]
       Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
       mvwaddstr @row % maxy, 0, "#{item.to_s}\n"

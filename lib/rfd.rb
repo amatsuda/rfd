@@ -22,7 +22,7 @@ module Rfd
   end
 
   class Window
-    def wmove(y, x)
+    def wmove(y, x = 0)
       Curses.wmove @window, y, x
     end
 
@@ -84,7 +84,7 @@ module Rfd
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
-      wmove 0, 0
+      wmove 0
       waddstr @path_and_page_number, clear_to_eol_before_add: true
     end
 
@@ -95,13 +95,13 @@ module Rfd
 
     def draw_current_filename(current_file_name)
       @current_file_name = "File: #{current_file_name}"
-      wmove 1, 0
+      wmove 1
       waddstr @current_file_name, clear_to_eol_before_add: true
     end
 
     def draw_stat(item)
       @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
-      wmove 2, 0
+      wmove 2
       waddstr @stat, clear_to_eol_before_add: true
     end
   end
@@ -113,12 +113,12 @@ module Rfd
     end
 
     def draw_marked_items(count: 0, size: 0)
-      wmove 1, 0
+      wmove 1
       waddstr %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}], clear_to_eol_before_add: true
     end
 
     def draw_total_items(count: 0, size: 0)
-      wmove 2, 0
+      wmove 2
       waddstr %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}], clear_to_eol_before_add: true
     end
 
@@ -257,7 +257,7 @@ module Rfd
     end
 
     def draw_items
-      wmove 0, 0
+      wmove 0
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|
         Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil

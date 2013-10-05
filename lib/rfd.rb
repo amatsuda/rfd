@@ -22,41 +22,43 @@ module Rfd
   end
 
   class Window
+    attr_reader :window
+
     def wmove(y, x = 0)
-      Curses.wmove @window, y, x
+      Curses.wmove window, y, x
     end
 
     def waddstr(str, clear_to_eol_before_add: false)
       wclrtoeol if clear_to_eol_before_add
-      Curses.waddstr @window, str
+      Curses.waddstr window, str
     end
 
     def mvwaddstr(y, x, str)
-      Curses.mvwaddstr @window, y, x, str
+      Curses.mvwaddstr window, y, x, str
     end
 
     def wclear
-      Curses.wclear @window
+      Curses.wclear window
     end
 
     def wrefresh
-      Curses.wrefresh @window
+      Curses.wrefresh window
     end
 
     def maxx
-      Curses.getmaxx @window
+      Curses.getmaxx window
     end
 
     def maxy
-      Curses.getmaxy @window
+      Curses.getmaxy window
     end
 
     def begx
-      Curses.getbegx @window
+      Curses.getbegx window
     end
 
     def begy
-      Curses.getbegy @window
+      Curses.getbegy window
     end
 
     def subwin(height, width, top, left)
@@ -64,7 +66,7 @@ module Rfd
     end
 
     def wclrtoeol
-      Curses.wclrtoeol @window
+      Curses.wclrtoeol window
     end
   end
 
@@ -196,13 +198,13 @@ module Rfd
       @row ||= 0
 
       if prev && (item = @items[prev])
-        Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil
+        Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
         mvwaddstr prev % maxy, 0, "#{item.to_s}\n"
       end
       item = @items[row || @row]
-      Curses.wattr_set @window, Curses::A_UNDERLINE, item.color, nil
+      Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
       mvwaddstr @row % maxy, 0, "#{item.to_s}\n"
-      Curses.wstandend @window
+      Curses.wstandend window
       wrefresh
 
       header_l.draw_current_file_info item
@@ -260,10 +262,10 @@ module Rfd
       wmove 0
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|
-        Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil
+        Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
         waddstr "#{item.to_s}\n"
       end
-      Curses.wstandend @window
+      Curses.wstandend window
       wrefresh
 
       draw_path_and_page_number
@@ -379,7 +381,7 @@ module Rfd
         command_line.wclear
         command_line.wrefresh
       end
-      Curses.wstandend @window
+      Curses.wstandend window
     end
 
     def view
@@ -403,16 +405,16 @@ module Rfd
     end
 
     def set_prompt(str)
-      Curses.wattr_set @window, Curses::A_BOLD, Curses::COLOR_WHITE, nil
+      Curses.wattr_set window, Curses::A_BOLD, Curses::COLOR_WHITE, nil
       mvwaddstr 0, 0, str
-      Curses.wstandend @window
+      Curses.wstandend window
     end
 
     def get_command(prompt: nil)
       Curses.echo
       startx = prompt ? prompt.length : 1
       s = ' ' * 100
-      Curses.mvwgetstr @window, 0, startx, s
+      Curses.mvwgetstr window, 0, startx, s
       "#{prompt[1..-1] if prompt}#{s.strip}"
     ensure
       Curses.noecho

@@ -292,14 +292,19 @@ module Rfd
     end
 
     def draw_items
-      wmove 0
       @displayed_items = @items[@current_page * max_items, max_items]
-      @displayed_items.each do |item|
-        Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
-        waddstr "#{item.to_s}\n"
+      0.upto(@window.size - 1) do |index|
+        @window.switch index
+        wmove 0
+        if (items = @displayed_items[maxy * index, maxy * (index + 1)])
+          items.each do |item|
+            Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
+            waddstr "#{item.to_s}\n"
+          end
+        end
+        Curses.wstandend window
+        wrefresh
       end
-      Curses.wstandend window
-      wrefresh
 
       draw_path_and_page_number
       header_l.wrefresh

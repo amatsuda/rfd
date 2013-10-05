@@ -10,9 +10,11 @@ module Rfd
 
     def d
       if selected_items.any?
-        FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
-        @row -= selected_items.count {|i| i.index <= @row}
-        ls
+        if ask %Q[Are your sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
+          FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+          @row -= selected_items.count {|i| i.index <= @row}
+          ls
+        end
       end
     end
 
@@ -70,9 +72,11 @@ module Rfd
 
     def D
       if selected_items.any?
-        FileUtils.rm_rf selected_items.map(&:path)
-        @row -= selected_items.count {|i| i.index <= @row}
-        ls
+        if ask %Q[Are your sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
+          FileUtils.rm_rf selected_items.map(&:path)
+          @row -= selected_items.count {|i| i.index <= @row}
+          ls
+        end
       end
     end
 

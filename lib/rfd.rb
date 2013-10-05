@@ -345,7 +345,7 @@ module Rfd
       @items.each.with_index {|item, index| item.index = index}
     end
 
-    def grep(pattern)
+    def grep(pattern = '.*')
       regexp = Regexp.new(pattern)
       fetch_items_from_filesystem
       @items = @items.shift(2) + @items.select {|i| i.name =~ regexp}

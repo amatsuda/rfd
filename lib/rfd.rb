@@ -22,10 +22,6 @@ module Rfd
   end
 
   class Window
-    def draw(contents)
-      FFI::NCurses.mvwaddstr @window, 0, 0, contents
-    end
-
     def wmove(y, x)
       FFI::NCurses.wmove @window, y, x
     end

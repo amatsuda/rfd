@@ -253,6 +253,7 @@ module Rfd
 
       wclear
       draw_items
+      wmove 0
       move_cursor @row
 
       draw_marked_items

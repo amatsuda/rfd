@@ -42,6 +42,10 @@ module Rfd
       end
     end
 
+    def l
+      (y = @row + maxy) < @items.size and move_cursor y
+    end
+
     def m
       process_command_line prompt: ':mv '
     end

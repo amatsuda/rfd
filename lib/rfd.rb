@@ -157,7 +157,7 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
 
-      @window = spawn_panes 1
+      @panes = spawn_panes 1
       border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
       Curses.box border_window, 0, 0
       @row = 0
@@ -197,11 +197,11 @@ module Rfd
     end
 
     def window
-      @window.active
+      @panes.active
     end
 
     def max_items
-      maxy * @window.size
+      maxy * @panes.size
     end
 
     def current_item
@@ -222,7 +222,7 @@ module Rfd
         pane_index = item_index_in_page / maxy
         if page != @current_page
           switch_page page
-          @window.switch pane_index
+          @panes.switch pane_index
           @row = row
         else
           if (prev_item = @items[@row])
@@ -231,7 +231,7 @@ module Rfd
             wrefresh
           end
           @row = row
-          @window.switch pane_index
+          @panes.switch pane_index
         end
       else
         @row = 0
@@ -260,7 +260,7 @@ module Rfd
       @current_page = page ? page : 0
 
       draw_items
-      @window.switch 0
+      @panes.switch 0
       wmove 0
       move_cursor @row
 
@@ -297,8 +297,8 @@ module Rfd
 
     def draw_items
       @displayed_items = @items[@current_page * max_items, max_items]
-      0.upto(@window.size - 1) do |index|
-        @window.switch index
+      0.upto(@panes.size - 1) do |index|
+        @panes.switch index
         wclear
         wmove 0
         if (items = @displayed_items[maxy * index, maxy * (index + 1)])

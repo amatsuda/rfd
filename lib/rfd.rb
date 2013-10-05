@@ -132,6 +132,14 @@ module Rfd
   class MainWindow < Window
     include Rfd::Commands
 
+    class Panes
+      attr_reader :panes
+
+      def initialize(panes)
+        @panes = panes
+      end
+    end
+
     attr_reader :header_l, :header_r, :command_line
 
     def initialize(dir = '.')
@@ -139,7 +147,7 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
 
-      @window = subwin Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
+      @window = spawn_panes 1
       border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
       Curses.box border_window, 0, 0
       @row = 0
@@ -170,6 +178,16 @@ module Rfd
           end
         end
       end
+    end
+
+    def spawn_panes(num)
+      width = (Rfd.maxx - 2) / num
+      windows = [subwin(Rfd.maxy - 7, Rfd.maxx - 2, 5, 1)]
+      Panes.new windows
+    end
+
+    def window
+      @window.panes.first
     end
 
     def current_item

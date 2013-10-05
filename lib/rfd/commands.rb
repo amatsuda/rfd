@@ -116,6 +116,14 @@ module Rfd
       ls
     end
 
+    (?1..?9).each do |n|
+      define_method(n) do
+        spawn_panes n.to_i
+        @row = 0
+        ls
+      end
+    end
+
     def /
       process_command_line prompt: ':grep '
     end

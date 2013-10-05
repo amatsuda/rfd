@@ -259,13 +259,11 @@ module Rfd
       @dir, @row = dir, nil if File.readable? dir
     end
 
-    def ls(page = nil)
-      unless page
-        fetch_items_from_filesystem
-        sort_items_according_to_current_direction
-      end
-      @current_page = page ? page : 0
+    def ls
+      fetch_items_from_filesystem
+      sort_items_according_to_current_direction
 
+      @current_page = 0
       draw_items
       @panes.switch 0
       move_cursor @row

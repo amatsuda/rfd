@@ -260,6 +260,7 @@ module Rfd
       @current_page = page ? page : 0
 
       draw_items
+      @window.switch 0
       wmove 0
       move_cursor @row
 

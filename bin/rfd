@@ -1,16 +1,17 @@
 #!/usr/bin/env ruby
 require 'ffi-ncurses'
+Curses = FFI::NCurses
 require File.expand_path('../../lib/rfd', __FILE__)
 
-FFI::NCurses.initscr
-FFI::NCurses.raw
-FFI::NCurses.noecho
-FFI::NCurses.curs_set 0
-FFI::NCurses.start_color
+Curses.initscr
+Curses.raw
+Curses.noecho
+Curses.curs_set 0
+Curses.start_color
 
 begin
   rfd = Rfd.start ARGV[0] || '.'
   rfd.run
 ensure
-  FFI::NCurses.endwin
+  Curses.endwin
 end

@@ -6,70 +6,70 @@ module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
   def self.start(dir = '.')
-    [FFI::NCurses::COLOR_WHITE, FFI::NCurses::COLOR_CYAN, FFI::NCurses::COLOR_MAGENTA, FFI::NCurses::COLOR_GREEN, FFI::NCurses::COLOR_RED].each do |c|
-      FFI::NCurses.init_pair c, c, FFI::NCurses::COLOR_BLACK
+    [Curses::COLOR_WHITE, Curses::COLOR_CYAN, Curses::COLOR_MAGENTA, Curses::COLOR_GREEN, Curses::COLOR_RED].each do |c|
+      Curses.init_pair c, c, Curses::COLOR_BLACK
     end
 
     Rfd::MainWindow.new dir
   end
 
   def self.maxx
-    FFI::NCurses.getmaxx FFI::NCurses.stdscr
+    Curses.getmaxx Curses.stdscr
   end
 
   def self.maxy
-    FFI::NCurses.getmaxy FFI::NCurses.stdscr
+    Curses.getmaxy Curses.stdscr
   end
 
   class Window
     def wmove(y, x)
-      FFI::NCurses.wmove @window, y, x
+      Curses.wmove @window, y, x
     end
 
     def wclear
-      FFI::NCurses.wclear @window
+      Curses.wclear @window
     end
 
     def wrefresh
-      FFI::NCurses.wrefresh @window
+      Curses.wrefresh @window
     end
 
     def maxx
-      FFI::NCurses.getmaxx @window
+      Curses.getmaxx @window
     end
 
     def maxy
-      FFI::NCurses.getmaxy @window
+      Curses.getmaxy @window
     end
 
     def begx
-      FFI::NCurses.getbegx @window
+      Curses.getbegx @window
     end
 
     def begy
-      FFI::NCurses.getbegy @window
+      Curses.getbegy @window
     end
   end
 
   # bordered Window
   class SubWindow < Window
     def initialize(*)
-      border_window = FFI::NCurses.derwin FFI::NCurses.stdscr, maxy + 2, maxx + 2, begy - 1, begx - 1
-      FFI::NCurses.box border_window, 0, 0
+      border_window = Curses.derwin Curses.stdscr, maxy + 2, maxx + 2, begy - 1, begx - 1
+      Curses.box border_window, 0, 0
     end
   end
 
   class HeaderLeftWindow < SubWindow
     def initialize
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, Rfd.maxx - 32, 1, 1
+      @window = Curses.derwin Curses.stdscr, 3, Rfd.maxx - 32, 1, 1
       super
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wmove 0, 0
-      FFI::NCurses.wclrtoeol @window
-      FFI::NCurses.waddstr @window, @path_and_page_number
+      Curses.wclrtoeol @window
+      Curses.waddstr @window, @path_and_page_number
     end
 
     def draw_current_file_info(current_file)
@@ -80,38 +80,38 @@ module Rfd
     def draw_current_filename(current_file_name)
       @current_file_name = "File: #{current_file_name}"
       wmove 1, 0
-      FFI::NCurses.wclrtoeol @window
-      FFI::NCurses.waddstr @window, @current_file_name
+      Curses.wclrtoeol @window
+      Curses.waddstr @window, @current_file_name
     end
 
     def draw_stat(item)
       @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
       wmove 2, 0
-      FFI::NCurses.wclrtoeol @window
-      FFI::NCurses.waddstr @window, @stat
+      Curses.wclrtoeol @window
+      Curses.waddstr @window, @stat
     end
   end
 
   class HeaderRightWindow < SubWindow
     def initialize
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 3, 29, 1, Rfd.maxx - 30
+      @window = Curses.derwin Curses.stdscr, 3, 29, 1, Rfd.maxx - 30
       super
     end
 
     def draw_marked_items(count: 0, size: 0)
       wmove 1, 0
-      FFI::NCurses.wclrtoeol @window
-      FFI::NCurses.waddstr @window, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+      Curses.wclrtoeol @window
+      Curses.waddstr @window, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
       wmove 2, 0
-      FFI::NCurses.wclrtoeol @window
-      FFI::NCurses.waddstr @window, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+      Curses.wclrtoeol @window
+      Curses.waddstr @window, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
     end
 
     def debug(s)
-      FFI::NCurses.mvwaddstr @window, 0, 0, s.to_s
+      Curses.mvwaddstr @window, 0, 0, s.to_s
     end
   end
 
@@ -125,9 +125,9 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
 
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
-      border_window = FFI::NCurses.derwin FFI::NCurses.stdscr, Rfd.maxy - 5, Rfd.maxx, 4, 0
-      FFI::NCurses.box border_window, 0, 0
+      @window = Curses.derwin Curses.stdscr, Rfd.maxy - 7, Rfd.maxx - 2, 5, 1
+      border_window = Curses.derwin Curses.stdscr, Rfd.maxy - 5, Rfd.maxx, 4, 0
+      Curses.box border_window, 0, 0
       @row = 0
 
       cd dir
@@ -136,7 +136,7 @@ module Rfd
 
     def run
       loop do
-        case (c = FFI::NCurses.getch)
+        case (c = Curses.getch)
         when 10  # enter
           enter
         when 27  # esc
@@ -145,7 +145,7 @@ module Rfd
           space
         when 127  # DEL
           del
-        when FFI::NCurses::KEY_CTRL_A..FFI::NCurses::KEY_CTRL_Z
+        when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
           chr = ((c - 1 + 65) ^ 0b0100000).chr
           public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
         else
@@ -184,13 +184,13 @@ module Rfd
       @row ||= 0
 
       if prev && (item = @items[prev])
-        FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
-        FFI::NCurses.mvwaddstr @window, prev % maxy, 0, "#{item.to_s}\n"
+        Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil
+        Curses.mvwaddstr @window, prev % maxy, 0, "#{item.to_s}\n"
       end
       item = @items[row || @row]
-      FFI::NCurses.wattr_set @window, FFI::NCurses::A_UNDERLINE, item.color, nil
-      FFI::NCurses.mvwaddstr @window, @row % maxy, 0, "#{item.to_s}\n"
-      FFI::NCurses.wstandend @window
+      Curses.wattr_set @window, Curses::A_UNDERLINE, item.color, nil
+      Curses.mvwaddstr @window, @row % maxy, 0, "#{item.to_s}\n"
+      Curses.wstandend @window
       wrefresh
 
       header_l.draw_current_file_info item
@@ -248,10 +248,10 @@ module Rfd
       wmove 0, 0
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|
-        FFI::NCurses.wattr_set @window, FFI::NCurses::A_NORMAL, item.color, nil
-        FFI::NCurses.waddstr @window, "#{item.to_s}\n"
+        Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil
+        Curses.waddstr @window, "#{item.to_s}\n"
       end
-      FFI::NCurses.wstandend @window
+      Curses.wstandend @window
       wrefresh
 
       draw_path_and_page_number
@@ -354,7 +354,7 @@ module Rfd
     end
 
     def toggle_mark
-      FFI::NCurses.mvwaddstr @window, @row % maxy, 0, current_item.toggle_mark
+      Curses.mvwaddstr @window, @row % maxy, 0, current_item.toggle_mark
       wrefresh
       j
     end
@@ -367,16 +367,16 @@ module Rfd
         command_line.wclear
         command_line.wrefresh
       end
-      FFI::NCurses.wstandend @window
+      Curses.wstandend @window
     end
 
     def view
-      FFI::NCurses.def_prog_mode
-      FFI::NCurses.endwin
+      Curses.def_prog_mode
+      Curses.endwin
       pager = ENV['PAGER'] || 'less'
       system "#{pager} #{current_item.path}"
-      FFI::NCurses.reset_prog_mode
-      FFI::NCurses.refresh
+      Curses.reset_prog_mode
+      Curses.refresh
     end
 
     def debug(str)
@@ -387,23 +387,23 @@ module Rfd
 
   class CommandLineWindow < Window
     def initialize
-      @window = FFI::NCurses.derwin FFI::NCurses.stdscr, 1, Rfd.maxx, Rfd.maxy - 1, 0
+      @window = Curses.derwin Curses.stdscr, 1, Rfd.maxx, Rfd.maxy - 1, 0
     end
 
     def set_prompt(str)
-      FFI::NCurses.wattr_set @window, FFI::NCurses::A_BOLD, FFI::NCurses::COLOR_WHITE, nil
-      FFI::NCurses.mvwaddstr @window, 0, 0, str
-      FFI::NCurses.wstandend @window
+      Curses.wattr_set @window, Curses::A_BOLD, Curses::COLOR_WHITE, nil
+      Curses.mvwaddstr @window, 0, 0, str
+      Curses.wstandend @window
     end
 
     def get_command(prompt: nil)
-      FFI::NCurses.echo
+      Curses.echo
       startx = prompt ? prompt.length : 1
       s = ' ' * 100
-      FFI::NCurses.mvwgetstr @window, 0, startx, s
+      Curses.mvwgetstr @window, 0, startx, s
       "#{prompt[1..-1] if prompt}#{s.strip}"
     ensure
-      FFI::NCurses.noecho
+      Curses.noecho
     end
   end
 end

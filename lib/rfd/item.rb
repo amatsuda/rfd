@@ -45,15 +45,15 @@ module Rfd
 
     def color
       if symlink?
-        FFI::NCurses::COLOR_MAGENTA
+        Curses::COLOR_MAGENTA
       elsif hidden?
-        FFI::NCurses::COLOR_GREEN
+        Curses::COLOR_GREEN
       elsif directory?
-        FFI::NCurses::COLOR_CYAN
+        Curses::COLOR_CYAN
       elsif executable?
-        FFI::NCurses::COLOR_RED
+        Curses::COLOR_RED
       else
-        FFI::NCurses::COLOR_WHITE
+        Curses::COLOR_WHITE
       end
     end
 

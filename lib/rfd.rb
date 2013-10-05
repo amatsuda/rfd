@@ -26,6 +26,10 @@ module Rfd
       Curses.wmove @window, y, x
     end
 
+    def waddstr(str)
+      Curses.waddstr @window, str
+    end
+
     def wclear
       Curses.wclear @window
     end
@@ -77,7 +81,7 @@ module Rfd
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wmove 0, 0
       wclrtoeol
-      Curses.waddstr @window, @path_and_page_number
+      waddstr @path_and_page_number
     end
 
     def draw_current_file_info(current_file)
@@ -89,14 +93,14 @@ module Rfd
       @current_file_name = "File: #{current_file_name}"
       wmove 1, 0
       wclrtoeol
-      Curses.waddstr @window, @current_file_name
+      waddstr @current_file_name
     end
 
     def draw_stat(item)
       @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
       wmove 2, 0
       wclrtoeol
-      Curses.waddstr @window, @stat
+      waddstr @stat
     end
   end
 
@@ -109,13 +113,13 @@ module Rfd
     def draw_marked_items(count: 0, size: 0)
       wmove 1, 0
       wclrtoeol
-      Curses.waddstr @window, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+      waddstr %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
       wmove 2, 0
       wclrtoeol
-      Curses.waddstr @window, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+      waddstr %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
     end
 
     def debug(s)
@@ -257,7 +261,7 @@ module Rfd
       @displayed_items = @items[@current_page * maxy, maxy]
       @displayed_items.each do |item|
         Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil
-        Curses.waddstr @window, "#{item.to_s}\n"
+        waddstr "#{item.to_s}\n"
       end
       Curses.wstandend @window
       wrefresh

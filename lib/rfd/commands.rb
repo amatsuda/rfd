@@ -65,7 +65,7 @@ module Rfd
     end
 
     def H
-      move_cursor @current_page * maxy
+      move_cursor @current_page * max_items
     end
 
     def K
@@ -73,17 +73,17 @@ module Rfd
     end
 
     def L
-      move_cursor @current_page * maxy + @displayed_items.size - 1
+      move_cursor @current_page * max_items + @displayed_items.size - 1
     end
 
     def M
-      move_cursor @current_page * maxy + @displayed_items.size / 2
+      move_cursor @current_page * max_items + @displayed_items.size / 2
     end
 
     def ctrl_n
       if total_pages > 1
         if @current_page + 1 < total_pages
-          move_cursor (@current_page + 1) * maxy
+          move_cursor (@current_page + 1) * max_items
         else
           move_cursor 0
         end
@@ -93,9 +93,9 @@ module Rfd
     def ctrl_p
       if total_pages > 1
         if @current_page > 0
-          move_cursor (@current_page - 1) * maxy
+          move_cursor (@current_page - 1) * max_items
         else
-          move_cursor (total_pages - 1) * maxy
+          move_cursor (total_pages - 1) * max_items
         end
       end
     end

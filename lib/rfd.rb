@@ -140,6 +140,10 @@ module Rfd
       def active
         @panes[@current_index]
       end
+
+      def size
+        @panes.size
+      end
     end
 
     attr_reader :header_l, :header_r, :command_line
@@ -192,6 +196,10 @@ module Rfd
       @window.active
     end
 
+    def max_items
+      maxy * @window.size
+    end
+
     def current_item
       @items[@row]
     end
@@ -206,7 +214,7 @@ module Rfd
 
     def move_cursor(row = nil)
       if row
-        page = row / maxy
+        page = row / max_items
         if page != @current_page
           switch_page page
           @row = row
@@ -280,7 +288,7 @@ module Rfd
 
     def draw_items
       wmove 0
-      @displayed_items = @items[@current_page * maxy, maxy]
+      @displayed_items = @items[@current_page * max_items, max_items]
       @displayed_items.each do |item|
         Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
         waddstr "#{item.to_s}\n"
@@ -365,7 +373,7 @@ module Rfd
     end
 
     def total_pages
-      @items.length / maxy + 1
+      @items.length / max_items + 1
     end
 
     def switch_page(page)

@@ -229,9 +229,9 @@ module Rfd
           end
           @row = row
         end
+      else
+        @row = 0
       end
-
-      @row ||= 0
 
       item = @items[@row]
       Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil

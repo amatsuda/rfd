@@ -233,7 +233,7 @@ module Rfd
 
       @row ||= 0
 
-      item = @items[row || @row]
+      item = @items[@row]
       Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
       mvwaddstr @row % maxy, 0, "#{item.to_s}\n"
       Curses.wstandend window

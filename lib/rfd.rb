@@ -31,6 +31,10 @@ module Rfd
       Curses.waddstr @window, str
     end
 
+    def mvwaddstr(y, x, str)
+      Curses.mvwaddstr @window, y, x, str
+    end
+
     def wclear
       Curses.wclear @window
     end
@@ -119,7 +123,7 @@ module Rfd
     end
 
     def debug(s)
-      Curses.mvwaddstr @window, 0, 0, s.to_s
+      mvwaddstr 0, 0, s.to_s
     end
   end
 
@@ -193,11 +197,11 @@ module Rfd
 
       if prev && (item = @items[prev])
         Curses.wattr_set @window, Curses::A_NORMAL, item.color, nil
-        Curses.mvwaddstr @window, prev % maxy, 0, "#{item.to_s}\n"
+        mvwaddstr prev % maxy, 0, "#{item.to_s}\n"
       end
       item = @items[row || @row]
       Curses.wattr_set @window, Curses::A_UNDERLINE, item.color, nil
-      Curses.mvwaddstr @window, @row % maxy, 0, "#{item.to_s}\n"
+      mvwaddstr @row % maxy, 0, "#{item.to_s}\n"
       Curses.wstandend @window
       wrefresh
 
@@ -362,7 +366,7 @@ module Rfd
     end
 
     def toggle_mark
-      Curses.mvwaddstr @window, @row % maxy, 0, current_item.toggle_mark
+      mvwaddstr @row % maxy, 0, current_item.toggle_mark
       wrefresh
       j
     end
@@ -400,7 +404,7 @@ module Rfd
 
     def set_prompt(str)
       Curses.wattr_set @window, Curses::A_BOLD, Curses::COLOR_WHITE, nil
-      Curses.mvwaddstr @window, 0, 0, str
+      mvwaddstr 0, 0, str
       Curses.wstandend @window
     end
 

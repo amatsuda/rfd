@@ -141,6 +141,10 @@ module Rfd
         @panes[@current_index]
       end
 
+      def switch(index)
+        @current_index = index if index < @panes.size
+      end
+
       def size
         @panes.size
       end

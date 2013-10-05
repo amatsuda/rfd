@@ -248,8 +248,8 @@ module Rfd
     end
 
     def cd(dir)
-      @row = nil
-      @dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
+      dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : @dir ? File.join(@dir, dir) : dir)
+      @dir, @row = dir, nil if File.readable? dir
     end
 
     def ls(page = nil)

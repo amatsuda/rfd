@@ -22,6 +22,10 @@ module Rfd
       process_command_line prompt: ':find_reverse '
     end
 
+    def h
+      (y = @row - maxy) >= 0 and move_cursor y
+    end
+
     def j
       if @row + 1 >= @items.size
         move_cursor 0

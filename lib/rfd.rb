@@ -182,7 +182,7 @@ module Rfd
 
     def spawn_panes(num)
       width = (Rfd.maxx - 2) / num
-      windows = [subwin(Rfd.maxy - 7, Rfd.maxx - 2, 5, 1)]
+      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Rfd.maxy - 7, width - 2, 5, width * i + 1)}
       Panes.new windows
     end
 

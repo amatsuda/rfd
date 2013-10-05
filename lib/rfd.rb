@@ -432,7 +432,12 @@ module Rfd
     def ask(prompt = '(y/n)')
       command_line.set_prompt prompt
       command_line.wrefresh
-      Curses.getch
+      while (c = Curses.getch.chr)
+        next unless %(y Y n N).include? c
+        command_line.wclear
+        command_line.wrefresh
+        break %(y Y).include? c
+      end
     end
 
     def view

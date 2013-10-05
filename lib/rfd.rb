@@ -148,6 +148,13 @@ module Rfd
       def size
         @panes.size
       end
+
+      def clear_all
+        @panes.each do |p|
+          Curses.wclear p
+          Curses.wrefresh p
+        end
+      end
     end
 
     attr_reader :header_l, :header_r, :command_line

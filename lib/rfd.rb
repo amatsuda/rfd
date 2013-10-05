@@ -418,7 +418,7 @@ module Rfd
     def process_command_line(prompt: ':')
       command_line.set_prompt prompt
       cmd, *args = command_line.get_command(prompt: prompt).split(' ')
-      if respond_to? cmd
+      if cmd && !cmd.empty? && respond_to?(cmd)
         self.public_send cmd, *args
         command_line.wclear
         command_line.wrefresh

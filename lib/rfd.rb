@@ -211,6 +211,7 @@ module Rfd
       width = (Rfd.maxx - 2) / num
       windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Rfd.maxy - 7, width - 1, 5, width * i + 1)}
       @panes = Panes.new windows
+      @panes.switch 0
     end
 
     def window

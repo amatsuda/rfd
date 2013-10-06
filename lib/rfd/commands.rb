@@ -111,20 +111,20 @@ module Rfd
 
     def ctrl_n
       if total_pages > 1
-        if @current_page + 1 < total_pages
-          move_cursor (@current_page + 1) * max_items
-        else
+        if last_page?
           move_cursor 0
+        else
+          move_cursor (@current_page + 1) * max_items
         end
       end
     end
 
     def ctrl_p
       if total_pages > 1
-        if @current_page > 0
-          move_cursor (@current_page - 1) * max_items
-        else
+        if first_page?
           move_cursor (total_pages - 1) * max_items
+        else
+          move_cursor (@current_page - 1) * max_items
         end
       end
     end

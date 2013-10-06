@@ -292,7 +292,8 @@ module Rfd
       move_cursor 0
     end
 
-    def chmod(mode)
+    def chmod(mode = nil)
+      return unless mode
       FileUtils.chmod mode, selected_items.map(&:path)
       ls
     end

@@ -125,7 +125,9 @@ module Rfd
     end
 
     def debug(s)
-      mvwaddstr 0, 0, s.to_s
+      wmove 0, 0
+      wclrtoeol
+      waddstr s.to_s
     end
   end
 
@@ -466,8 +468,8 @@ module Rfd
     end
 
     def debug(str)
-      header_r.wclear
       header_r.debug str
+      header_r.wrefresh
     end
   end
 

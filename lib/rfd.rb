@@ -133,6 +133,8 @@ module Rfd
     include Rfd::Commands
 
     class Panes
+      attr_reader :current_index
+
       def initialize(panes)
         @panes, @current_index = panes, 0
       end

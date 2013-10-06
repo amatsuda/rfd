@@ -441,7 +441,7 @@ module Rfd
       command_line.set_prompt prompt
       command_line.wrefresh
       while (c = Curses.getch)
-        next unless [78, 89, 110, 121] .include? c  # N, Y, n, y
+        next unless [78, 89, 110, 121, 3, 27] .include? c  # N, Y, n, y, ^c, esc
         command_line.wclear
         command_line.wrefresh
         break [89, 121].include? c  # Y, y

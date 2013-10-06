@@ -273,9 +273,8 @@ module Rfd
       fetch_items_from_filesystem
       sort_items_according_to_current_direction
 
-      @current_page = 0
+      @current_page ||= 0
       draw_items
-      @panes.switch 0
       move_cursor @row
 
       draw_marked_items

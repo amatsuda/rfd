@@ -100,7 +100,7 @@ module Rfd
     end
 
     def directory?
-      lstat.directory?
+      stat.directory?
     end
 
     def symlink?

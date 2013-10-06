@@ -74,6 +74,7 @@ module Rfd
   class SubWindow < Window
     def initialize(*)
       border_window = subwin maxy + 2, maxx + 2, begy - 1, begx - 1
+      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
       Curses.box border_window, 0, 0
     end
   end
@@ -170,6 +171,7 @@ module Rfd
 
       spawn_panes 2
       border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
+      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
       Curses.box border_window, 0, 0
 
       cd dir

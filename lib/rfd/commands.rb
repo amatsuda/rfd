@@ -109,6 +109,14 @@ module Rfd
       header_r.wrefresh
     end
 
+    def ctrl_b
+      ctrl_p
+    end
+
+    def ctrl_f
+      ctrl_n
+    end
+
     def ctrl_n
       if total_pages > 1
         if last_page?

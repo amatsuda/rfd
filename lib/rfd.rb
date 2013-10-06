@@ -423,7 +423,6 @@ module Rfd
 
     def toggle_mark
       mvwaddstr @row % maxy, 0, current_item.toggle_mark unless %w(. ..).include? current_item.name
-      j
     end
 
     def process_command_line(prompt: ':')

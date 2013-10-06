@@ -147,6 +147,7 @@ module Rfd
 
     def space
       toggle_mark
+      j
       draw_marked_items
       header_r.wrefresh
     end

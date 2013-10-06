@@ -43,6 +43,10 @@ module Rfd
       @lstat ||= File.lstat path
     end
 
+    def stat
+      @stat ||= File.stat path
+    end
+
     def color
       if symlink?
         Curses::COLOR_MAGENTA

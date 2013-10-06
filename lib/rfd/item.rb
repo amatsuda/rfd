@@ -120,8 +120,10 @@ module Rfd
     end
 
     def toggle_mark
-      @marked = !@marked
-      current_mark
+      unless %w(. ..).include? name
+        @marked = !@marked
+        true
+      end
     end
 
     def marked?

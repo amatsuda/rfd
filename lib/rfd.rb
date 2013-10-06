@@ -311,6 +311,8 @@ module Rfd
 
     def draw_items
       @displayed_items = @items[@current_page * max_items, max_items]
+      original_active_pane_index = @panes.current_index
+
       0.upto(@panes.size - 1) do |index|
         @panes.switch index
         wclear
@@ -324,6 +326,7 @@ module Rfd
         Curses.wstandend window
         wrefresh
       end
+      @panes.switch original_active_pane_index
 
       draw_path_and_page_number
       header_l.wrefresh

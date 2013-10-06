@@ -1,14 +1,5 @@
 #!/usr/bin/env ruby
-require 'ffi-ncurses'
-Curses = FFI::NCurses
 require File.expand_path('../../lib/rfd', __FILE__)
-
-Curses.initscr
-Curses.raw
-Curses.noecho
-Curses.curs_set 0
-Curses.keypad Curses.stdscr, true
-Curses.start_color
 
 begin
   rfd = Rfd.start ARGV[0] || '.'

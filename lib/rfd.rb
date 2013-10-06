@@ -1,3 +1,5 @@
+require 'ffi-ncurses'
+Curses = FFI::NCurses
 require 'fileutils'
 require_relative 'rfd/commands'
 require_relative 'rfd/item'
@@ -6,6 +8,13 @@ module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
   def self.start(dir = '.')
+    Curses.initscr
+    Curses.raw
+    Curses.noecho
+    Curses.curs_set 0
+    Curses.keypad Curses.stdscr, true
+    Curses.start_color
+
     [Curses::COLOR_WHITE, Curses::COLOR_CYAN, Curses::COLOR_MAGENTA, Curses::COLOR_GREEN, Curses::COLOR_RED].each do |c|
       Curses.init_pair c, c, Curses::COLOR_BLACK
     end

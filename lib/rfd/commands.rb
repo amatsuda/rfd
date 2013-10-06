@@ -18,6 +18,10 @@ module Rfd
       end
     end
 
+    def e
+      edit
+    end
+
     def f
       process_command_line prompt: ':find '
     end

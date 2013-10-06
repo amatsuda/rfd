@@ -180,21 +180,21 @@ module Rfd
     def run
       loop do
         case (c = Curses.getch)
-        when 10  # enter
+        when Curses::KEY_RETURN
           enter
-        when 27  # esc
+        when Curses::KEY_ESCAPE
           q
         when 32  # space
           space
         when 127  # DEL
           del
-        when 258  # down
+        when Curses::KEY_DOWN
           j
-        when 259  # up
+        when Curses::KEY_UP
           k
-        when 260  # left
+        when Curses::KEY_LEFT
           h
-        when 261  # right
+        when Curses::KEY_RIGHT
           l
         when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
           chr = ((c - 1 + 65) ^ 0b0100000).chr

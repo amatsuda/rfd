@@ -203,7 +203,7 @@ module Rfd
           if respond_to? c.chr
             public_send c.chr
           else
-            p c
+            debug "key: #{c}"
           end
         end
       end

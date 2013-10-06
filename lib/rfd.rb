@@ -76,13 +76,6 @@ module Rfd
     end
   end
 
-  # bordered Window
-  class SubWindow < Window
-    def initialize(*)
-      draw_border
-    end
-  end
-
   class HeaderLeftWindow < Window
     def initialize
       @window = subwin 3, Rfd.maxx - 32, 1, 1

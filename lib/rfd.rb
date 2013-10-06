@@ -491,14 +491,14 @@ module Rfd
     def edit
       execute_external_command do
         editor = ENV['EDITOR'] || 'vim'
-        system "#{editor} #{current_item.path}"
+        system %Q[#{editor} "#{current_item.path}"]
       end
     end
 
     def view
       execute_external_command do
         pager = ENV['PAGER'] || 'less'
-        system "#{pager} #{current_item.path}"
+        system %Q[#{pager} "#{current_item.path}"]
       end
     end
 

@@ -434,6 +434,10 @@ module Rfd
         command_line.wclear
         command_line.wrefresh
       end
+    rescue Interrupt
+      command_line.wclear
+      command_line.wrefresh
+    ensure
       Curses.wstandend window
     end
 

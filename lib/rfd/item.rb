@@ -119,10 +119,6 @@ module Rfd
       File.readlink path if symlink?
     end
 
-    def read
-      File.read path
-    end
-
     def toggle_mark
       unless %w(. ..).include? name
         @marked = !@marked

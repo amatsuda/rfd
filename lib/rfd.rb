@@ -475,13 +475,20 @@ module Rfd
       end
     end
 
-    def view
+    def execute_external_command
       Curses.def_prog_mode
       Curses.endwin
-      pager = ENV['PAGER'] || 'less'
-      system "#{pager} #{current_item.path}"
+      yield
+    ensure
       Curses.reset_prog_mode
       Curses.refresh
+    end
+
+    def view
+      execute_external_command do
+        pager = ENV['PAGER'] || 'less'
+        system "#{pager} #{current_item.path}"
+      end
     end
 
     def debug(str)

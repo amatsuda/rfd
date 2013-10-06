@@ -96,6 +96,15 @@ module Rfd
       move_cursor @current_page * max_items + @displayed_items.size / 2
     end
 
+    def ctrl_a
+      mark = marked_items.size != (@items.size - 2)  # exclude . and ..
+      @items.each {|i| i.toggle_mark unless i.marked? == mark}
+      draw_items
+      move_cursor @row
+      draw_marked_items
+      header_r.wrefresh
+    end
+
     def ctrl_n
       if total_pages > 1
         if @current_page + 1 < total_pages

@@ -149,7 +149,6 @@ module Rfd
       define_method(n) do
         @panes.clear_all
         spawn_panes n.to_i
-        @row = 0
         ls
       end
     end

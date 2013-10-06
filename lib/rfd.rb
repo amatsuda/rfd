@@ -171,7 +171,6 @@ module Rfd
       spawn_panes 2
       border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
       Curses.box border_window, 0, 0
-      @row = 0
 
       cd dir
       ls
@@ -212,6 +211,7 @@ module Rfd
     def spawn_panes(num)
       width = (Rfd.maxx - 2) / num
       windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Rfd.maxy - 7, width - 1, 5, width * i + 1)}
+      @row = @current_page = 0
       @panes = Panes.new windows
       @panes.switch 0
     end

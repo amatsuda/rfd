@@ -27,14 +27,16 @@ module Rfd
     end
 
     def display_name
-      n = full_display_name
-      if mb_size(n) <= @window_width - 15
-        n
-      else
-        if symlink?
-          mb_left n, @window_width - 16
+      @display_name ||= begin
+        n = full_display_name
+        if mb_size(n) <= @window_width - 15
+          n
         else
-          "#{mb_left(basename, @window_width - 16 - extname.length)}…#{extname}"
+          if symlink?
+            mb_left n, @window_width - 16
+          else
+            "#{mb_left(basename, @window_width - 16 - extname.length)}…#{extname}"
+          end
         end
       end
     end
@@ -82,21 +84,23 @@ module Rfd
     end
 
     def mode
-      m = lstat.mode
-      ret = directory? ? 'd' : symlink? ? 'l' : '-'
-      [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ret) do |str, s|
-        str << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
+      @mode ||= begin
+        m = lstat.mode
+        ret = directory? ? 'd' : symlink? ? 'l' : '-'
+        [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ret) do |str, s|
+          str << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
+        end
+        if m & 04000 != 0
+          ret[3] = directory? ? 's' : 'S'
+        end
+        if m & 02000 != 0
+          ret[6] = directory? ? 's' : 'S'
+        end
+        if m & 01000 == 512
+          ret[-1] = directory? ? 't' : 'T'
+        end
+        ret
       end
-      if m & 04000 != 0
-        ret[3] = directory? ? 's' : 'S'
-      end
-      if m & 02000 != 0
-        ret[6] = directory? ? 's' : 'S'
-      end
-      if m & 01000 == 512
-        ret[-1] = directory? ? 't' : 'T'
-      end
-      ret
     end
 
     def directory?

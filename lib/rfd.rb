@@ -455,7 +455,9 @@ module Rfd
     def process_shell_command
       command_line.set_prompt ':!'
       cmd = command_line.get_command(prompt: ':!')[1..-1]
-      system cmd
+      execute_external_command pause: true do
+        system cmd
+      end
       command_line.wclear
       command_line.wrefresh
     rescue Interrupt

@@ -488,6 +488,13 @@ module Rfd
       Curses.refresh
     end
 
+    def edit
+      execute_external_command do
+        editor = ENV['EDITOR'] || 'vim'
+        system "#{editor} #{current_item.path}"
+      end
+    end
+
     def view
       execute_external_command do
         pager = ENV['PAGER'] || 'less'

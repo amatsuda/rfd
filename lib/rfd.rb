@@ -83,10 +83,10 @@ module Rfd
     end
   end
 
-  class HeaderLeftWindow < SubWindow
+  class HeaderLeftWindow < Window
     def initialize
       @window = subwin 3, Rfd.maxx - 32, 1, 1
-      super
+      draw_border 0, 0, 0, 0, 0, 0, Curses::ACS_LTEE, 0
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)

@@ -165,14 +165,14 @@ module Rfd
     attr_reader :header_l, :header_r, :command_line
 
     def initialize(dir = '.')
+      border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
+      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
+      Curses.box border_window, 0, 0
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
 
       spawn_panes 2
-      border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
-      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
-      Curses.box border_window, 0, 0
 
       cd dir
       ls

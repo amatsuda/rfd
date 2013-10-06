@@ -451,6 +451,19 @@ module Rfd
       Curses.wstandend window
     end
 
+    def process_shell_command
+      command_line.set_prompt ':!'
+      cmd = command_line.get_command(prompt: ':!')[1..-1]
+      system cmd
+      command_line.wclear
+      command_line.wrefresh
+    rescue Interrupt
+      command_line.wclear
+      command_line.wrefresh
+    ensure
+      Curses.wstandend window
+    end
+
     def ask(prompt = '(y/n)')
       command_line.set_prompt prompt
       command_line.wrefresh

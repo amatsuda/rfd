@@ -440,11 +440,11 @@ module Rfd
     def ask(prompt = '(y/n)')
       command_line.set_prompt prompt
       command_line.wrefresh
-      while (c = Curses.getch.chr)
-        next unless %(y Y n N).include? c
+      while (c = Curses.getch)
+        next unless [78, 89, 110, 121] .include? c  # N, Y, n, y
         command_line.wclear
         command_line.wrefresh
-        break %(y Y).include? c
+        break [89, 121].include? c  # Y, y
       end
     end
 

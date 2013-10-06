@@ -154,6 +154,10 @@ module Rfd
       process_command_line prompt: ':grep '
     end
 
+    define_method('!') do
+      process_shell_command
+    end
+
     define_method(':') do
       process_command_line
     end

@@ -54,6 +54,10 @@ module Rfd
       process_command_line prompt: ':mv '
     end
 
+    def o
+      system "open #{selected_items.map {|i| %Q["#{i.path}"]}.join(' ')}"
+    end
+
     def q
       raise StopIteration if ask 'Are your sure want to exit? (y/n)'
     end

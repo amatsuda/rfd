@@ -184,6 +184,14 @@ module Rfd
           space
         when 127  # DEL
           del
+        when 258  # down
+          j
+        when 259  # up
+          k
+        when 260  # left
+          h
+        when 261  # right
+          l
         when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
           chr = ((c - 1 + 65) ^ 0b0100000).chr
           public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")

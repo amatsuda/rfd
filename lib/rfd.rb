@@ -197,12 +197,14 @@ module Rfd
         when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
           chr = ((c - 1 + 65) ^ 0b0100000).chr
           public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
-        else
+        when 0..255
           if respond_to? c.chr
             public_send c.chr
           else
             debug "key: #{c}"
           end
+        else
+          debug "key: #{c}"
         end
       end
     end

@@ -39,8 +39,8 @@ module Rfd
       end
     end
 
-    def stat
-      @stat ||= File.lstat path
+    def lstat
+      @lstat ||= File.lstat path
     end
 
     def color
@@ -58,7 +58,7 @@ module Rfd
     end
 
     def size
-      directory? ? 0 : stat.size
+      directory? ? 0 : lstat.size
     end
 
     def size_or_dir
@@ -66,19 +66,19 @@ module Rfd
     end
 
     def atime
-      stat.atime.strftime('%Y-%m-%d %H:%M:%S')
+      lstat.atime.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def ctime
-      stat.ctime.strftime('%Y-%m-%d %H:%M:%S')
+      lstat.ctime.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def mtime
-      stat.mtime.strftime('%Y-%m-%d %H:%M:%S')
+      lstat.mtime.strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def mode
-      m = stat.mode
+      m = lstat.mode
       ret = directory? ? 'd' : symlink? ? 'l' : '-'
       [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ret) do |str, s|
         str << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
@@ -96,11 +96,11 @@ module Rfd
     end
 
     def directory?
-      stat.directory?
+      lstat.directory?
     end
 
     def symlink?
-      stat.symlink?
+      lstat.symlink?
     end
 
     def hidden?
@@ -108,7 +108,7 @@ module Rfd
     end
 
     def executable?
-      stat.executable?
+      lstat.executable?
     end
 
     def target

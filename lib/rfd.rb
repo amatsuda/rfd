@@ -113,10 +113,10 @@ module Rfd
     end
   end
 
-  class HeaderRightWindow < SubWindow
+  class HeaderRightWindow < Window
     def initialize
       @window = subwin 3, 29, 1, Rfd.maxx - 30
-      super
+      draw_border 0, 0, 0, 0, Curses::ACS_TTEE, 0, Curses::ACS_BTEE, Curses::ACS_RTEE
     end
 
     def draw_marked_items(count: 0, size: 0)

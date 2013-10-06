@@ -143,6 +143,7 @@ module Rfd
 
     (?1..?9).each do |n|
       define_method(n) do
+        @panes.clear_all
         spawn_panes n.to_i
         @row = 0
         ls

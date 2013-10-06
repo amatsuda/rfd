@@ -68,14 +68,18 @@ module Rfd
     def wclrtoeol
       Curses.wclrtoeol window
     end
+
+    def draw_border
+      border_window = subwin maxy + 2, maxx + 2, begy - 1, begx - 1
+      Curses.wbkgd border_window, Curses.COLOR_PAIR(Curses::COLOR_CYAN)
+      Curses.box border_window, 0, 0
+    end
   end
 
   # bordered Window
   class SubWindow < Window
     def initialize(*)
-      border_window = subwin maxy + 2, maxx + 2, begy - 1, begx - 1
-      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
-      Curses.box border_window, 0, 0
+      draw_border
     end
   end
 

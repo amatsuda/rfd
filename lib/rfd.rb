@@ -125,6 +125,7 @@ module Rfd
     def draw_total_items(count: 0, size: 0)
       wmove 2
       waddstr %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}], clear_to_eol_before_add: true
+      wrefresh
     end
 
     def debug(s)
@@ -303,7 +304,6 @@ module Rfd
 
       draw_marked_items
       draw_total_items
-      header_r.wrefresh
     end
 
     def sort(direction = nil)
@@ -401,7 +401,6 @@ module Rfd
       move_cursor 0
 
       draw_total_items
-      header_r.wrefresh
     end
 
     def cp(dest)

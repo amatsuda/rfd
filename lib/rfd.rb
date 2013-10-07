@@ -160,7 +160,7 @@ module Rfd
       end
     end
 
-    attr_reader :header_l, :header_r, :command_line, :items, :current_row
+    attr_reader :header_l, :header_r, :command_line, :items, :displayed_items, :current_row
 
     def initialize(dir = '.')
       border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
@@ -343,7 +343,7 @@ module Rfd
         @panes.switch index
         wclear
         wmove 0
-        if (items = @displayed_items[maxy * index, maxy * (index + 1)])
+        if (items = displayed_items[maxy * index, maxy * (index + 1)])
           items.each do |item|
             Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
             waddstr "#{item.to_s}\n"

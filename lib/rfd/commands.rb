@@ -97,11 +97,11 @@ module Rfd
     end
 
     def L
-      move_cursor @current_page * max_items + @displayed_items.size - 1
+      move_cursor @current_page * max_items + displayed_items.size - 1
     end
 
     def M
-      move_cursor @current_page * max_items + @displayed_items.size / 2
+      move_cursor @current_page * max_items + displayed_items.size / 2
     end
 
     def ctrl_a

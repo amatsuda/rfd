@@ -335,26 +335,26 @@ module Rfd
     end
 
     def draw_items
-      @displayed_items = items[current_page * max_items, max_items]
+      draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
+      draw_path_and_page_number
+      header_l.wrefresh
+    end
+
+    def draw_items_to_each_pane(items)
       original_active_pane_index = @panes.current_index
 
       0.upto(@panes.size - 1) do |index|
         @panes.switch index
         wclear
         wmove 0
-        if (items = displayed_items[maxy * index, maxy * (index + 1)])
-          items.each do |item|
-            Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
-            waddstr "#{item.to_s}\n"
-          end
-        end
+        items[maxy * index, maxy * (index + 1)].each do |item|
+          Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
+          waddstr "#{item.to_s}\n"
+        end if items[maxy * index, maxy * (index + 1)]
         Curses.wstandend window
         wrefresh
       end
       @panes.switch original_active_pane_index
-
-      draw_path_and_page_number
-      header_l.wrefresh
     end
 
     def sort_items_according_to_current_direction

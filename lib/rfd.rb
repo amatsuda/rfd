@@ -90,6 +90,7 @@ module Rfd
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wmove 0
       waddstr @path_and_page_number, clear_to_eol_before_add: true
+      wrefresh
     end
 
     def draw_current_file_info(current_file)
@@ -336,8 +337,7 @@ module Rfd
 
     def draw_items
       draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
-      draw_path_and_page_number
-      header_l.wrefresh
+      header_l.draw_path_and_page_number path: current_dir, current: current_page + 1, total: total_pages
     end
 
     def draw_items_to_each_pane(items)
@@ -436,10 +436,6 @@ module Rfd
     def switch_page(page)
       @current_page = page
       draw_items
-    end
-
-    def draw_path_and_page_number
-      header_l.draw_path_and_page_number path: current_dir, current: current_page + 1, total: total_pages
     end
 
     def draw_marked_items

@@ -7,7 +7,7 @@ require_relative 'rfd/item'
 module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
-  def self.start(dir = '.')
+  def self.init_curses
     Curses.initscr
     Curses.raw
     Curses.noecho
@@ -18,7 +18,10 @@ module Rfd
     [Curses::COLOR_WHITE, Curses::COLOR_CYAN, Curses::COLOR_MAGENTA, Curses::COLOR_GREEN, Curses::COLOR_RED].each do |c|
       Curses.init_pair c, c, Curses::COLOR_BLACK
     end
+  end
 
+  def self.start(dir = '.')
+    init_curses
     Rfd::MainWindow.new dir
   end
 

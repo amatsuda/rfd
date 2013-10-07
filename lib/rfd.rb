@@ -225,7 +225,11 @@ module Rfd
       windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.LINES - 7, width - 1, 5, width * i + 1)}
       @current_row = @current_page = 0
       @panes = Panes.new windows
-      @panes.activate 0
+      activate_pane 0
+    end
+
+    def activate_pane(num)
+      @panes.activate num
     end
 
     def window
@@ -258,7 +262,7 @@ module Rfd
             draw_item prev_item
           end
         end
-        @panes.activate item_index_in_page / maxy
+        activate_pane item_index_in_page / maxy
         @current_row = row
       else
         @current_row = 0
@@ -277,7 +281,7 @@ module Rfd
         Dir.chdir target
         (@dir_history ||= []) << current_dir if current_dir && pushd
         @current_dir, @current_page, @current_row = target, 0, nil
-        @panes.activate 0
+        activate_pane 0
       end
     end
 
@@ -344,7 +348,7 @@ module Rfd
       original_active_pane_index = @panes.current_index
 
       0.upto(@panes.size - 1) do |index|
-        @panes.activate index
+        activate_pane index
         wclear
         wmove 0
         items[maxy * index, maxy * (index + 1)].each do |item|
@@ -354,7 +358,7 @@ module Rfd
         Curses.wstandend window
         wrefresh
       end
-      @panes.activate original_active_pane_index
+      activate_pane original_active_pane_index
     end
 
     def sort_items_according_to_current_direction

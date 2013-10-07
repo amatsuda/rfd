@@ -76,7 +76,7 @@ module Rfd
     def draw_border(*border_param)
       border_window = subwin maxy + 2, maxx + 2, begy - 1, begx - 1
       Curses.wbkgd border_window, Curses.COLOR_PAIR(Curses::COLOR_CYAN)
-      Curses.wborder border_window, *(border_param.any? ? border_param : [0, 0, 0, 0, 0, 0, 0, 0])
+      Curses.wborder border_window, *border_param
     end
   end
 

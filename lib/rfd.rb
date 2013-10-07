@@ -132,6 +132,7 @@ module Rfd
       wmove 0, 0
       wclrtoeol
       waddstr s.to_s
+      wrefresh
     end
   end
 
@@ -517,7 +518,6 @@ module Rfd
 
     def debug(str)
       header_r.debug str
-      header_r.wrefresh
     end
   end
 

@@ -110,6 +110,88 @@ module Rfd
     end
   end
 
+  class MainWindow < Window
+    class Panes
+      attr_reader :current_index
+
+      def initialize(panes)
+        @panes, @current_index = panes, 0
+      end
+
+      def active
+        @panes[@current_index]
+      end
+
+      def activate(index)
+        @current_index = index if index < @panes.size
+      end
+
+      def size
+        @panes.size
+      end
+
+      def close_all
+        @panes.each {|p| Curses.delwin p}
+      end
+    end
+
+    def initialize(dir = '.')
+      border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
+      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
+      Curses.box border_window, 0, 0
+
+      spawn_panes 2
+    end
+
+    def spawn_panes(num)
+      @panes.close_all if defined? @panes
+      width = (Curses.COLS - 2) / num
+      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.LINES - 7, width - 1, 5, width * i + 1)}
+      @panes = Panes.new windows
+      activate_pane 0
+    end
+
+    def activate_pane(num)
+      @panes.activate num
+    end
+
+    def window
+      @panes.active
+    end
+
+    def max_items
+      maxy * @panes.size
+    end
+
+    def draw_item(item, current: false)
+      Curses.wattr_set window, current ? Curses::A_UNDERLINE : Curses::A_NORMAL, item.color, nil
+      mvwaddstr item.index % maxy, 0, "#{item.to_s}\n"
+      Curses.wstandend window
+      wrefresh
+    end
+
+    def draw_items_to_each_pane(items)
+      original_active_pane_index = @panes.current_index
+
+      0.upto(@panes.size - 1) do |index|
+        activate_pane index
+        wclear
+        wmove 0
+        items[maxy * index, maxy * (index + 1)].each do |item|
+          Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
+          waddstr "#{item.to_s}\n"
+        end if items[maxy * index, maxy * (index + 1)]
+        Curses.wstandend window
+        wrefresh
+      end
+      activate_pane original_active_pane_index
+    end
+
+    def toggle_mark(item)
+      mvwaddstr item.index % maxy, 0, item.current_mark if item.toggle_mark
+    end
+  end
+
   class CommandLineWindow < Window
     def initialize
       @window = subwin 1, Curses.COLS, Curses.LINES - 1, 0

@@ -279,11 +279,11 @@ module Rfd
     end
 
     def cd(dir)
-      dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @dir ? File.join(@dir, dir) : dir)
-      if File.readable? dir
-        Dir.chdir dir
+      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @dir ? File.join(@dir, dir) : dir)
+      if File.readable? target
+        Dir.chdir target
         (@dir_history ||= []) << @dir if @dir
-        @dir, @current_page, @row = dir, 0, nil
+        @dir, @current_page, @row = target, 0, nil
         @panes.switch 0
       end
     end

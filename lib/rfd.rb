@@ -537,5 +537,14 @@ module Rfd
     ensure
       Curses.noecho
     end
+
+    def show_error(str)
+      Curses.wattr_set window, Curses::A_BOLD, Curses::COLOR_RED, nil
+      wmove 0
+      wclrtoeol
+      waddstr str
+      wrefresh
+      Curses.wstandend window
+    end
   end
 end

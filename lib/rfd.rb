@@ -181,34 +181,40 @@ module Rfd
 
     def run
       loop do
-        case (c = Curses.getch)
-        when Curses::KEY_RETURN
-          enter
-        when Curses::KEY_ESCAPE
-          q
-        when 32  # space
-          space
-        when 127  # DEL
-          del
-        when Curses::KEY_DOWN
-          j
-        when Curses::KEY_UP
-          k
-        when Curses::KEY_LEFT
-          h
-        when Curses::KEY_RIGHT
-          l
-        when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
-          chr = ((c - 1 + 65) ^ 0b0100000).chr
-          public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
-        when 0..255
-          if respond_to? c.chr
-            public_send c.chr
+        begin
+          case (c = Curses.getch)
+          when Curses::KEY_RETURN
+            enter
+          when Curses::KEY_ESCAPE
+            q
+          when 32  # space
+            space
+          when 127  # DEL
+            del
+          when Curses::KEY_DOWN
+            j
+          when Curses::KEY_UP
+            k
+          when Curses::KEY_LEFT
+            h
+          when Curses::KEY_RIGHT
+            l
+          when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
+            chr = ((c - 1 + 65) ^ 0b0100000).chr
+            public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
+          when 0..255
+            if respond_to? c.chr
+              public_send c.chr
+            else
+              debug "key: #{c}"
+            end
           else
             debug "key: #{c}"
           end
-        else
-          debug "key: #{c}"
+        rescue StopIteration
+          raise
+        rescue => e
+          command_line.show_error e.to_s
         end
       end
     ensure

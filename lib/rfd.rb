@@ -206,15 +206,16 @@ module Rfd
             if respond_to? c.chr
               public_send c.chr
             else
-              debug "key: #{c}"
+              debug "key: #{c}" if ENV['DEBUG']
             end
           else
-            debug "key: #{c}"
+            debug "key: #{c}" if ENV['DEBUG']
           end
         rescue StopIteration
           raise
         rescue => e
           command_line.show_error e.to_s
+          raise if ENV['DEBUG']
         end
       end
     ensure

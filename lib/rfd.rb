@@ -155,11 +155,8 @@ module Rfd
         @panes.size
       end
 
-      def clear_all
-        @panes.each do |p|
-          Curses.wclear p
-          Curses.wrefresh p
-        end
+      def close_all
+        @panes.each {|p| Curses.delwin p}
       end
     end
 

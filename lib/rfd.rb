@@ -250,18 +250,15 @@ module Rfd
     def move_cursor(row = nil)
       if row
         page, item_index_in_page = row.divmod max_items
-        pane_index = item_index_in_page / maxy
         if page != current_page
           switch_page page
-          @panes.switch pane_index
-          @current_row = row
         else
           if (prev_item = items[current_row])
             draw_item prev_item
           end
-          @current_row = row
-          @panes.switch pane_index
         end
+        @panes.switch item_index_in_page / maxy
+        @current_row = row
       else
         @current_row = 0
       end

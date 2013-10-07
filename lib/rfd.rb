@@ -522,7 +522,9 @@ module Rfd
 
     def set_prompt(str)
       Curses.wattr_set window, Curses::A_BOLD, Curses::COLOR_WHITE, nil
-      mvwaddstr 0, 0, str
+      wmove 0
+      wclrtoeol
+      waddstr str
       Curses.wstandend window
     end
 

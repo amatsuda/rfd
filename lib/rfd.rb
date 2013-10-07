@@ -160,7 +160,7 @@ module Rfd
       end
     end
 
-    attr_reader :header_l, :header_r, :command_line, :items, :displayed_items, :current_row
+    attr_reader :header_l, :header_r, :command_line, :items, :displayed_items, :current_row, :current_page
 
     def initialize(dir = '.')
       border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
@@ -251,7 +251,7 @@ module Rfd
       if row
         page, item_index_in_page = row.divmod max_items
         pane_index = item_index_in_page / maxy
-        if page != @current_page
+        if page != current_page
           switch_page page
           @panes.switch pane_index
           @current_row = row
@@ -336,7 +336,7 @@ module Rfd
     end
 
     def draw_items
-      @displayed_items = items[@current_page * max_items, max_items]
+      @displayed_items = items[current_page * max_items, max_items]
       original_active_pane_index = @panes.current_index
 
       0.upto(@panes.size - 1) do |index|
@@ -423,11 +423,11 @@ module Rfd
     end
 
     def first_page?
-      @current_page == 0
+      current_page == 0
     end
 
     def last_page?
-      @current_page == total_pages - 1
+      current_page == total_pages - 1
     end
 
     def total_pages
@@ -440,7 +440,7 @@ module Rfd
     end
 
     def draw_path_and_page_number
-      header_l.draw_path_and_page_number path: @dir, current: @current_page + 1, total: total_pages
+      header_l.draw_path_and_page_number path: @dir, current: current_page + 1, total: total_pages
     end
 
     def draw_marked_items

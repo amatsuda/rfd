@@ -121,6 +121,10 @@ module Rfd
       ctrl_n
     end
 
+    def ctrl_l
+      ls
+    end
+
     def ctrl_n
       if total_pages > 1
         if last_page?
@@ -139,10 +143,6 @@ module Rfd
           move_cursor (@current_page - 1) * max_items
         end
       end
-    end
-
-    def ctrl_r
-      ls
     end
 
     (?1..?9).each do |n|

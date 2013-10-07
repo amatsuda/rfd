@@ -153,6 +153,10 @@ module Rfd
       end
     end
 
+    def -
+      popd
+    end
+
     def /
       process_command_line prompt: ':grep '
     end

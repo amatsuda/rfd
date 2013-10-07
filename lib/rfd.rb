@@ -222,7 +222,7 @@ module Rfd
     def spawn_panes(num)
       width = (Curses.COLS - 2) / num
       windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.LINES - 7, width - 1, 5, width * i + 1)}
-      @row = @current_page = 0
+      @current_row = @current_page = 0
       @panes = Panes.new windows
       @panes.switch 0
     end
@@ -236,7 +236,7 @@ module Rfd
     end
 
     def current_item
-      items[@row]
+      items[@current_row]
     end
 
     def marked_items
@@ -254,23 +254,23 @@ module Rfd
         if page != @current_page
           switch_page page
           @panes.switch pane_index
-          @row = row
+          @current_row = row
         else
-          if (prev_item = items[@row])
+          if (prev_item = items[@current_row])
             Curses.wattr_set window, Curses::A_NORMAL, prev_item.color, nil
-            mvwaddstr @row % maxy, 0, "#{prev_item.to_s}\n"
+            mvwaddstr @current_row % maxy, 0, "#{prev_item.to_s}\n"
             wrefresh
           end
-          @row = row
+          @current_row = row
           @panes.switch pane_index
         end
       else
-        @row = 0
+        @current_row = 0
       end
 
-      item = items[@row]
+      item = items[@current_row]
       Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
-      mvwaddstr @row % maxy, 0, "#{item.to_s}\n"
+      mvwaddstr @current_row % maxy, 0, "#{item.to_s}\n"
       Curses.wstandend window
       wrefresh
 
@@ -283,7 +283,7 @@ module Rfd
       if File.readable? target
         Dir.chdir target
         (@dir_history ||= []) << @dir if @dir
-        @dir, @current_page, @row = target, 0, nil
+        @dir, @current_page, @current_row = target, 0, nil
         @panes.switch 0
       end
     end
@@ -301,7 +301,7 @@ module Rfd
 
       @current_page ||= 0
       draw_items
-      move_cursor @row
+      move_cursor @current_row
 
       draw_marked_items
       draw_total_items
@@ -453,7 +453,7 @@ module Rfd
     end
 
     def toggle_mark
-      mvwaddstr @row % maxy, 0, current_item.current_mark if current_item.toggle_mark
+      mvwaddstr @current_row % maxy, 0, current_item.current_mark if current_item.toggle_mark
     end
 
     def process_command_line(prompt: ':')

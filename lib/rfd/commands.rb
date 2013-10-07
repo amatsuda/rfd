@@ -12,7 +12,7 @@ module Rfd
       if selected_items.any?
         if ask %Q[Are your sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
           FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
-          @current_row -= selected_items.count {|i| i.index <= @current_row}
+          @current_row -= selected_items.count {|i| i.index <= current_row}
           ls
         end
       end
@@ -31,27 +31,27 @@ module Rfd
     end
 
     def h
-      (y = @current_row - maxy) >= 0 and move_cursor y
+      (y = current_row - maxy) >= 0 and move_cursor y
     end
 
     def j
-      if @current_row + 1 >= items.size
+      if current_row + 1 >= items.size
         move_cursor 0
       else
-        move_cursor @current_row + 1
+        move_cursor current_row + 1
       end
     end
 
     def k
-      if @current_row == 0
+      if current_row == 0
         move_cursor items.size - 1
       else
-        move_cursor @current_row - 1
+        move_cursor current_row - 1
       end
     end
 
     def l
-      (y = @current_row + maxy) < items.size and move_cursor y
+      (y = current_row + maxy) < items.size and move_cursor y
     end
 
     def m
@@ -82,7 +82,7 @@ module Rfd
       if selected_items.any?
         if ask %Q[Are your sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
           FileUtils.rm_rf selected_items.map(&:path)
-          @current_row -= selected_items.count {|i| i.index <= @current_row}
+          @current_row -= selected_items.count {|i| i.index <= current_row}
           ls
         end
       end
@@ -108,7 +108,7 @@ module Rfd
       mark = marked_items.size != (items.size - 2)  # exclude . and ..
       items.each {|i| i.toggle_mark unless i.marked? == mark}
       draw_items
-      move_cursor @current_row
+      move_cursor current_row
       draw_marked_items
       header_r.wrefresh
     end

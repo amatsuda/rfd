@@ -160,7 +160,7 @@ module Rfd
       end
     end
 
-    attr_reader :header_l, :header_r, :command_line, :items
+    attr_reader :header_l, :header_r, :command_line, :items, :current_row
 
     def initialize(dir = '.')
       border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
@@ -236,7 +236,7 @@ module Rfd
     end
 
     def current_item
-      items[@current_row]
+      items[current_row]
     end
 
     def marked_items
@@ -256,9 +256,9 @@ module Rfd
           @panes.switch pane_index
           @current_row = row
         else
-          if (prev_item = items[@current_row])
+          if (prev_item = items[current_row])
             Curses.wattr_set window, Curses::A_NORMAL, prev_item.color, nil
-            mvwaddstr @current_row % maxy, 0, "#{prev_item.to_s}\n"
+            mvwaddstr current_row % maxy, 0, "#{prev_item.to_s}\n"
             wrefresh
           end
           @current_row = row
@@ -268,9 +268,9 @@ module Rfd
         @current_row = 0
       end
 
-      item = items[@current_row]
+      item = items[current_row]
       Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
-      mvwaddstr @current_row % maxy, 0, "#{item.to_s}\n"
+      mvwaddstr current_row % maxy, 0, "#{item.to_s}\n"
       Curses.wstandend window
       wrefresh
 
@@ -301,7 +301,7 @@ module Rfd
 
       @current_page ||= 0
       draw_items
-      move_cursor @current_row
+      move_cursor current_row
 
       draw_marked_items
       draw_total_items
@@ -453,7 +453,7 @@ module Rfd
     end
 
     def toggle_mark
-      mvwaddstr @current_row % maxy, 0, current_item.current_mark if current_item.toggle_mark
+      mvwaddstr current_row % maxy, 0, current_item.current_mark if current_item.toggle_mark
     end
 
     def process_command_line(prompt: ':')

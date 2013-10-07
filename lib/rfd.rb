@@ -257,9 +257,7 @@ module Rfd
           @current_row = row
         else
           if (prev_item = items[current_row])
-            Curses.wattr_set window, Curses::A_NORMAL, prev_item.color, nil
-            mvwaddstr current_row % maxy, 0, "#{prev_item.to_s}\n"
-            wrefresh
+            draw_item prev_item
           end
           @current_row = row
           @panes.switch pane_index
@@ -269,10 +267,7 @@ module Rfd
       end
 
       item = items[current_row]
-      Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
-      mvwaddstr current_row % maxy, 0, "#{item.to_s}\n"
-      Curses.wstandend window
-      wrefresh
+      draw_item item, current: true
 
       header_l.draw_current_file_info item
       header_l.wrefresh
@@ -333,6 +328,13 @@ module Rfd
     def find_reverse(str)
       index = items.reverse.index {|i| i.name.start_with? str}
       move_cursor items.length - index - 1 if index
+    end
+
+    def draw_item(item, current: false)
+      Curses.wattr_set window, current ? Curses::A_UNDERLINE : Curses::A_NORMAL, item.color, nil
+      mvwaddstr item.index % maxy, 0, "#{item.to_s}\n"
+      Curses.wstandend window
+      wrefresh
     end
 
     def draw_items

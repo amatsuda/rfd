@@ -35,7 +35,7 @@ module Rfd
     end
 
     def j
-      if @row + 1 >= @items.size
+      if @row + 1 >= items.size
         move_cursor 0
       else
         move_cursor @row + 1
@@ -44,14 +44,14 @@ module Rfd
 
     def k
       if @row == 0
-        move_cursor @items.size - 1
+        move_cursor items.size - 1
       else
         move_cursor @row - 1
       end
     end
 
     def l
-      (y = @row + maxy) < @items.size and move_cursor y
+      (y = @row + maxy) < items.size and move_cursor y
     end
 
     def m
@@ -105,8 +105,8 @@ module Rfd
     end
 
     def ctrl_a
-      mark = marked_items.size != (@items.size - 2)  # exclude . and ..
-      @items.each {|i| i.toggle_mark unless i.marked? == mark}
+      mark = marked_items.size != (items.size - 2)  # exclude . and ..
+      items.each {|i| i.toggle_mark unless i.marked? == mark}
       draw_items
       move_cursor @row
       draw_marked_items

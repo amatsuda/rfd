@@ -160,7 +160,7 @@ module Rfd
       end
     end
 
-    attr_reader :header_l, :header_r, :command_line
+    attr_reader :header_l, :header_r, :command_line, :items
 
     def initialize(dir = '.')
       border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
@@ -236,11 +236,11 @@ module Rfd
     end
 
     def current_item
-      @items[@row]
+      items[@row]
     end
 
     def marked_items
-      @items.select(&:marked?)
+      items.select(&:marked?)
     end
 
     def selected_items
@@ -256,7 +256,7 @@ module Rfd
           @panes.switch pane_index
           @row = row
         else
-          if (prev_item = @items[@row])
+          if (prev_item = items[@row])
             Curses.wattr_set window, Curses::A_NORMAL, prev_item.color, nil
             mvwaddstr @row % maxy, 0, "#{prev_item.to_s}\n"
             wrefresh
@@ -268,7 +268,7 @@ module Rfd
         @row = 0
       end
 
-      item = @items[@row]
+      item = items[@row]
       Curses.wattr_set window, Curses::A_UNDERLINE, item.color, nil
       mvwaddstr @row % maxy, 0, "#{item.to_s}\n"
       Curses.wstandend window
@@ -326,17 +326,17 @@ module Rfd
     end
 
     def find(str)
-      index = @items.index {|i| i.name.start_with? str}
+      index = items.index {|i| i.name.start_with? str}
       move_cursor index if index
     end
 
     def find_reverse(str)
-      index = @items.reverse.index {|i| i.name.start_with? str}
-      move_cursor @items.length - index - 1 if index
+      index = items.reverse.index {|i| i.name.start_with? str}
+      move_cursor items.length - index - 1 if index
     end
 
     def draw_items
-      @displayed_items = @items[@current_page * max_items, max_items]
+      @displayed_items = items[@current_page * max_items, max_items]
       original_active_pane_index = @panes.current_index
 
       0.upto(@panes.size - 1) do |index|
@@ -361,37 +361,37 @@ module Rfd
     def sort_items_according_to_current_direction
       case @direction
       when nil
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map(&:sort)
+        @items = items.shift(2) + items.partition(&:directory?).flat_map(&:sort)
       when 'r'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
       when 'S', 's'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| -i.size}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| -i.size}}
       when 'Sr', 'sr'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:size)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:size)}
       when 't'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.mtime <=> x.mtime}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.mtime <=> x.mtime}}
       when 'tr'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:mtime)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:mtime)}
       when 'c'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.ctime <=> x.ctime}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.ctime <=> x.ctime}}
       when 'cr'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:ctime)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:ctime)}
       when 'u'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.atime <=> x.atime}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.atime <=> x.atime}}
       when 'ur'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:atime)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:atime)}
       when 'e'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.extname <=> x.extname}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.extname <=> x.extname}}
       when 'er'
-        @items = @items.shift(2) + @items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:extname)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:extname)}
       end
-      @items.each.with_index {|item, index| item.index = index}
+      items.each.with_index {|item, index| item.index = index}
     end
 
     def grep(pattern = '.*')
       regexp = Regexp.new(pattern)
       fetch_items_from_filesystem
-      @items = @items.shift(2) + @items.select {|i| i.name =~ regexp}
+      @items = items.shift(2) + items.select {|i| i.name =~ regexp}
       sort_items_according_to_current_direction
       switch_page 0
       move_cursor 0
@@ -431,7 +431,7 @@ module Rfd
     end
 
     def total_pages
-      @items.length / max_items + 1
+      items.length / max_items + 1
     end
 
     def switch_page(page)
@@ -449,7 +449,7 @@ module Rfd
     end
 
     def draw_total_items
-      header_r.draw_total_items count: @items.size, size: @items.inject(0) {|sum, i| sum += i.size}
+      header_r.draw_total_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 
     def toggle_mark

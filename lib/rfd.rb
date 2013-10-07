@@ -139,6 +139,11 @@ module Rfd
   class MainWindow < Window
     include Rfd::Commands
 
+    #FIXME remove me
+    def main
+      self
+    end
+
     class Panes
       attr_reader :current_index
 
@@ -262,17 +267,17 @@ module Rfd
           switch_page page
         else
           if (prev_item = items[current_row])
-            draw_item prev_item
+            main.draw_item prev_item
           end
         end
-        activate_pane item_index_in_page / maxy
+        main.activate_pane item_index_in_page / maxy
         @current_row = row
       else
         @current_row = 0
       end
 
       item = items[current_row]
-      draw_item item, current: true
+      main.draw_item item, current: true
 
       header_l.draw_current_file_info item
       header_l.wrefresh
@@ -284,7 +289,7 @@ module Rfd
         Dir.chdir target
         (@dir_history ||= []) << current_dir if current_dir && pushd
         @current_dir, @current_page, @current_row = target, 0, nil
-        activate_pane 0
+        main.activate_pane 0
       end
     end
 
@@ -342,7 +347,7 @@ module Rfd
     end
 
     def draw_items
-      draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
+      main.draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
       header_l.draw_path_and_page_number path: current_dir, current: current_page + 1, total: total_pages
     end
 

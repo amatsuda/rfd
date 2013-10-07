@@ -221,6 +221,7 @@ module Rfd
     end
 
     def spawn_panes(num)
+      @panes.close_all if defined? @panes
       width = (Curses.COLS - 2) / num
       windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.LINES - 7, width - 1, 5, width * i + 1)}
       @current_row = @current_page = 0

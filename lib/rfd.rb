@@ -160,7 +160,7 @@ module Rfd
       end
     end
 
-    attr_reader :header_l, :header_r, :command_line, :items, :displayed_items, :current_row, :current_page
+    attr_reader :header_l, :header_r, :command_line, :items, :displayed_items, :current_row, :current_page, :current_dir
 
     def initialize(dir = '.')
       border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
@@ -279,7 +279,7 @@ module Rfd
     end
 
     def cd(dir, pushd: true)
-      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @current_dir ? File.join(@current_dir, dir) : dir)
+      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : current_dir ? File.join(current_dir, dir) : dir)
       if File.readable? target
         Dir.chdir target
         (@dir_history ||= []) << current_dir if current_dir && pushd
@@ -322,7 +322,7 @@ module Rfd
     end
 
     def fetch_items_from_filesystem
-      @items = Dir.foreach(@current_dir).map {|fn| Item.new dir: @current_dir, name: fn, window_width: maxx}.to_a
+      @items = Dir.foreach(current_dir).map {|fn| Item.new dir: current_dir, name: fn, window_width: maxx}.to_a
     end
 
     def find(str)
@@ -402,23 +402,23 @@ module Rfd
 
     def cp(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.cp_r src, File.join(@current_dir, dest)
+      FileUtils.cp_r src, File.join(current_dir, dest)
       ls
     end
 
     def mv(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.mv src, File.join(@current_dir, dest)
+      FileUtils.mv src, File.join(current_dir, dest)
       ls
     end
 
     def mkdir(dir)
-      FileUtils.mkdir_p File.join(@current_dir, dir)
+      FileUtils.mkdir_p File.join(current_dir, dir)
       ls
     end
 
     def touch(filename)
-      FileUtils.touch File.join(@current_dir, filename)
+      FileUtils.touch File.join(current_dir, filename)
       ls
     end
 
@@ -440,7 +440,7 @@ module Rfd
     end
 
     def draw_path_and_page_number
-      header_l.draw_path_and_page_number path: @current_dir, current: current_page + 1, total: total_pages
+      header_l.draw_path_and_page_number path: current_dir, current: current_page + 1, total: total_pages
     end
 
     def draw_marked_items

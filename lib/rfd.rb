@@ -25,14 +25,6 @@ module Rfd
     Rfd::MainWindow.new dir
   end
 
-  def self.maxx
-    Curses.getmaxx Curses.stdscr
-  end
-
-  def self.maxy
-    Curses.getmaxy Curses.stdscr
-  end
-
   class Window
     attr_reader :window
 
@@ -90,7 +82,7 @@ module Rfd
 
   class HeaderLeftWindow < Window
     def initialize
-      @window = subwin 3, Rfd.maxx - 32, 1, 1
+      @window = subwin 3, Curses.COLS - 32, 1, 1
       draw_border 0, 0, 0, 0, 0, 0, Curses::ACS_LTEE, 0
     end
 
@@ -120,7 +112,7 @@ module Rfd
 
   class HeaderRightWindow < Window
     def initialize
-      @window = subwin 3, 29, 1, Rfd.maxx - 30
+      @window = subwin 3, 29, 1, Curses.COLS - 30
       draw_border 0, 0, 0, 0, Curses::ACS_TTEE, 0, Curses::ACS_BTEE, Curses::ACS_RTEE
     end
 
@@ -174,7 +166,7 @@ module Rfd
     attr_reader :header_l, :header_r, :command_line
 
     def initialize(dir = '.')
-      border_window = subwin Rfd.maxy - 5, Rfd.maxx, 4, 0
+      border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
       Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
       Curses.box border_window, 0, 0
       @header_l = HeaderLeftWindow.new
@@ -224,8 +216,8 @@ module Rfd
     end
 
     def spawn_panes(num)
-      width = (Rfd.maxx - 2) / num
-      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Rfd.maxy - 7, width - 1, 5, width * i + 1)}
+      width = (Curses.COLS - 2) / num
+      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.LINES - 7, width - 1, 5, width * i + 1)}
       @row = @current_page = 0
       @panes = Panes.new windows
       @panes.switch 0
@@ -525,7 +517,7 @@ module Rfd
 
   class CommandLineWindow < Window
     def initialize
-      @window = subwin 1, Rfd.maxx, Rfd.maxy - 1, 0
+      @window = subwin 1, Curses.COLS, Curses.LINES - 1, 0
     end
 
     def set_prompt(str)

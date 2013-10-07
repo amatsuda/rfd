@@ -474,9 +474,8 @@ module Rfd
       execute_external_command pause: true do
         system cmd
       end
-      command_line.wclear
-      command_line.wrefresh
     rescue Interrupt
+    ensure
       command_line.wclear
       command_line.wrefresh
     end

@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 require File.expand_path('../../lib/rfd', __FILE__)
 
-begin
-  rfd = Rfd.start ARGV[0] || '.'
-  rfd.run
-ensure
-  Curses.endwin
-end
+rfd = Rfd.start ARGV[0] || '.'
+rfd.run

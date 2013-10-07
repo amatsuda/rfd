@@ -216,6 +216,8 @@ module Rfd
           debug "key: #{c}"
         end
       end
+    ensure
+      Curses.endwin
     end
 
     def spawn_panes(num)

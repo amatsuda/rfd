@@ -282,8 +282,16 @@ module Rfd
       dir = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @dir ? File.join(@dir, dir) : dir)
       if File.readable? dir
         Dir.chdir dir
+        (@dir_history ||= []) << @dir if @dir
         @dir, @current_page, @row = dir, 0, nil
         @panes.switch 0
+      end
+    end
+
+    def popd
+      if defined?(@dir_history) && @dir_history.any?
+        cd @dir_history.pop
+        ls
       end
     end
 

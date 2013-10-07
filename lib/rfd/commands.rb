@@ -186,7 +186,7 @@ module Rfd
     end
 
     def del
-      if @dir != '/'
+      if @current_dir != '/'
         cd '..'
         ls
       end

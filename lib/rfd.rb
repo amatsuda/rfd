@@ -279,11 +279,11 @@ module Rfd
     end
 
     def cd(dir, pushd: true)
-      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @dir ? File.join(@dir, dir) : dir)
+      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @current_dir ? File.join(@current_dir, dir) : dir)
       if File.readable? target
         Dir.chdir target
-        (@dir_history ||= []) << @dir if @dir && pushd
-        @dir, @current_page, @current_row = target, 0, nil
+        (@dir_history ||= []) << current_dir if current_dir && pushd
+        @current_dir, @current_page, @current_row = target, 0, nil
         @panes.switch 0
       end
     end
@@ -322,7 +322,7 @@ module Rfd
     end
 
     def fetch_items_from_filesystem
-      @items = Dir.foreach(@dir).map {|fn| Item.new dir: @dir, name: fn, window_width: maxx}.to_a
+      @items = Dir.foreach(@current_dir).map {|fn| Item.new dir: @current_dir, name: fn, window_width: maxx}.to_a
     end
 
     def find(str)
@@ -402,23 +402,23 @@ module Rfd
 
     def cp(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.cp_r src, File.join(@dir, dest)
+      FileUtils.cp_r src, File.join(@current_dir, dest)
       ls
     end
 
     def mv(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.mv src, File.join(@dir, dest)
+      FileUtils.mv src, File.join(@current_dir, dest)
       ls
     end
 
     def mkdir(dir)
-      FileUtils.mkdir_p File.join(@dir, dir)
+      FileUtils.mkdir_p File.join(@current_dir, dir)
       ls
     end
 
     def touch(filename)
-      FileUtils.touch File.join(@dir, filename)
+      FileUtils.touch File.join(@current_dir, filename)
       ls
     end
 
@@ -440,7 +440,7 @@ module Rfd
     end
 
     def draw_path_and_page_number
-      header_l.draw_path_and_page_number path: @dir, current: current_page + 1, total: total_pages
+      header_l.draw_path_and_page_number path: @current_dir, current: current_page + 1, total: total_pages
     end
 
     def draw_marked_items

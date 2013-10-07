@@ -278,11 +278,11 @@ module Rfd
       header_l.wrefresh
     end
 
-    def cd(dir)
+    def cd(dir, pushd: true)
       target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : @dir ? File.join(@dir, dir) : dir)
       if File.readable? target
         Dir.chdir target
-        (@dir_history ||= []) << @dir if @dir
+        (@dir_history ||= []) << @dir if @dir && pushd
         @dir, @current_page, @current_row = target, 0, nil
         @panes.switch 0
       end
@@ -290,7 +290,7 @@ module Rfd
 
     def popd
       if defined?(@dir_history) && @dir_history.any?
-        cd @dir_history.pop
+        cd @dir_history.pop, pushd: false
         ls
       end
     end

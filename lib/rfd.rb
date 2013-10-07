@@ -466,8 +466,6 @@ module Rfd
     rescue Interrupt
       command_line.wclear
       command_line.wrefresh
-    ensure
-      Curses.wstandend window
     end
 
     def process_shell_command
@@ -481,8 +479,6 @@ module Rfd
     rescue Interrupt
       command_line.wclear
       command_line.wrefresh
-    ensure
-      Curses.wstandend window
     end
 
     def ask(prompt = '(y/n)')

@@ -97,6 +97,11 @@ module Rfd
       process_command_line preset_command: 'chown'
     end
 
+    # Archive selected files and directories into a "z"ip file.
+    def z
+      process_command_line preset_command: 'zip'
+    end
+
     # "C"opy paths of selected files and directory to the "C"lipboard.
     def C
       clipboard

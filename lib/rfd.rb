@@ -1,6 +1,7 @@
 require 'ffi-ncurses'
 Curses = FFI::NCurses
 require 'fileutils'
+require 'zip'
 require_relative 'rfd/commands'
 require_relative 'rfd/item'
 require_relative 'rfd/windows'
@@ -381,6 +382,19 @@ module Rfd
     # Copy selected files and directories' path into clipboard on OSX
     def clipboard
       IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if osx?
+    end
+
+    # Archive selected files and directories into a .zip file
+    def zip(zipfile_name)
+      return unless zipfile_name
+      zipfile_name << '.zip' unless zipfile_name.end_with? '.zip'
+
+      Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+        selected_items.each do |item|
+          zipfile.add item.name, item.path
+        end
+      end
+      ls
     end
 
     # Current page is the first page?

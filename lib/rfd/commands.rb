@@ -26,7 +26,7 @@ module Rfd
       edit
     end
 
-    # "f"ind the first flie or directory of which name starts with the given String.
+    # "f"ind the first file or directory of which name starts with the given String.
     def f
       process_command_line preset_command: 'find'
     end
@@ -105,7 +105,7 @@ module Rfd
       end
     end
 
-    # "f"ind the last flie or directory of which name starts with the given String.
+    # "f"ind the last file or directory of which name starts with the given String.
     def F
       process_command_line preset_command: 'find_reverse'
     end

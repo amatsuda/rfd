@@ -6,12 +6,15 @@ describe Rfd::Controller do
 
   around do |example|
     @stdout = capture(:stdout) do
-      @rfd = Rfd.start testdir
+      FileUtils.cp_r File.join(__dir__, 'testdir'), tmpdir
+      @rfd = Rfd.start tmpdir
       def (@rfd.main).maxy
         3
       end
 
       example.run
+
+      FileUtils.rm_r tmpdir
     end
   end
 
@@ -19,7 +22,7 @@ describe Rfd::Controller do
     Curses.endwin
   end
 
-  let(:testdir) { File.join __dir__, 'testdir' }
+  let(:tmpdir) { File.join __dir__, 'tmpdir' }
   let!(:controller) { @rfd }
   subject { controller }
   let(:items) { controller.items }
@@ -102,13 +105,13 @@ describe Rfd::Controller do
     before do
       controller.cd 'dir1'
     end
-    its(:current_dir) { should == File.join(testdir, 'dir1') }
+    its(:current_dir) { should == File.join(tmpdir, 'dir1') }
 
     describe '#popd' do
       before do
         controller.popd
       end
-      its(:current_dir) { should == testdir }
+      its(:current_dir) { should == tmpdir }
     end
   end
 
@@ -122,15 +125,12 @@ describe Rfd::Controller do
 
   describe '#sort' do
     let(:item) do
-      Dir.mkdir File.join testdir, '.a'
-      Rfd::Item.new dir: testdir, name: '.a', window_width: 100
+      Dir.mkdir File.join tmpdir, '.a'
+      Rfd::Item.new dir: tmpdir, name: '.a', window_width: 100
     end
     before do
       controller.items << item
       controller.sort
-    end
-    after do
-      Dir.rmdir File.join testdir, '.a'
     end
     subject { item }
     its(:index) { should == 2 }  # . .. then next
@@ -139,9 +139,6 @@ describe Rfd::Controller do
   describe '#chmod' do
     let(:item) { controller.items.detect {|i| !i.directory?} }
     subject { item }
-    after do
-      FileUtils.chmod 0644, item.path
-    end
 
     context 'With an octet string' do
       before do
@@ -204,11 +201,8 @@ describe Rfd::Controller do
       controller.find 'file1'
       controller.cp 'file4'
     end
-    after do
-      File.delete File.join(testdir, 'file4')
-    end
     it 'should be the same file as the copy source file' do
-      File.read(File.join(testdir, 'file1')).should == File.read(File.join(testdir, 'file4'))
+      File.read(File.join(tmpdir, 'file1')).should == File.read(File.join(tmpdir, 'file4'))
     end
   end
 
@@ -217,11 +211,8 @@ describe Rfd::Controller do
       controller.find 'file3'
       controller.mv 'dir2'
     end
-    after do
-      FileUtils.mv File.join(testdir, 'dir2/file3'), File.join(testdir, 'file3')
-    end
     it 'should move current file to the specified directory' do
-      File.exist?(File.join(testdir, 'dir2/file3')).should == true
+      File.exist?(File.join(tmpdir, 'dir2/file3')).should == true
     end
   end
 
@@ -233,13 +224,9 @@ describe Rfd::Controller do
       controller.toggle_mark
       controller.rename 'fi/faaai'
     end
-    after do
-      FileUtils.mv File.join(testdir, '.faaaile2'), File.join(testdir, '.file2')
-      FileUtils.mv File.join(testdir, 'faaaile3'), File.join(testdir, 'file3')
-    end
     it 'should rename selected files' do
-      File.exist?(File.join(testdir, '.faaaile2')).should == true
-      File.exist?(File.join(testdir, 'faaaile3')).should == true
+      File.exist?(File.join(tmpdir, '.faaaile2')).should == true
+      File.exist?(File.join(tmpdir, 'faaaile3')).should == true
     end
   end
 
@@ -258,11 +245,8 @@ describe Rfd::Controller do
     before do
       controller.mkdir 'aho'
     end
-    after do
-      Dir.delete File.join(testdir, 'aho')
-    end
     it 'should create a new directory' do
-      Dir.exist?(File.join(testdir, 'aho')).should == true
+      Dir.exist?(File.join(tmpdir, 'aho')).should == true
     end
   end
 
@@ -270,11 +254,8 @@ describe Rfd::Controller do
     before do
       controller.touch 'fuga'
     end
-    after do
-      File.delete File.join(testdir, 'fuga')
-    end
     it 'should create a new file' do
-      File.exist?(File.join(testdir, 'fuga')).should == true
+      File.exist?(File.join(tmpdir, 'fuga')).should == true
     end
   end
 

@@ -8,6 +8,7 @@ require_relative 'rfd/windows'
 module Rfd
   VERSION = Gem.loaded_specs['rfd'].version.to_s
 
+  # :nodoc:
   def self.init_curses
     Curses.initscr
     Curses.raw
@@ -21,6 +22,10 @@ module Rfd
     end
   end
 
+  # Start the app here!
+  #
+  # ==== Parameters
+  # * +dir+ - The initial directory.
   def self.start(dir = '.')
     init_curses
     Rfd::Controller.new dir
@@ -31,6 +36,7 @@ module Rfd
 
     attr_reader :header_l, :header_r, :main, :command_line, :items, :displayed_items, :current_row, :current_page, :current_dir
 
+    # :nodoc:
     def initialize(dir = '.')
       @main = MainWindow.new
       @header_l = HeaderLeftWindow.new
@@ -41,6 +47,7 @@ module Rfd
       ls
     end
 
+    # The main loop.
     def run
       loop do
         begin

@@ -1,29 +1,31 @@
-# Rfd
+# rfd (Ruby on Files and Directories)
 
-TODO: Write a gem description
+rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS filer, "FD".
 
 ## Installation
 
-Add this line to your application's Gemfile:
+    % gem install rfd
 
-    gem 'rfd'
+## Requirements
 
-And then execute:
+* Ruby 2.0, Ruby 2.1
+* NCurses
+* (FFI)
 
-    $ bundle
+## Tested environment
 
-Or install it yourself as:
-
-    $ gem install rfd
+Max OSX Snow Leopard
 
 ## Usage
 
-TODO: Write usage instructions here
+Open up your terminal and type in:
+
+    % rfd
+
+You can command rfd by pressing some chars on your keyboard, just like Vim.
+
+All available commands are defined here. https://github.com/amatsuda/rfd/tree/master/lib/rfd/commands.rb
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Send me your pull requests here. https://github.com/amatsuda/rfd

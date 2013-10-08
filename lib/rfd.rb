@@ -84,23 +84,33 @@ module Rfd
       Curses.endwin
     end
 
+    # Change the number of columns in the main window.
     def spawn_panes(num)
       main.spawn_panes num
       @current_row = @current_page = 0
     end
 
+    # The file or directory on which the cursor is on.
     def current_item
       items[current_row]
     end
 
+    # * marked files and directories.
     def marked_items
       items.select(&:marked?)
     end
 
+    # Marked files and directories or Array(the current file or directory).
+    #
+    # . and .. will not be included.
     def selected_items
       ((m = marked_items).any? ? m : Array(current_item)).reject {|i| %w(. ..).include? i.name}
     end
 
+    # Move the cursor to specified row.
+    #
+    # The main window and the headers will be updated reflecting the displayed files and directories.
+    # The row number can be out of range of the current page.
     def move_cursor(row = nil)
       if row
         page, item_index_in_page = row.divmod max_items
@@ -124,6 +134,7 @@ module Rfd
       header_l.wrefresh
     end
 
+    # Change the current directory.
     def cd(dir, pushd: true)
       target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : current_dir ? File.join(current_dir, dir) : dir)
       if File.readable? target
@@ -134,6 +145,7 @@ module Rfd
       end
     end
 
+    # cd to the previous directory.
     def popd
       if defined?(@dir_history) && @dir_history.any?
         cd @dir_history.pop, pushd: false
@@ -141,6 +153,8 @@ module Rfd
       end
     end
 
+    # Fetch files from current directory.
+    # Then update each windows reflecting the newest information.
     def ls
       fetch_items_from_filesystem
       sort_items_according_to_current_direction
@@ -153,6 +167,22 @@ module Rfd
       draw_total_items
     end
 
+    # Sort the whole files and directories in the current directory, then refresh the screen.
+    #
+    # ==== Parameters
+    # * +direction+ - Sort order in a String.
+    #                 nil   : order by name
+    #                 r     : reverse order by name
+    #                 s, S  : order by file size
+    #                 sr, Sr: reverse order by file size
+    #                 t     : order by mtime
+    #                 tr    : reverse order by mtime
+    #                 c     : order by ctime
+    #                 cr    : reverse order by ctime
+    #                 u     : order by atime
+    #                 ur    : reverse order by atime
+    #                 e     : order by extname
+    #                 er    : reverse order by extname
     def sort(direction = nil)
       @direction, @current_page = direction, 0
       sort_items_according_to_current_direction
@@ -160,43 +190,57 @@ module Rfd
       move_cursor 0
     end
 
+    # Change the file permission of the selected files and directories.
+    #
+    # ==== Parameters
+    # * +mode+ - Unix chmod string (e.g. +w, g-r)
+    #
+    #TODO: accept number forms such as 755, 0644
     def chmod(mode = nil)
       return unless mode
       FileUtils.chmod mode, selected_items.map(&:path)
       ls
     end
 
+    # Fetch files from current directory.
     def fetch_items_from_filesystem
       @items = Dir.foreach(current_dir).map {|fn| Item.new dir: current_dir, name: fn, window_width: maxx}.to_a
     end
 
+    # Focus at the first file or directory of which name starts with the given String.
     def find(str)
       index = items.index {|i| i.name.start_with? str}
       move_cursor index if index
     end
 
+    # Focus at the last file or directory of which name starts with the given String.
     def find_reverse(str)
       index = items.reverse.index {|i| i.name.start_with? str}
       move_cursor items.length - index - 1 if index
     end
 
+    # Width of the currently active pane.
     def maxx
       main.maxx
     end
 
+    # Height of the currently active pane.
     def maxy
       main.maxy
     end
 
+    # Number of files or directories that the current main window can show in a page.
     def max_items
       main.max_items
     end
 
+    # Update the main window with the loaded files and directories. Also update the header.
     def draw_items
       main.draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
       header_l.draw_path_and_page_number path: current_dir, current: current_page + 1, total: total_pages
     end
 
+    # Sort the loaded files and directories in already given sort order.
     def sort_items_according_to_current_direction
       case @direction
       when nil
@@ -227,6 +271,14 @@ module Rfd
       items.each.with_index {|item, index| item.index = index}
     end
 
+    # Search files and directories from the current directory, and update the screen.
+    #
+    # * +pattern+ - Search pattern against file names in Ruby Regexp string.
+    #
+    # === Example
+    #
+    # a        : Search files that contains the letter "a" in their file name
+    # .*\.pdf$ : Search PDF files
     def grep(pattern = '.*')
       regexp = Regexp.new(pattern)
       fetch_items_from_filesystem
@@ -238,50 +290,63 @@ module Rfd
       draw_total_items
     end
 
+    # Copy selected files and directories to the destination.
     def cp(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
       FileUtils.cp_r src, File.join(current_dir, dest)
       ls
     end
 
+    # Move selected files and directories to the destination.
     def mv(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
       FileUtils.mv src, File.join(current_dir, dest)
       ls
     end
 
+    # Create a new directory.
     def mkdir(dir)
       FileUtils.mkdir_p File.join(current_dir, dir)
       ls
     end
 
+    # Create a new empty file.
     def touch(filename)
       FileUtils.touch File.join(current_dir, filename)
       ls
     end
 
+    # Current page is the first page?
     def first_page?
       current_page == 0
     end
 
+    # Do we have more pages?
     def last_page?
       current_page == total_pages - 1
     end
 
+    # Number of pages in the current directory.
     def total_pages
       items.length / max_items + 1
     end
 
+    # Move to the given page number.
+    #
+    # ==== Parameters
+    # * +page+ - Target page number
     def switch_page(page)
       @current_page = page
       draw_items
     end
 
+    # Update the header information concerning currently marked files or directories.
     def draw_marked_items
       items = marked_items
       header_r.draw_marked_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 
+    # Update the header information concerning total files and directories in the current directory.
     def draw_total_items
       header_r.draw_total_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
@@ -290,6 +355,10 @@ module Rfd
       main.toggle_mark current_item
     end
 
+    # Accept user input, and directly execute it as a Ruby method call to the controller.
+    #
+    # ==== Parameters
+    # * +preset_command+ - A command that would be displayed at the command line before user input.
     def process_command_line(preset_command: nil)
       prompt = preset_command ? ":#{preset_command} " : ':'
       command_line.set_prompt prompt
@@ -304,6 +373,7 @@ module Rfd
       command_line.wrefresh
     end
 
+    # Accept user input, and directly execute it in an external shell.
     def process_shell_command
       command_line.set_prompt ':!'
       cmd = command_line.get_command(prompt: ':!')[1..-1]
@@ -316,6 +386,10 @@ module Rfd
       command_line.wrefresh
     end
 
+    # Let the user answer y or n.
+    #
+    # ==== Parameters
+    # * +prompt+ - Prompt message
     def ask(prompt = '(y/n)')
       command_line.set_prompt prompt
       command_line.wrefresh
@@ -327,6 +401,7 @@ module Rfd
       end
     end
 
+    # Open current file or directory with the editor.
     def edit
       execute_external_command do
         editor = ENV['EDITOR'] || 'vim'
@@ -334,6 +409,7 @@ module Rfd
       end
     end
 
+    # Open current file or directory with the viewer.
     def view
       execute_external_command do
         pager = ENV['PAGER'] || 'less'

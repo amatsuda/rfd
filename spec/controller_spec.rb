@@ -274,6 +274,15 @@ describe Rfd::Controller do
     end
   end
 
+  describe '#symlink' do
+    before do
+      controller.find 'dir1'
+      controller.symlink 'aaa'
+    end
+    subject { File }
+    it { should be_symlink File.join(tmpdir, 'aaa') }
+  end
+
   describe '#first_page? and #last_page?' do
     context 'When on the first page' do
       it { should be_first_page }

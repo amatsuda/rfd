@@ -361,6 +361,12 @@ module Rfd
       ls
     end
 
+    # Create a symlink to the current file or directory.
+    def symlink(name)
+      FileUtils.ln_s current_item.path, name
+      ls
+    end
+
     # Current page is the first page?
     def first_page?
       current_page == 0

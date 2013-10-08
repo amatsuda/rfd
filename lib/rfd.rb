@@ -378,6 +378,11 @@ module Rfd
       ls
     end
 
+    # Copy selected files and directories' path into clipboard on OSX
+    def clipboard
+      IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if RbConfig::CONFIG['host_os'] =~ /darwin/
+    end
+
     # Current page is the first page?
     def first_page?
       current_page == 0

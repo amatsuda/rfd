@@ -308,6 +308,19 @@ describe Rfd::Controller do
     it { should be_symlink File.join(tmpdir, 'aaa') }
   end
 
+  describe '#pbcopy' do
+    before do
+      controller.find '.file1'
+      controller.toggle_mark
+      controller.find 'dir3'
+      controller.toggle_mark
+      controller.clipboard
+    end
+    it 'copies the selected paths into clipboard' do
+      `pbpaste`.should == "#{File.join(tmpdir, 'dir3')} #{File.join(tmpdir, '.file1')}"
+    end
+  end
+
   describe '#first_page? and #last_page?' do
     context 'When on the first page' do
       it { should be_first_page }

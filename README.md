@@ -1,4 +1,4 @@
-# rfd (Ruby on Files and Directories)
+# rfd (Ruby on Files & Directories)
 
 rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS filer, "FD".
 

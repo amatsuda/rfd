@@ -311,6 +311,20 @@ module Rfd
       ls
     end
 
+    # Rename selected files and directories.
+    #
+    # ==== Parameters
+    # * +pattern+ - / separated Regexp like string
+    def rename(pattern)
+      from, to = pattern.split '/'
+      from = Regexp.new from
+      selected_items.each do |item|
+        name = item.name.gsub from, to
+        FileUtils.mv item.path, File.join(current_dir, name)
+      end
+      ls
+    end
+
     # Create a new directory.
     def mkdir(dir)
       FileUtils.mkdir_p File.join(current_dir, dir)

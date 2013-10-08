@@ -199,6 +199,24 @@ describe Rfd::Controller do
     end
   end
 
+  describe '#rename' do
+    before do
+      controller.find '.file2'
+      controller.toggle_mark
+      controller.find 'file3'
+      controller.toggle_mark
+      controller.rename 'fi/faaai'
+    end
+    after do
+      FileUtils.mv File.join(testdir, '.faaaile2'), File.join(testdir, '.file2')
+      FileUtils.mv File.join(testdir, 'faaaile3'), File.join(testdir, 'file3')
+    end
+    it 'should rename selected files' do
+      File.exist?(File.join(testdir, '.faaaile2')).should == true
+      File.exist?(File.join(testdir, 'faaaile3')).should == true
+    end
+  end
+
   describe '#mkdir' do
     before do
       controller.mkdir 'aho'

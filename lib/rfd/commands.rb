@@ -92,6 +92,11 @@ module Rfd
       view
     end
 
+    # Change o"w"ner of selected files and directories.
+    def w
+      process_command_line preset_command: 'chown'
+    end
+
     # Hard "d"elete selected files and directories.
     def D
       if selected_items.any?

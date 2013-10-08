@@ -126,6 +126,11 @@ module Rfd
       move_cursor current_page * max_items + displayed_items.size / 2
     end
 
+    # "S"ymlink the current file or directory
+    def S
+      process_command_line preset_command: 'symlink'
+    end
+
     # Mark or unmark "a"ll files and directories.
     def ctrl_a
       mark = marked_items.size != (items.size - 2)  # exclude . and ..

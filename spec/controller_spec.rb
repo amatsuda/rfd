@@ -248,7 +248,7 @@ describe Rfd::Controller do
       controller.toggle_mark
       controller.find 'dir2'
       controller.toggle_mark
-      controller.trash
+      controller.delete
     end
     it 'should be properly deleted from the current directory' do
       controller.items.none? {|i| i.name == 'file3'}.should == true

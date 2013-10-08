@@ -243,6 +243,17 @@ describe Rfd::Controller do
     end
   end
 
+  describe '#trash' do
+    before do
+      controller.find 'file3'
+      controller.toggle_mark
+      controller.trash
+    end
+    it 'should be properly deleted from the current directory' do
+      controller.items.none? {|i| i.name == 'file3'}.should == true
+    end
+  end
+
   describe '#mkdir' do
     before do
       controller.mkdir 'aho'

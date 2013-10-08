@@ -328,6 +328,20 @@ module Rfd
       ls
     end
 
+    # Soft delete selected files and directories.
+    #
+    # If the OS is not OSX, performs the same as `delete` command.
+    def trash
+      if RbConfig::CONFIG['host_os'] =~ /darwin/
+        FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+      else
+        #TODO support other OS
+        FileUtils.rm_rf selected_items.map(&:path)
+      end
+      @current_row -= selected_items.count {|i| i.index <= current_row}
+      ls
+    end
+
     # Create a new directory.
     def mkdir(dir)
       FileUtils.mkdir_p File.join(current_dir, dir)

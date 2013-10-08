@@ -74,6 +74,11 @@ module Rfd
       raise StopIteration if ask 'Are your sure want to exit? (y/n)'
     end
 
+    # "r"ename selected files and directories.
+    def r
+      process_command_line preset_command: 'rename'
+    end
+
     # "s"ort displayed files and directories in the given order.
     def s
       process_command_line preset_command: 'sort'

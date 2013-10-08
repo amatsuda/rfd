@@ -212,6 +212,17 @@ module Rfd
       ls
     end
 
+    # Change the file owner of the selected files and directories.
+    #
+    # ==== Parameters
+    # * +user_and_group+ - user name and group name separated by : (e.g. alice, nobody:nobody, :admin)
+    def chown(user_and_group)
+      return unless user_and_group
+      user, group = user_and_group.split(':').map {|s| s == '' ? nil : s}
+      FileUtils.chown user, group, selected_items.map(&:path)
+      ls
+    end
+
     # Fetch files from current directory.
     def fetch_items_from_filesystem
       @items = Dir.foreach(current_dir).map {|fn| Item.new dir: current_dir, name: fn, window_width: maxx}.to_a

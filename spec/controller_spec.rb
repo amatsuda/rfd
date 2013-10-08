@@ -172,6 +172,35 @@ describe Rfd::Controller do
     end
   end
 
+  describe '#chown' do
+    let(:item) { controller.items.detect {|i| !i.directory?} }
+    subject { item }
+
+    context 'With user name only' do
+      before do
+        expect(FileUtils).to receive(:chown).with('alice', nil, Array(item.path))
+        item.toggle_mark
+      end
+      specify { controller.chown 'alice' }
+    end
+
+    context 'With group name only' do
+      before do
+        expect(FileUtils).to receive(:chown).with(nil, 'admin', Array(item.path))
+        item.toggle_mark
+      end
+      specify { controller.chown ':admin' }
+    end
+
+    context 'With both user name and group name' do
+      before do
+        expect(FileUtils).to receive(:chown).with('nobody', 'nobody', Array(item.path))
+        item.toggle_mark
+      end
+      specify { controller.chown 'nobody:nobody' }
+    end
+  end
+
   describe '#find' do
     before do
       controller.find 'd'

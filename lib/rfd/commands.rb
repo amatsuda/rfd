@@ -31,11 +31,6 @@ module Rfd
       process_command_line preset_command: 'find'
     end
 
-    # "f"ind the last flie or directory of which name starts with the given String.
-    def F
-      process_command_line preset_command: 'find_reverse'
-    end
-
     # Move the cursor to the left pane.
     def h
       (y = current_row - maxy) >= 0 and move_cursor y
@@ -103,6 +98,11 @@ module Rfd
           ls
         end
       end
+    end
+
+    # "f"ind the last flie or directory of which name starts with the given String.
+    def F
+      process_command_line preset_command: 'find_reverse'
     end
 
     # Move the cursor to the top.

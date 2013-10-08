@@ -343,7 +343,7 @@ module Rfd
     #
     # If the OS is not OSX, performs the same as `delete` command.
     def trash
-      if RbConfig::CONFIG['host_os'] =~ /darwin/
+      if osx?
         FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
       else
         #TODO support other OS
@@ -380,7 +380,7 @@ module Rfd
 
     # Copy selected files and directories' path into clipboard on OSX
     def clipboard
-      IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if RbConfig::CONFIG['host_os'] =~ /darwin/
+      IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if osx?
     end
 
     # Current page is the first page?
@@ -493,6 +493,10 @@ module Rfd
       Curses.reset_prog_mode
       Curses.getch if pause
       Curses.refresh
+    end
+
+    def osx?
+      @_osx ||= RbConfig::CONFIG['host_os'] =~ /darwin/
     end
 
     def debug(str)

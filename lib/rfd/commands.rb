@@ -10,11 +10,16 @@ module Rfd
       process_command_line preset_command: 'cp'
     end
 
-    # Soft "d"elete (actually mv to the trash folder) selected files and directories.
+    # Soft "d"elete (actually mv to the trash folder on OSX) selected files and directories.
     def d
       if selected_items.any?
         if ask %Q[Are your sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
-          FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+          if RbConfig::CONFIG['host_os'] =~ /darwin/
+            FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+          else
+            #TODO support other OS
+            FileUtils.rm_rf selected_items.map(&:path)
+          end
           @current_row -= selected_items.count {|i| i.index <= current_row}
           ls
         end

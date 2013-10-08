@@ -138,14 +138,40 @@ describe Rfd::Controller do
 
   describe '#chmod' do
     let(:item) { controller.items.detect {|i| !i.directory?} }
-    before do
-      item.toggle_mark
-      controller.chmod 'a+w'
-      item.instance_variable_set :@lstat, nil  # clear cached value
-      item.instance_variable_set :@mode, nil  # clear cached value
-    end
     subject { item }
-    its(:mode) { should == '-rw-rw-rw-' }
+    after do
+      FileUtils.chmod 0644, item.path
+    end
+
+    context 'With an octet string' do
+      before do
+        item.toggle_mark
+        controller.chmod '666'
+        item.instance_variable_set :@lstat, nil  # clear cached value
+        item.instance_variable_set :@mode, nil  # clear cached value
+      end
+      its(:mode) { should == '-rw-rw-rw-' }
+    end
+
+    context 'With a decimal string' do
+      before do
+        item.toggle_mark
+        controller.chmod '0666'
+        item.instance_variable_set :@lstat, nil  # clear cached value
+        item.instance_variable_set :@mode, nil  # clear cached value
+      end
+      its(:mode) { should == '-rw-rw-rw-' }
+    end
+
+    context 'With a non-numeric string' do
+      before do
+        item.toggle_mark
+        controller.chmod 'a+w'
+        item.instance_variable_set :@lstat, nil  # clear cached value
+        item.instance_variable_set :@mode, nil  # clear cached value
+      end
+      its(:mode) { should == '-rw-rw-rw-' }
+    end
   end
 
   describe '#find' do

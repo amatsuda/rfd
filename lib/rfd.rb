@@ -200,11 +200,14 @@ module Rfd
     # Change the file permission of the selected files and directories.
     #
     # ==== Parameters
-    # * +mode+ - Unix chmod string (e.g. +w, g-r)
-    #
-    #TODO: accept number forms such as 755, 0644
+    # * +mode+ - Unix chmod string (e.g. +w, g-r, 755, 0644)
     def chmod(mode = nil)
       return unless mode
+      begin
+        Integer mode
+        mode = Integer mode.size == 3 ? "0#{mode}" : mode
+      rescue ArgumentError
+      end
       FileUtils.chmod mode, selected_items.map(&:path)
       ls
     end

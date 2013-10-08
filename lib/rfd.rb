@@ -327,16 +327,6 @@ module Rfd
       end
     end
 
-    def execute_external_command(pause: false)
-      Curses.def_prog_mode
-      Curses.endwin
-      yield
-    ensure
-      Curses.reset_prog_mode
-      Curses.getch if pause
-      Curses.refresh
-    end
-
     def edit
       execute_external_command do
         editor = ENV['EDITOR'] || 'vim'
@@ -349,6 +339,17 @@ module Rfd
         pager = ENV['PAGER'] || 'less'
         system %Q[#{pager} "#{current_item.path}"]
       end
+    end
+
+    private
+    def execute_external_command(pause: false)
+      Curses.def_prog_mode
+      Curses.endwin
+      yield
+    ensure
+      Curses.reset_prog_mode
+      Curses.getch if pause
+      Curses.refresh
     end
 
     def debug(str)

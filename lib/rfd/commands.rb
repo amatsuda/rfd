@@ -97,6 +97,11 @@ module Rfd
       process_command_line preset_command: 'chown'
     end
 
+    # "C"opy paths of selected files and directory to the "C"lipboard.
+    def C
+      clipboard
+    end
+
     # Hard "d"elete selected files and directories.
     def D
       if selected_items.any?

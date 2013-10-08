@@ -391,7 +391,14 @@ module Rfd
 
       Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
         selected_items.each do |item|
-          zipfile.add item.name, item.path
+          next if item.symlink?
+          if item.directory?
+            Dir[File.join(item.path, '**/**')].each do |file|
+              zipfile.add file.sub("#{item.path}/", ''), file
+            end
+          else
+            zipfile.add item.name, item.path
+          end
         end
       end
       ls

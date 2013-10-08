@@ -290,7 +290,8 @@ module Rfd
       main.toggle_mark current_item
     end
 
-    def process_command_line(prompt: ':')
+    def process_command_line(preset_command: nil)
+      prompt = preset_command ? ":#{preset_command} " : ':'
       command_line.set_prompt prompt
       cmd, *args = command_line.get_command(prompt: prompt).split(' ')
       if cmd && !cmd.empty? && respond_to?(cmd)

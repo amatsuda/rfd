@@ -212,9 +212,8 @@ describe Rfd::Controller do
       controller.find 'file3'
       controller.mv 'dir2'
     end
-    it 'should move current file to the specified directory' do
-      File.exist?(File.join(tmpdir, 'dir2/file3')).should == true
-    end
+    subject { File }
+    it { should be_exist File.join(tmpdir, 'dir2/file3') }
   end
 
   describe '#rename' do
@@ -225,10 +224,9 @@ describe Rfd::Controller do
       controller.toggle_mark
       controller.rename 'fi/faaai'
     end
-    it 'should rename selected files' do
-      File.exist?(File.join(tmpdir, '.faaaile2')).should == true
-      File.exist?(File.join(tmpdir, 'faaaile3')).should == true
-    end
+    subject { File }
+    it { should be_exist File.join(tmpdir, '.faaaile2') }
+    it { should be_exist File.join(tmpdir, 'faaaile3') }
   end
 
   describe '#trash' do
@@ -260,18 +258,16 @@ describe Rfd::Controller do
     before do
       controller.mkdir 'aho'
     end
-    it 'should create a new directory' do
-      Dir.exist?(File.join(tmpdir, 'aho')).should == true
-    end
+    subject { Dir }
+    it { should be_exist File.join(tmpdir, 'aho') }
   end
 
   describe '#touch' do
     before do
       controller.touch 'fuga'
     end
-    it 'should create a new file' do
-      File.exist?(File.join(tmpdir, 'fuga')).should == true
-    end
+    subject { File }
+    it { should be_exist File.join(tmpdir, 'fuga') }
   end
 
   describe '#symlink' do

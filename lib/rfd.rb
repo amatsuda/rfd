@@ -28,7 +28,10 @@ module Rfd
   # * +dir+ - The initial directory.
   def self.start(dir = '.')
     init_curses
-    Rfd::Controller.new dir
+    rfd = Rfd::Controller.new
+    rfd.cd dir
+    rfd.ls
+    rfd
   end
 
   class Controller
@@ -37,14 +40,11 @@ module Rfd
     attr_reader :header_l, :header_r, :main, :command_line, :items, :displayed_items, :current_row, :current_page, :current_dir
 
     # :nodoc:
-    def initialize(dir = '.')
+    def initialize
       @main = MainWindow.new
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
-
-      cd dir
-      ls
     end
 
     # The main loop.

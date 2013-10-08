@@ -342,6 +342,13 @@ module Rfd
       ls
     end
 
+    # Delete selected files and directories.
+    def delete
+      FileUtils.rm_rf selected_items.map(&:path)
+      @current_row -= selected_items.count {|i| i.index <= current_row}
+      ls
+    end
+
     # Create a new directory.
     def mkdir(dir)
       FileUtils.mkdir_p File.join(current_dir, dir)

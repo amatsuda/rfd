@@ -96,9 +96,7 @@ module Rfd
     def D
       if selected_items.any?
         if ask %Q[Are your sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
-          FileUtils.rm_rf selected_items.map(&:path)
-          @current_row -= selected_items.count {|i| i.index <= current_row}
-          ls
+          delete
         end
       end
     end

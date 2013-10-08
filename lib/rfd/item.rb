@@ -35,7 +35,7 @@ module Rfd
           if symlink?
             mb_left n, @window_width - 16
           else
-            "#{mb_left(basename, @window_width - 16 - extname.length)}…#{extname}"
+            "#{mb_left(basename, @window_width - 16 - extname.size)}…#{extname}"
           end
         end
       end

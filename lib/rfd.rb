@@ -223,7 +223,7 @@ module Rfd
     # Focus at the last file or directory of which name starts with the given String.
     def find_reverse(str)
       index = items.reverse.index {|i| i.name.start_with? str}
-      move_cursor items.length - index - 1 if index
+      move_cursor items.size - index - 1 if index
     end
 
     # Width of the currently active pane.
@@ -349,7 +349,7 @@ module Rfd
 
     # Number of pages in the current directory.
     def total_pages
-      items.length / max_items + 1
+      items.size / max_items + 1
     end
 
     # Move to the given page number.

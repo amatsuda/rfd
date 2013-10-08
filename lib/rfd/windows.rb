@@ -207,7 +207,7 @@ module Rfd
 
     def get_command(prompt: nil)
       Curses.echo
-      startx = prompt ? prompt.length : 1
+      startx = prompt ? prompt.size : 1
       s = ' ' * 100
       Curses.mvwgetstr window, 0, startx, s
       "#{prompt[1..-1] if prompt}#{s.strip}"

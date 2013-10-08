@@ -15,6 +15,7 @@ describe Rfd::Controller do
       example.run
 
       FileUtils.rm_r tmpdir
+      Dir.chdir __dir__
     end
   end
 

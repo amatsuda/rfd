@@ -315,14 +315,14 @@ module Rfd
     # Copy selected files and directories to the destination.
     def cp(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.cp_r src, File.join(current_dir, dest)
+      FileUtils.cp_r src, expand_path(dest)
       ls
     end
 
     # Move selected files and directories to the destination.
     def mv(dest)
       src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.mv src, File.join(current_dir, dest)
+      FileUtils.mv src, expand_path(dest)
       ls
     end
 

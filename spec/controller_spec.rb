@@ -126,7 +126,7 @@ describe Rfd::Controller do
 
   describe '#sort' do
     let(:item) do
-      Dir.mkdir File.join tmpdir, '.a'
+      Dir.mkdir File.join(tmpdir, '.a')
       Rfd::Item.new dir: tmpdir, name: '.a', window_width: 100
     end
     before do

@@ -144,7 +144,7 @@ module Rfd
 
     # Change the current directory.
     def cd(dir, pushd: true)
-      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') ? dir : current_dir ? File.join(current_dir, dir) : dir)
+      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') || dir.start_with?('~') ? dir : current_dir ? File.join(current_dir, dir) : dir)
       if File.readable? target
         Dir.chdir target
         (@dir_history ||= []) << current_dir if current_dir && pushd

@@ -144,7 +144,7 @@ module Rfd
 
     # Change the current directory.
     def cd(dir, pushd: true)
-      target = File.expand_path(dir.is_a?(Rfd::Item) ? dir.path : dir.start_with?('/') || dir.start_with?('~') ? dir : current_dir ? File.join(current_dir, dir) : dir)
+      target = expand_path dir
       if File.readable? target
         Dir.chdir target
         (@dir_history ||= []) << current_dir if current_dir && pushd
@@ -514,6 +514,10 @@ module Rfd
       Curses.reset_prog_mode
       Curses.getch if pause
       Curses.refresh
+    end
+
+    def expand_path(path)
+      File.expand_path path.is_a?(Rfd::Item) ? path.path : path.start_with?('/') || path.start_with?('~') ? path : current_dir ? File.join(current_dir, path) : path
     end
 
     def osx?

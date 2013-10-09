@@ -115,6 +115,10 @@ module Rfd
       stat.executable?
     end
 
+    def zip?
+      @zip_ ||= directory? ? false : File.binread(path, 4).unpack('V').first == 0x04034b50
+    end
+
     def target
       File.readlink path if symlink?
     end

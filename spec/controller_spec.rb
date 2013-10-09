@@ -127,7 +127,8 @@ describe Rfd::Controller do
   describe '#sort' do
     let(:item) do
       Dir.mkdir File.join(tmpdir, '.a')
-      Rfd::Item.new dir: tmpdir, name: '.a', window_width: 100
+      stat = File.lstat File.join(tmpdir, '.a')
+      Rfd::Item.new dir: tmpdir, name: '.a', stat: stat, window_width: 100
     end
     before do
       controller.items << item
@@ -139,15 +140,13 @@ describe Rfd::Controller do
 
   describe '#chmod' do
     let(:item) { controller.items.detect {|i| !i.directory?} }
-    subject { item }
 
     context 'With an octet string' do
       before do
         item.toggle_mark
         controller.chmod '666'
-        item.instance_variable_set :@stat, nil  # clear cached value
-        item.instance_variable_set :@mode, nil  # clear cached value
       end
+      subject { controller.items.detect {|i| !i.directory?} }
       its(:mode) { should == '-rw-rw-rw-' }
     end
 
@@ -155,9 +154,8 @@ describe Rfd::Controller do
       before do
         item.toggle_mark
         controller.chmod '0666'
-        item.instance_variable_set :@stat, nil  # clear cached value
-        item.instance_variable_set :@mode, nil  # clear cached value
       end
+      subject { controller.items.detect {|i| !i.directory?} }
       its(:mode) { should == '-rw-rw-rw-' }
     end
 
@@ -165,9 +163,8 @@ describe Rfd::Controller do
       before do
         item.toggle_mark
         controller.chmod 'a+w'
-        item.instance_variable_set :@stat, nil  # clear cached value
-        item.instance_variable_set :@mode, nil  # clear cached value
       end
+      subject { controller.items.detect {|i| !i.directory?} }
       its(:mode) { should == '-rw-rw-rw-' }
     end
   end

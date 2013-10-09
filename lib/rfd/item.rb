@@ -1,11 +1,11 @@
 module Rfd
   class Item
     include Comparable
-    attr_reader :name
+    attr_reader :name, :stat
     attr_accessor :index
 
-    def initialize(dir: nil, name: nil, window_width: nil)
-      @dir, @name, @window_width, @marked = dir, name, window_width, false
+    def initialize(dir: nil, name: nil, stat: nil, window_width: nil)
+      @dir, @name, @stat, @window_width, @marked = dir, name, stat, window_width, false
     end
 
     def path
@@ -39,10 +39,6 @@ module Rfd
           end
         end
       end
-    end
-
-    def stat
-      @stat ||= File.lstat path
     end
 
     def color

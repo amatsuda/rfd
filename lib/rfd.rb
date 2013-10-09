@@ -226,7 +226,10 @@ module Rfd
 
     # Fetch files from current directory.
     def fetch_items_from_filesystem
-      @items = Dir.foreach(current_dir).map {|fn| Item.new dir: current_dir, name: fn, window_width: maxx}.to_a
+      @items = Dir.foreach(current_dir).map {|fn|
+        stat = File.stat File.join(current_dir, fn)
+        Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
+      }.to_a
     end
 
     # Focus at the first file or directory of which name starts with the given String.

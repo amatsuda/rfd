@@ -145,7 +145,7 @@ describe Rfd::Controller do
       before do
         item.toggle_mark
         controller.chmod '666'
-        item.instance_variable_set :@lstat, nil  # clear cached value
+        item.instance_variable_set :@stat, nil  # clear cached value
         item.instance_variable_set :@mode, nil  # clear cached value
       end
       its(:mode) { should == '-rw-rw-rw-' }
@@ -155,7 +155,7 @@ describe Rfd::Controller do
       before do
         item.toggle_mark
         controller.chmod '0666'
-        item.instance_variable_set :@lstat, nil  # clear cached value
+        item.instance_variable_set :@stat, nil  # clear cached value
         item.instance_variable_set :@mode, nil  # clear cached value
       end
       its(:mode) { should == '-rw-rw-rw-' }
@@ -165,7 +165,7 @@ describe Rfd::Controller do
       before do
         item.toggle_mark
         controller.chmod 'a+w'
-        item.instance_variable_set :@lstat, nil  # clear cached value
+        item.instance_variable_set :@stat, nil  # clear cached value
         item.instance_variable_set :@mode, nil  # clear cached value
       end
       its(:mode) { should == '-rw-rw-rw-' }

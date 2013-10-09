@@ -96,7 +96,11 @@ module Rfd
     end
 
     def directory?
-      @directory ||= File.stat(path).directory?
+      @directory ||= if symlink?
+        File.stat(path).directory?
+      else
+        stat.directory?
+      end
     end
 
     def symlink?

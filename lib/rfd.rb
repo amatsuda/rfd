@@ -342,8 +342,17 @@ module Rfd
 
     # Copy selected files and directories to the destination.
     def cp(dest)
-      src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.cp_r src, expand_path(dest)
+      unless in_zip?
+        src = (m = marked_items).any? ? m.map(&:path) : current_item.path
+        FileUtils.cp_r src, expand_path(dest)
+      else
+        raise 'cping multiple items in .zip is not supported.' if selected_items.size > 1
+        Zip::File.open(current_zip.path) do |zip|
+          entry = zip.find_entry(selected_items.first.name).dup
+          entry.name, entry.name_length = dest, dest.size
+          zip.instance_variable_get(:@entry_set) << entry
+        end
+      end
       ls
     end
 

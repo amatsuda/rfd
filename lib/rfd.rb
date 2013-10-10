@@ -2,6 +2,7 @@ require 'ffi-ncurses'
 Curses = FFI::NCurses
 require 'fileutils'
 require 'zip'
+require 'zip/filesystem'
 require_relative 'rfd/commands'
 require_relative 'rfd/item'
 require_relative 'rfd/windows'
@@ -226,10 +227,20 @@ module Rfd
 
     # Fetch files from current directory.
     def fetch_items_from_filesystem
-      @items = Dir.foreach(current_dir).map {|fn|
-        stat = File.stat File.join(current_dir, fn)
-        Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
-      }.to_a
+      if @in_zip
+        @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: maxx),
+          Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]
+        zf = Zip::File.new current_dir
+        zf.each {|entry|
+          stat = zf.file.stat entry.name
+          @items << Item.new(dir: current_dir, name: entry.name, stat: stat, window_width: maxx)
+        }
+      else
+        @items = Dir.foreach(current_dir).map {|fn|
+          stat = File.stat File.join(current_dir, fn)
+          Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
+        }.to_a
+      end
     end
 
     # Focus at the first file or directory of which name starts with the given String.

@@ -565,7 +565,7 @@ module Rfd
     def view
       pager = ENV['PAGER'] || 'less'
       execute_external_command do
-        filename = if in_zip?
+        if in_zip?
           begin
             tmpdir, tmpfile_name = nil
             Zip::File.open(current_zip.path) do |zip|

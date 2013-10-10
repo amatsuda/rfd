@@ -393,13 +393,12 @@ module Rfd
     def mkdir(dir)
       unless in_zip?
         FileUtils.mkdir_p File.join(current_dir, dir)
-        ls
       else
         Zip::File.open(current_zip.path) do |zip|
           zip.dir.mkdir dir
-          ls
         end
       end
+      ls
     end
 
     # Create a new empty file.

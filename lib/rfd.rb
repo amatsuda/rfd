@@ -251,7 +251,7 @@ module Rfd
         }
       else
         @items = Dir.foreach(current_dir).map {|fn|
-          stat = File.stat File.join(current_dir, fn)
+          stat = File.lstat File.join(current_dir, fn)
           Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
         }.to_a
       end

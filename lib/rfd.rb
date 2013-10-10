@@ -349,8 +349,13 @@ module Rfd
 
     # Move selected files and directories to the destination.
     def mv(dest)
-      src = (m = marked_items).any? ? m.map(&:path) : current_item.path
-      FileUtils.mv src, expand_path(dest)
+      unless in_zip?
+        src = (m = marked_items).any? ? m.map(&:path) : current_item.path
+        FileUtils.mv src, expand_path(dest)
+      else
+        raise 'mving multiple items in .zip is not supported.' if selected_items.size > 1
+        rename "#{selected_items.first.name}/#{dest}"
+      end
       ls
     end
 

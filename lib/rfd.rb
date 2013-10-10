@@ -419,7 +419,7 @@ module Rfd
           next if item.symlink?
           if item.directory?
             Dir[File.join(item.path, '**/**')].each do |file|
-              zipfile.add file.sub("#{item.path}/", ''), file
+              zipfile.add file.sub("#{current_dir}/", ''), file
             end
           else
             zipfile.add item.name, item.path

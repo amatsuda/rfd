@@ -397,7 +397,13 @@ module Rfd
 
     # Create a new empty file.
     def touch(filename)
-      FileUtils.touch File.join(current_dir, filename)
+      unless in_zip?
+        FileUtils.touch File.join(current_dir, filename)
+      else
+        Zip::File.open(current_zip.path) do |zip|
+          zip.file.open(filename, 'w') {|_f| }
+        end
+      end
       ls
     end
 

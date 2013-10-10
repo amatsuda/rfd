@@ -404,12 +404,12 @@ module Rfd
       ls
     end
 
-    # Copy selected files and directories' path into clipboard on OSX
+    # Copy selected files and directories' path into clipboard on OSX.
     def clipboard
       IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if osx?
     end
 
-    # Archive selected files and directories into a .zip file
+    # Archive selected files and directories into a .zip file.
     def zip(zipfile_name)
       return unless zipfile_name
       zipfile_name << '.zip' unless zipfile_name.end_with? '.zip'
@@ -429,7 +429,7 @@ module Rfd
       ls
     end
 
-    # Unarchive .zip file within selected files and directories into current_directory
+    # Unarchive .zip files within selected files and directories into current_directory.
     def unzip
       selected_items.select(&:zip?).each do |f|
         FileUtils.mkdir_p File.join(current_dir, f.basename)

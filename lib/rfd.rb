@@ -47,6 +47,7 @@ module Rfd
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
+      @dir_history = []
     end
 
     # The main loop.
@@ -151,7 +152,7 @@ module Rfd
         target = expand_path dir
         if File.readable? target
           Dir.chdir target
-          (@dir_history ||= []) << current_dir if current_dir && pushd
+          @dir_history << current_dir if current_dir && pushd
           @current_dir, @current_page, @current_row, @current_zip = target, 0, nil, nil
           main.activate_pane 0
         end
@@ -167,7 +168,7 @@ module Rfd
 
     # cd to the previous directory.
     def popd
-      if defined?(@dir_history) && @dir_history.any?
+      if @dir_history.any?
         cd @dir_history.pop, pushd: false
         ls
       end

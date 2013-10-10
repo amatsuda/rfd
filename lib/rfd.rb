@@ -424,7 +424,8 @@ module Rfd
         FileUtils.touch File.join(current_dir, filename)
       else
         Zip::File.open(current_zip.path) do |zip|
-          zip.file.open(filename, 'w') {|_f| }
+          # zip.file.open(filename, 'w') {|_f| }  #HAXX this code creates an unneeded temporary file
+          zip.instance_variable_get(:@entry_set) << Zip::Entry.new(current_zip.path, filename)
         end
       end
       ls

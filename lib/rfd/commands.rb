@@ -13,7 +13,7 @@ module Rfd
     # Soft "d"elete (actually mv to the trash folder on OSX) selected files and directories.
     def d
       if selected_items.any?
-        if ask %Q[Are your sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
+        if ask %Q[Are you sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
           trash
         end
       end
@@ -69,7 +69,7 @@ module Rfd
 
     # "q"uit the app.
     def q
-      raise StopIteration if ask 'Are your sure want to exit? (y/n)'
+      raise StopIteration if ask 'Are you sure want to exit? (y/n)'
     end
 
     # "r"ename selected files and directories.
@@ -115,7 +115,7 @@ module Rfd
     # Hard "d"elete selected files and directories.
     def D
       if selected_items.any?
-        if ask %Q[Are your sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
+        if ask %Q[Are you sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
           delete
         end
       end

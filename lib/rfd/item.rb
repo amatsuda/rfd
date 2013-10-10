@@ -116,7 +116,13 @@ module Rfd
     end
 
     def zip?
-      @zip_ ||= directory? ? false : File.binread(path, 4).unpack('V').first == 0x04034b50
+      @zip_ ||= if directory?
+        false
+      elsif symlink?
+        File.binread(target, 4).unpack('V').first == 0x04034b50
+      else
+        File.binread(path, 4).unpack('V').first == 0x04034b50
+      end
     end
 
     def target

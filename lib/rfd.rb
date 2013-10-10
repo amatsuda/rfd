@@ -181,7 +181,7 @@ module Rfd
 
       @current_page ||= 0
       draw_items
-      move_cursor current_row
+      move_cursor (current_row ? [current_row, items.size - 1].min : nil)
 
       draw_marked_items
       draw_total_items

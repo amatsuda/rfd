@@ -228,7 +228,9 @@ module Rfd
 
     # cd into a directory, or view a file.
     def enter
-      if current_item.directory? || current_item.zip?
+      if in_zip?
+        v
+      elsif current_item.directory? || current_item.zip?
         cd current_item
         ls
       else

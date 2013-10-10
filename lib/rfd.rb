@@ -1,6 +1,7 @@
 require 'ffi-ncurses'
 Curses = FFI::NCurses
 require 'fileutils'
+require 'tmpdir'
 require 'zip'
 require 'zip/filesystem'
 require_relative 'rfd/commands'
@@ -548,9 +549,24 @@ module Rfd
 
     # Open current file or directory with the viewer.
     def view
+      pager = ENV['PAGER'] || 'less'
       execute_external_command do
-        pager = ENV['PAGER'] || 'less'
-        system %Q[#{pager} "#{current_item.path}"]
+        filename = if in_zip?
+          begin
+            tmpdir, tmpfile_name = nil
+            Zip::File.open(current_zip.path) do |zip|
+              tmpdir = Dir.mktmpdir
+              FileUtils.mkdir_p File.join(tmpdir, File.dirname(current_item.name))
+              tmpfile_name = File.join(tmpdir, current_item.name)
+              File.open(tmpfile_name, 'w') {|f| f.puts zip.file.read(current_item.name)}
+            end
+            system %Q[#{pager} "#{tmpfile_name}"]
+          ensure
+            FileUtils.remove_entry_secure tmpdir if tmpdir
+          end
+        else
+          system %Q[#{pager} "#{current_item.path}"]
+        end
       end
     end
 

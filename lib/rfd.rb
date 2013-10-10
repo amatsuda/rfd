@@ -145,13 +145,24 @@ module Rfd
 
     # Change the current directory.
     def cd(dir, pushd: true)
-      target = expand_path dir
-      if File.readable? target
-        Dir.chdir target
-        (@dir_history ||= []) << current_dir if current_dir && pushd
-        @current_dir, @current_page, @current_row = target, 0, nil
-        main.activate_pane 0
+      if dir.is_a?(Item) && dir.zip?
+        cd_into_zip dir
+      else
+        target = expand_path dir
+        if File.readable? target
+          Dir.chdir target
+          (@dir_history ||= []) << current_dir if current_dir && pushd
+          @current_dir, @current_page, @current_row, @in_zip = target, 0, nil, false
+          main.activate_pane 0
+        end
       end
+    end
+
+    def cd_into_zip(zipfile)
+      @in_zip = true
+      @dir_history << current_dir if current_dir
+      @current_dir, @current_page, @current_row = zipfile.path, 0, nil
+      main.activate_pane 0
     end
 
     # cd to the previous directory.

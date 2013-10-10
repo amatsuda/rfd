@@ -152,14 +152,14 @@ module Rfd
         if File.readable? target
           Dir.chdir target
           (@dir_history ||= []) << current_dir if current_dir && pushd
-          @current_dir, @current_page, @current_row, @in_zip = target, 0, nil, false
+          @current_dir, @current_page, @current_row, @current_zip = target, 0, nil, nil
           main.activate_pane 0
         end
       end
     end
 
     def cd_into_zip(zipfile)
-      @in_zip = true
+      @current_zip = zipfile
       @dir_history << current_dir if current_dir
       @current_dir, @current_page, @current_row = zipfile.path, 0, nil
       main.activate_pane 0
@@ -564,7 +564,7 @@ module Rfd
     end
 
     def in_zip?
-      @in_zip
+      @current_zip
     end
 
     def debug(str)

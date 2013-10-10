@@ -64,7 +64,11 @@ module Rfd
 
     # "o"pen selected files and directories with the OS "open" command.
     def o
-      system "open #{selected_items.map {|i| %Q["#{i.path}"]}.join(' ')}"
+      if selected_items.any?
+        system "open #{selected_items.map {|i| %Q["#{i.path}"]}.join(' ')}"
+      elsif %w(. ..).include? current_item.name
+        system %Q[open "#{current_item.path}"]
+      end
     end
 
     # "q"uit the app.

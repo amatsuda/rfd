@@ -87,6 +87,11 @@ module Rfd
       process_command_line preset_command: 'touch'
     end
 
+    # "u"nzip .zip files within selected files and directories into current_directory.
+    def u
+      unzip
+    end
+
     # "o"pen selected files and directories with the viewer.
     def v
       view

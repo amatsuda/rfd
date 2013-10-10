@@ -435,6 +435,7 @@ module Rfd
         FileUtils.mkdir_p File.join(current_dir, f.basename)
         Zip::File.open(f.path) do |zip|
           zip.each do |entry|
+            FileUtils.mkdir_p File.join(File.join(f.basename, File.dirname(entry.to_s)))
             zip.extract(entry, File.join(f.basename, entry.to_s)) { true }
           end
         end

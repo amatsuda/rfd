@@ -361,9 +361,18 @@ module Rfd
     def rename(pattern)
       from, to = pattern.split '/'
       from = Regexp.new from
-      selected_items.each do |item|
-        name = item.name.gsub from, to
-        FileUtils.mv item.path, File.join(current_dir, name)
+      unless in_zip?
+        selected_items.each do |item|
+          name = item.name.gsub from, to
+          FileUtils.mv item.path, File.join(current_dir, name)
+        end
+      else
+        Zip::File.open(current_zip.path) do |zip|
+          selected_items.each do |item|
+            name = item.name.gsub from, to
+            zip.rename item.name, name
+          end
+        end
       end
       ls
     end

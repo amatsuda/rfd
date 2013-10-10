@@ -638,7 +638,7 @@ module Rfd
               tmpfile_name = File.join(tmpdir, current_item.name)
               File.open(tmpfile_name, 'w') {|f| f.puts zip.file.read(current_item.name)}
               system %Q[#{editor} "#{tmpfile_name}"]
-              zip.add(current_item.name, tmpfile_name) { gotCalled = true; true }
+              zip.add(current_item.name, tmpfile_name) { true }
             end
             ls
           ensure

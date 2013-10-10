@@ -597,7 +597,24 @@ module Rfd
     def edit
       execute_external_command do
         editor = ENV['EDITOR'] || 'vim'
-        system %Q[#{editor} "#{current_item.path}"]
+        unless in_zip?
+          system %Q[#{editor} "#{current_item.path}"]
+        else
+          begin
+            tmpdir, tmpfile_name = nil
+            Zip::File.open(current_zip.path) do |zip|
+              tmpdir = Dir.mktmpdir
+              FileUtils.mkdir_p File.join(tmpdir, File.dirname(current_item.name))
+              tmpfile_name = File.join(tmpdir, current_item.name)
+              File.open(tmpfile_name, 'w') {|f| f.puts zip.file.read(current_item.name)}
+              system %Q[#{editor} "#{tmpfile_name}"]
+              zip.add(current_item.name, tmpfile_name) { gotCalled = true; true }
+            end
+            ls
+          ensure
+            FileUtils.remove_entry_secure tmpdir if tmpdir
+          end
+        end
       end
     end
 

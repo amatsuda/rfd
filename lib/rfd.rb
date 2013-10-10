@@ -245,6 +245,7 @@ module Rfd
           Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]
         zf = Zip::File.new current_dir
         zf.each {|entry|
+          next if entry.name_is_directory?
           stat = zf.file.stat entry.name
           @items << Item.new(dir: current_dir, name: entry.name, stat: stat, window_width: maxx)
         }

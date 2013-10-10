@@ -240,7 +240,12 @@ module Rfd
 
     # Fetch files from current directory or current .zip file.
     def fetch_items_from_filesystem_or_zip
-      if in_zip?
+      unless in_zip?
+        @items = Dir.foreach(current_dir).map {|fn|
+          stat = File.lstat File.join(current_dir, fn)
+          Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
+        }.to_a
+      else
         @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: maxx),
           Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]
         zf = Zip::File.new current_dir
@@ -249,11 +254,6 @@ module Rfd
           stat = zf.file.stat entry.name
           @items << Item.new(dir: current_dir, name: entry.name, stat: stat, window_width: maxx)
         }
-      else
-        @items = Dir.foreach(current_dir).map {|fn|
-          stat = File.lstat File.join(current_dir, fn)
-          Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
-        }.to_a
       end
     end
 
@@ -447,14 +447,7 @@ module Rfd
 
     # Unarchive .zip files within selected files and directories into current_directory.
     def unzip
-      if in_zip?
-        Zip::File.open(current_zip.path) do |zip|
-          zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
-            FileUtils.mkdir_p File.join(current_zip.dir, current_zip.basename, File.dirname(entry.to_s))
-            zip.extract(entry, File.join(current_zip.dir, current_zip.basename, entry.to_s)) { true }
-          end
-        end
-      else
+      unless in_zip?
         selected_items.select(&:zip?).each do |f|
           FileUtils.mkdir_p File.join(current_dir, f.basename)
           Zip::File.open(f.path) do |zip|
@@ -462,6 +455,13 @@ module Rfd
               FileUtils.mkdir_p File.join(File.join(f.basename, File.dirname(entry.to_s)))
               zip.extract(entry, File.join(f.basename, entry.to_s)) { true }
             end
+          end
+        end
+      else
+        Zip::File.open(current_zip.path) do |zip|
+          zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
+            FileUtils.mkdir_p File.join(current_zip.dir, current_zip.basename, File.dirname(entry.to_s))
+            zip.extract(entry, File.join(current_zip.dir, current_zip.basename, entry.to_s)) { true }
           end
         end
       end
@@ -565,7 +565,9 @@ module Rfd
     def view
       pager = ENV['PAGER'] || 'less'
       execute_external_command do
-        if in_zip?
+        unless in_zip?
+          system %Q[#{pager} "#{current_item.path}"]
+        else
           begin
             tmpdir, tmpfile_name = nil
             Zip::File.open(current_zip.path) do |zip|
@@ -578,8 +580,6 @@ module Rfd
           ensure
             FileUtils.remove_entry_secure tmpdir if tmpdir
           end
-        else
-          system %Q[#{pager} "#{current_item.path}"]
         end
       end
     end

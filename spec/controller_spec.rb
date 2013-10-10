@@ -330,11 +330,16 @@ describe Rfd::Controller do
   describe '#unzip' do
     before do
       controller.find 'zip1'
+      controller.toggle_mark
+      controller.find 'gz1'
+      controller.toggle_mark
       controller.unzip
     end
     subject { File }
     it { should be_exist File.join(tmpdir, 'zip1/zip_content1') }
     it { should be_exist File.join(tmpdir, 'zip1/zip_content_dir1/zip_content1_1') }
+    it { should be_exist File.join(tmpdir, 'gz1/gz_content1') }
+    it { should be_exist File.join(tmpdir, 'gz1/gz_content_dir1/gz_content1_1') }
   end
 
   describe '#first_page? and #last_page?' do

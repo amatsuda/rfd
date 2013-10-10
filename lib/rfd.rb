@@ -2,6 +2,7 @@ require 'ffi-ncurses'
 Curses = FFI::NCurses
 require 'fileutils'
 require 'tmpdir'
+require 'rubygems/package'
 require 'zip'
 require 'zip/filesystem'
 require_relative 'rfd/commands'
@@ -485,15 +486,44 @@ module Rfd
       ls
     end
 
-    # Unarchive .zip files within selected files and directories into current_directory.
+    # Unarchive .zip and .tar.gz files within selected files and directories into current_directory.
     def unzip
       unless in_zip?
-        selected_items.select(&:zip?).each do |f|
-          FileUtils.mkdir_p File.join(current_dir, f.basename)
-          Zip::File.open(f.path) do |zip|
+        zips, gzs = selected_items.partition(&:zip?).tap {|zips, others| break [zips, *others.partition(&:gz?)]}
+        zips.each do |item|
+          FileUtils.mkdir_p File.join(current_dir, item.basename)
+          Zip::File.open(item.path) do |zip|
             zip.each do |entry|
-              FileUtils.mkdir_p File.join(File.join(f.basename, File.dirname(entry.to_s)))
-              zip.extract(entry, File.join(f.basename, entry.to_s)) { true }
+              FileUtils.mkdir_p File.join(File.join(item.basename, File.dirname(entry.to_s)))
+              zip.extract(entry, File.join(item.basename, entry.to_s)) { true }
+            end
+          end
+        end
+        gzs.each do |item|
+          Zlib::GzipReader.open(item.path) do |gz|
+            Gem::Package::TarReader.new(gz) do |tar|
+              dest_dir = File.join current_dir, (gz.orig_name || item.basename).sub(/\.tar$/, '')
+              tar.each do |entry|
+                dest = nil
+                if entry.full_name == '././@LongLink'
+                  dest = File.join dest_dir, entry.read.strip
+                  next
+                end
+                dest ||= File.join dest_dir, entry.full_name
+                if entry.directory?
+                  FileUtils.mkdir_p dest, :mode => entry.header.mode
+                elsif entry.file?
+                  FileUtils.mkdir_p dest_dir
+                  File.open(dest, 'wb') {|f| f.print entry.read}
+                  FileUtils.chmod entry.header.mode, dest
+                elsif entry.header.typeflag == '2'  # symlink
+                  File.symlink entry.header.linkname, dest
+                end
+                unless Dir.exist? dest_dir
+                  FileUtils.mkdir_p dest_dir
+                  File.open(File.join(dest_dir, gz.orig_name || item.basename), 'wb') {|f| f.print gz.read}
+                end
+              end
             end
           end
         end

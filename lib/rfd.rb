@@ -431,12 +431,21 @@ module Rfd
 
     # Unarchive .zip files within selected files and directories into current_directory.
     def unzip
-      selected_items.select(&:zip?).each do |f|
-        FileUtils.mkdir_p File.join(current_dir, f.basename)
-        Zip::File.open(f.path) do |zip|
-          zip.each do |entry|
-            FileUtils.mkdir_p File.join(File.join(f.basename, File.dirname(entry.to_s)))
-            zip.extract(entry, File.join(f.basename, entry.to_s)) { true }
+      if in_zip?
+        Zip::File.open(current_zip.path) do |zip|
+          zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
+            FileUtils.mkdir_p File.join(current_zip.dir, current_zip.basename, File.dirname(entry.to_s))
+            zip.extract(entry, File.join(current_zip.dir, current_zip.basename, entry.to_s)) { true }
+          end
+        end
+      else
+        selected_items.select(&:zip?).each do |f|
+          FileUtils.mkdir_p File.join(current_dir, f.basename)
+          Zip::File.open(f.path) do |zip|
+            zip.each do |entry|
+              FileUtils.mkdir_p File.join(File.join(f.basename, File.dirname(entry.to_s)))
+              zip.extract(entry, File.join(f.basename, entry.to_s)) { true }
+            end
           end
         end
       end

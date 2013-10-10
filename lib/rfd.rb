@@ -372,11 +372,16 @@ module Rfd
     #
     # If the OS is not OSX, performs the same as `delete` command.
     def trash
-      if osx?
-        FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+      unless in_zip?
+        if osx?
+          FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+        else
+          #TODO support other OS
+          FileUtils.rm_rf selected_items.map(&:path)
+        end
       else
-        #TODO support other OS
-        FileUtils.rm_rf selected_items.map(&:path)
+        return unless ask %Q[Trashing zip entries is not supported. Actually the files will be deleted. Are you sure want to proceed? (y/n)]
+        delete
       end
       @current_row -= selected_items.count {|i| i.index <= current_row}
       ls

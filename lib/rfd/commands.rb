@@ -150,6 +150,14 @@ module Rfd
       move_cursor current_page * max_items + displayed_items.size / 2
     end
 
+    # "O"pen terminal here.
+    def O
+      dir = current_item.directory? ? current_item.path : current_dir
+      system %Q[osascript -e 'tell app "Terminal"
+        do script "cd #{dir}"
+      end tell'] if osx?
+    end
+
     # "S"ymlink the current file or directory
     def S
       process_command_line preset_command: 'symlink'

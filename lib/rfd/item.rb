@@ -1,7 +1,7 @@
 module Rfd
   class Item
     include Comparable
-    attr_reader :name, :stat
+    attr_reader :name, :dir, :stat
     attr_accessor :index
 
     def initialize(dir: nil, name: nil, stat: nil, window_width: nil)

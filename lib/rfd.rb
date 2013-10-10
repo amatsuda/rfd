@@ -391,8 +391,15 @@ module Rfd
 
     # Create a new directory.
     def mkdir(dir)
-      FileUtils.mkdir_p File.join(current_dir, dir)
-      ls
+      unless in_zip?
+        FileUtils.mkdir_p File.join(current_dir, dir)
+        ls
+      else
+        Zip::File.open(current_zip.path) do |zip|
+          zip.dir.mkdir dir
+          ls
+        end
+      end
     end
 
     # Create a new empty file.

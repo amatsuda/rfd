@@ -489,7 +489,7 @@ module Rfd
     # Unarchive .zip and .tar.gz files within selected files and directories into current_directory.
     def unarchive
       unless in_zip?
-        zips, gzs = selected_items.partition(&:zip?).tap {|zips, others| break [zips, *others.partition(&:gz?)]}
+        zips, gzs = selected_items.partition(&:zip?).tap {|z, others| break [z, *others.partition(&:gz?)]}
         zips.each do |item|
           FileUtils.mkdir_p File.join(current_dir, item.basename)
           Zip::File.open(item.path) do |zip|

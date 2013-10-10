@@ -262,7 +262,7 @@ describe Rfd::Controller do
       controller.trash
     end
     it 'should be properly deleted from the current directory' do
-      controller.items.none? {|i| i.name == 'file3'}.should == true
+      controller.items.should be_none {|i| i.name == 'file3'}
     end
   end
 
@@ -275,8 +275,8 @@ describe Rfd::Controller do
       controller.delete
     end
     it 'should be properly deleted from the current directory' do
-      controller.items.none? {|i| i.name == 'file3'}.should == true
-      controller.items.none? {|i| i.name == 'dir2'}.should == true
+      controller.items.should be_none {|i| i.name == 'file3'}
+      controller.items.should be_none {|i| i.name == 'dir2'}
     end
   end
 

@@ -327,13 +327,13 @@ describe Rfd::Controller do
     it { should be_exist File.join(tmpdir, 'archive1.zip') }
   end
 
-  describe '#unzip' do
+  describe '#unarchive' do
     before do
       controller.find 'zip1'
       controller.toggle_mark
       controller.find 'gz1'
       controller.toggle_mark
-      controller.unzip
+      controller.unarchive
     end
     subject { File }
     it { should be_exist File.join(tmpdir, 'zip1/zip_content1') }

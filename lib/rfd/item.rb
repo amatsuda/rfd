@@ -129,6 +129,20 @@ module Rfd
       end
     end
 
+    def gz?
+      @gz_ ||= begin
+        if directory?
+          false
+        elsif symlink?
+          File.binread(target, 2).unpack('n').first == 0x1f8b
+        else
+          File.binread(path, 2).unpack('n').first == 0x1f8b
+        end
+      rescue
+        false
+      end
+    end
+
     def target
       File.readlink path if symlink?
     end

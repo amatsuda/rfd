@@ -178,7 +178,7 @@ module Rfd
     # Fetch files from current directory.
     # Then update each windows reflecting the newest information.
     def ls
-      fetch_items_from_filesystem
+      fetch_items_from_filesystem_or_zip
       sort_items_according_to_current_direction
 
       @current_page ||= 0
@@ -238,8 +238,8 @@ module Rfd
       ls
     end
 
-    # Fetch files from current directory.
-    def fetch_items_from_filesystem
+    # Fetch files from current directory or current .zip file.
+    def fetch_items_from_filesystem_or_zip
       if in_zip?
         @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: maxx),
           Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]
@@ -330,7 +330,7 @@ module Rfd
     # .*\.pdf$ : Search PDF files
     def grep(pattern = '.*')
       regexp = Regexp.new(pattern)
-      fetch_items_from_filesystem
+      fetch_items_from_filesystem_or_zip
       @items = items.shift(2) + items.select {|i| i.name =~ regexp}
       sort_items_according_to_current_direction
       switch_page 0

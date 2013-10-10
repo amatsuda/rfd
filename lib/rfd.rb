@@ -384,7 +384,19 @@ module Rfd
 
     # Delete selected files and directories.
     def delete
-      FileUtils.rm_rf selected_items.map(&:path)
+      unless in_zip?
+        FileUtils.rm_rf selected_items.map(&:path)
+      else
+        Zip::File.open(current_zip.path) do |zip|
+          zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
+            if entry.name_is_directory?
+              zip.dir.delete entry.to_s
+            else
+              zip.file.delete entry.to_s
+            end
+          end
+        end
+      end
       @current_row -= selected_items.count {|i| i.index <= current_row}
       ls
     end

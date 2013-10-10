@@ -39,7 +39,7 @@ module Rfd
   class Controller
     include Rfd::Commands
 
-    attr_reader :header_l, :header_r, :main, :command_line, :items, :displayed_items, :current_row, :current_page, :current_dir
+    attr_reader :header_l, :header_r, :main, :command_line, :items, :displayed_items, :current_row, :current_page, :current_dir, :current_zip
 
     # :nodoc:
     def initialize

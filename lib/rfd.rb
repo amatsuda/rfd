@@ -429,6 +429,19 @@ module Rfd
       ls
     end
 
+    # Unarchive .zip file within selected files and directories into current_directory
+    def unzip
+      selected_items.select(&:zip?).each do |f|
+        FileUtils.mkdir_p File.join(current_dir, f.basename)
+        Zip::File.open(f.path) do |zip|
+          zip.each do |entry|
+            zip.extract(entry, File.join(f.basename, entry.to_s)) { true }
+          end
+        end
+      end
+      ls
+    end
+
     # Current page is the first page?
     def first_page?
       current_page == 0

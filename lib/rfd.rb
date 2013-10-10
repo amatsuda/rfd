@@ -238,7 +238,7 @@ module Rfd
 
     # Fetch files from current directory.
     def fetch_items_from_filesystem
-      if @in_zip
+      if in_zip?
         @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: maxx),
           Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]
         zf = Zip::File.new current_dir
@@ -561,6 +561,10 @@ module Rfd
 
     def osx?
       @_osx ||= RbConfig::CONFIG['host_os'] =~ /darwin/
+    end
+
+    def in_zip?
+      @in_zip
     end
 
     def debug(str)

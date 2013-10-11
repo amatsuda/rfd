@@ -590,6 +590,7 @@ module Rfd
       header_r.draw_total_items count: items.size, size: items.inject(0) {|sum, i| sum += i.size}
     end
 
+    # Swktch on / off marking on the current file or directory.
     def toggle_mark
       main.toggle_mark current_item
     end

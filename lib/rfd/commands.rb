@@ -29,6 +29,11 @@ module Rfd
       process_command_line preset_command: 'find'
     end
 
+    # Move the cursor to the top of the list.
+    def g
+      move_cursor 0
+    end
+
     # Move the cursor to the left pane.
     def h
       (y = current_row - maxy) >= 0 and move_cursor y
@@ -133,6 +138,11 @@ module Rfd
     # Move the cursor to the top.
     def H
       move_cursor current_page * max_items
+    end
+
+    # Move the cursor to the bottom of the list.
+    def G
+      move_cursor items.size - 1
     end
 
     # Ma"K"e a directory.

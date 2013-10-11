@@ -217,10 +217,16 @@ module Rfd
       end
     end
 
-    # Change the number of columns in the main window.
-    (?1..?9).each do |n|
-      define_method(n) do
-        spawn_panes n.to_i
+    # Split the main "w"indow into given number of columns.
+    # type the number of columns (1-9) right after ctrl-w
+    def ctrl_w
+      if (c = get_char)
+        begin
+          num = Integer c
+        rescue ArgumentError
+          return
+        end
+        spawn_panes num
         ls
       end
     end

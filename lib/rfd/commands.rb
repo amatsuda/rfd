@@ -274,5 +274,12 @@ module Rfd
     def click(y: nil, x: nil)
       move_cursor_by_click y: y, x: x
     end
+
+    # Move cursor position and enter
+    def double_click(y: nil, x: nil)
+      if move_cursor_by_click y: y, x: x
+        enter
+      end
+    end
   end
 end

@@ -91,6 +91,8 @@ module Rfd
             if Curses.getmouse(mouse_event) == Curses::OK
               if Curses.BUTTON_CLICK(mouse_event[:bstate], 1) > 0
                 click y: mouse_event[:y], x: mouse_event[:x]
+              elsif Curses.BUTTON_DOUBLE_CLICK(mouse_event[:bstate], 1) > 0
+                double_click y: mouse_event[:y], x: mouse_event[:x]
               end
             end
           else

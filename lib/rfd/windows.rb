@@ -130,6 +130,7 @@ module Rfd
         @panes.each.with_index do |p, i|
           @current_index = i and return p if include_point? pane: p, y: y, x: x
         end if y && x
+        nil
       end
 
       def size

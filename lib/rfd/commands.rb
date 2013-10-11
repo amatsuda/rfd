@@ -26,7 +26,7 @@ module Rfd
 
     # "f"ind the first file or directory of which name starts with the given String.
     def f
-      process_command_line preset_command: 'find'
+      c = get_char and find c
     end
 
     # Move the cursor to the top of the list.
@@ -132,7 +132,7 @@ module Rfd
 
     # "f"ind the last file or directory of which name starts with the given String.
     def F
-      process_command_line preset_command: 'find_reverse'
+      c = get_char and find_reverse c
     end
 
     # Move the cursor to the top.

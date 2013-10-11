@@ -14,7 +14,7 @@ rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS
 
 ## Tested environment
 
-Mac OSX Snow Leopard
+Mac OS X Mountain Lion, Mac OS X Lion
 
 ## Usage
 

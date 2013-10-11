@@ -279,7 +279,7 @@ module Rfd
 
     # Focus at the last file or directory of which name starts with the given String.
     def find_reverse(str)
-      index = items.reverse.index {|i| i.name.start_with? str}
+      index = items.reverse.index {|i| i.index < current_row && i.name.start_with?(str)} || items.reverse.index {|i| i.name.start_with? str}
       move_cursor items.size - index - 1 if index
     end
 

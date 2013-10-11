@@ -53,7 +53,7 @@ module Rfd
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
-      @direction, @dir_history, @last_command = nil, [], nil
+      @direction, @dir_history, @last_command, @times = nil, [], nil, ''
     end
 
     # The main loop.
@@ -61,6 +61,7 @@ module Rfd
       mouse_event = Curses::MEVENT.new
       loop do
         begin
+          tmp_times = nil
           case (c = Curses.getch)
           when Curses::KEY_RETURN
             enter
@@ -81,6 +82,8 @@ module Rfd
           when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
             chr = ((c - 1 + 65) ^ 0b0100000).chr
             public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
+          when 49..57  # ?1..?9
+            tmp_times = "#{@times}#{c.chr}"
           when 0..255
             if respond_to? c.chr
               public_send c.chr
@@ -98,6 +101,7 @@ module Rfd
           else
             debug "key: #{c}" if ENV['DEBUG']
           end
+          @times = tmp_times
         rescue StopIteration
           raise
         rescue => e

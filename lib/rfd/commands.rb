@@ -197,13 +197,7 @@ module Rfd
 
     # Forward to the "n"ext page.
     def ctrl_n
-      if total_pages > 1
-        if last_page?
-          move_cursor 0
-        else
-          move_cursor (current_page + 1) * max_items
-        end
-      end
+      move_cursor (current_page + 1) % total_pages * max_items if total_pages > 1
     end
 
     # Back to the "p"revious page.

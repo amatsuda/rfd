@@ -269,5 +269,10 @@ module Rfd
         ls
       end
     end
+
+    # Move cursor position by mouse click.
+    def click(y: nil, x: nil)
+      move_cursor_by_click y: y, x: x
+    end
   end
 end

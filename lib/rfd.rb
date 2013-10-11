@@ -1,4 +1,5 @@
 require 'ffi-ncurses'
+require 'ffi-ncurses/mouse'
 Curses = FFI::NCurses
 require 'fileutils'
 require 'tmpdir'
@@ -24,6 +25,9 @@ module Rfd
     [Curses::COLOR_WHITE, Curses::COLOR_CYAN, Curses::COLOR_MAGENTA, Curses::COLOR_GREEN, Curses::COLOR_RED].each do |c|
       Curses.init_pair c, c, Curses::COLOR_BLACK
     end
+
+    Curses.mousemask Curses::ALL_MOUSE_EVENTS | Curses::REPORT_MOUSE_POSITION, nil
+    Curses.extend FFI::NCurses::Mouse
   end
 
   # Start the app here!
@@ -54,6 +58,7 @@ module Rfd
 
     # The main loop.
     def run
+      mouse_event = Curses::MEVENT.new
       loop do
         begin
           case (c = Curses.getch)
@@ -81,6 +86,12 @@ module Rfd
               public_send c.chr
             else
               debug "key: #{c}" if ENV['DEBUG']
+            end
+          when Curses::KEY_MOUSE
+            if Curses.getmouse(mouse_event) == Curses::OK
+              if Curses.BUTTON_CLICK(mouse_event[:bstate], 1) > 0
+                click y: mouse_event[:y], x: mouse_event[:x]
+              end
             end
           else
             debug "key: #{c}" if ENV['DEBUG']

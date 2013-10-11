@@ -126,9 +126,9 @@ module Rfd
         @current_index = index if index < @panes.size
       end
 
-      def activate_by_point(y: nil, x: nil)
+      def get_index_by_point(y: nil, x: nil)
         @panes.each.with_index do |p, i|
-          @current_index = i and return p if include_point? pane: p, y: y, x: x
+          return i if include_point? pane: p, y: y, x: x
         end if y && x
         nil
       end
@@ -166,8 +166,8 @@ module Rfd
       @panes.activate num
     end
 
-    def activate_pane_at(y: nil, x: nil)
-      @panes.activate_by_point y: y, x: x
+    def pane_index_at(y: nil, x: nil)
+      @panes.get_index_by_point y: y, x: x
     end
 
     def window

@@ -41,11 +41,7 @@ module Rfd
 
     # Move the cursor down.
     def j
-      if current_row + 1 >= items.size
-        move_cursor 0
-      else
-        move_cursor current_row + 1
-      end
+      move_cursor (current_row + 1) % items.size
     end
 
     # Move the cursor up.

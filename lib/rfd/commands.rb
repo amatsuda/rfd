@@ -46,11 +46,7 @@ module Rfd
 
     # Move the cursor up.
     def k
-      if current_row == 0
-        move_cursor items.size - 1
-      else
-        move_cursor current_row - 1
-      end
+      move_cursor (current_row - 1) % items.size
     end
 
     # Move the cursor to the right pane.

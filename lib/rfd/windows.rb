@@ -126,12 +126,22 @@ module Rfd
         @current_index = index if index < @panes.size
       end
 
+      def activate_by_point(y: nil, x: nil)
+        @panes.each.with_index do |p, i|
+          @current_index = i and return p if include_point? pane: p, y: y, x: x
+        end if y && x
+      end
+
       def size
         @panes.size
       end
 
       def close_all
         @panes.each {|p| Curses.delwin p}
+      end
+
+      def include_point?(pane: pane, y: nil, x: nil)
+        (y >= Curses.getbegy(pane)) && (Curses.getmaxy(pane) >= y) && (x >= Curses.getbegx(pane)) && (Curses.getmaxx(pane) >= x)
       end
     end
 
@@ -153,6 +163,10 @@ module Rfd
 
     def activate_pane(num)
       @panes.activate num
+    end
+
+    def activate_pane_at(y: nil, x: nil)
+      @panes.activate_by_point y: y, x: x
     end
 
     def window

@@ -202,13 +202,7 @@ module Rfd
 
     # Back to the "p"revious page.
     def ctrl_p
-      if total_pages > 1
-        if first_page?
-          move_cursor (total_pages - 1) * max_items
-        else
-          move_cursor (current_page - 1) * max_items
-        end
-      end
+      move_cursor (current_page - 1) % total_pages * max_items if total_pages > 1
     end
 
     # Split the main "w"indow into given number of columns.

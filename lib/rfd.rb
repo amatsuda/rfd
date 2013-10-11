@@ -671,6 +671,13 @@ module Rfd
       end
     end
 
+    def move_cursor_by_click(y: nil, x: nil)
+      if main.activate_pane_at(y: y, x: x)
+        row = y - main.begy
+        move_cursor row if (row >= 0) && (row < items.size)
+      end
+    end
+
     private
     def execute_external_command(pause: false)
       Curses.def_prog_mode

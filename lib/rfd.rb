@@ -119,6 +119,11 @@ module Rfd
       @current_row = @current_page = 0
     end
 
+    # Number of times to repeat the next command.
+    def times
+      (@times || 1).to_i
+    end
+
     # The file or directory on which the cursor is on.
     def current_item
       items[current_row]

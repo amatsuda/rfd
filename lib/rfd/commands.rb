@@ -67,6 +67,11 @@ module Rfd
       process_command_line preset_command: 'mv'
     end
 
+    # Redo the latest f or F.
+    def n
+      @last_command.call if @last_command
+    end
+
     # "o"pen selected files and directories with the OS "open" command.
     def o
       if selected_items.any?

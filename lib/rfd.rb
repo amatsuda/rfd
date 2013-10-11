@@ -53,7 +53,7 @@ module Rfd
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
-      @direction, @dir_history = nil, []
+      @direction, @dir_history, @last_command = nil, [], nil
     end
 
     # The main loop.

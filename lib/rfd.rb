@@ -61,7 +61,7 @@ module Rfd
       mouse_event = Curses::MEVENT.new
       loop do
         begin
-          tmp_times = nil
+          number_pressed = false
           case (c = Curses.getch)
           when Curses::KEY_RETURN
             enter
@@ -83,7 +83,8 @@ module Rfd
             chr = ((c - 1 + 65) ^ 0b0100000).chr
             public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
           when 48..57  # ?0..?9
-            tmp_times = "#{@times}#{c.chr}"
+            public_send c.chr
+            number_pressed = true
           when 0..255
             if respond_to? c.chr
               public_send c.chr
@@ -101,7 +102,7 @@ module Rfd
           else
             debug "key: #{c}" if ENV['DEBUG']
           end
-          @times = tmp_times
+          @times = nil unless number_pressed
         rescue StopIteration
           raise
         rescue => e

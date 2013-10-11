@@ -273,7 +273,7 @@ module Rfd
 
     # Focus at the first file or directory of which name starts with the given String.
     def find(str)
-      index = items.index {|i| i.name.start_with? str}
+      index = items.index {|i| i.index > current_row && i.name.start_with?(str)}
       move_cursor index if index
     end
 

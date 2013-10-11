@@ -41,12 +41,12 @@ module Rfd
 
     # Move the cursor down.
     def j
-      move_cursor (current_row + 1) % items.size
+      move_cursor (current_row + times) % items.size
     end
 
     # Move the cursor up.
     def k
-      move_cursor (current_row - 1) % items.size
+      move_cursor (current_row - times) % items.size
     end
 
     # Move the cursor to the right pane.

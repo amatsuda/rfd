@@ -266,7 +266,7 @@ module Rfd
     # cd to the upper hierarchy.
     def del
       if current_dir != '/'
-        cd '..'
+        cd File.expand_path(File.join(current_dir, ['..'] * times))
         ls
       end
     end

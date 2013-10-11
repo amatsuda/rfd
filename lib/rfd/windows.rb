@@ -142,7 +142,7 @@ module Rfd
       end
 
       def include_point?(pane: pane, y: nil, x: nil)
-        (y >= Curses.getbegy(pane)) && (Curses.getmaxy(pane) >= y) && (x >= Curses.getbegx(pane)) && (Curses.getmaxx(pane) >= x)
+        (y >= Curses.getbegy(pane)) && (Curses.getbegy(pane) + Curses.getmaxy(pane) >= y) && (x >= Curses.getbegx(pane)) && (Curses.getbegx(pane) + Curses.getmaxx(pane) >= x)
       end
     end
 

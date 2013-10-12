@@ -106,13 +106,13 @@ describe Rfd::Controller do
     before do
       controller.cd 'dir1'
     end
-    its(:current_dir) { should == File.join(tmpdir, 'dir1') }
+    its('current_dir.path') { should == File.join(tmpdir, 'dir1') }
 
     describe '#popd' do
       before do
         controller.popd
       end
-      its(:current_dir) { should == tmpdir }
+      its('current_dir.path') { should == tmpdir }
     end
   end
 

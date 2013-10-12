@@ -171,13 +171,13 @@ module Rfd
 
     # Change the current directory.
     def cd(dir, pushd: true)
-      if dir.is_a?(Item) && dir.zip?
+      dir = load_item expand_path(dir) unless dir.is_a? Item
+      if dir.zip?
         cd_into_zip dir
       else
-        target = expand_path dir
-        Dir.chdir target
+        Dir.chdir dir
         @dir_history << current_dir if current_dir && pushd
-        @current_dir, @current_page, @current_row, @current_zip = target, 0, nil, nil
+        @current_dir, @current_page, @current_row, @current_zip = dir, 0, nil, nil
         main.activate_pane 0
       end
     end
@@ -185,7 +185,7 @@ module Rfd
     def cd_into_zip(zipfile)
       @current_zip = zipfile
       @dir_history << current_dir if current_dir
-      @current_dir, @current_page, @current_row = zipfile.path, 0, nil
+      @current_dir, @current_page, @current_row = zipfile, 0, nil
       main.activate_pane 0
     end
 
@@ -718,7 +718,12 @@ module Rfd
     end
 
     def expand_path(path)
-      File.expand_path path.is_a?(Rfd::Item) ? path : path.start_with?('/') || path.start_with?('~') ? path : current_dir ? File.join(current_dir, path) : path
+      File.expand_path path.start_with?('/') || path.start_with?('~') ? path : current_dir ? File.join(current_dir, path) : path
+    end
+
+    def load_item(path)
+      stat = File.lstat path
+      Item.new dir: File.dirname(path), name: File.basename(path), stat: stat, window_width: maxx
     end
 
     def osx?

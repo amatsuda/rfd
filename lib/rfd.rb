@@ -258,7 +258,7 @@ module Rfd
     def fetch_items_from_filesystem_or_zip
       unless in_zip?
         @items = Dir.foreach(current_dir).map {|fn|
-          stat = File.lstat File.join(current_dir, fn)
+          stat = File.lstat current_dir.join(fn)
           Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
         }.to_a
       else
@@ -394,7 +394,7 @@ module Rfd
       unless in_zip?
         selected_items.each do |item|
           name = item.name.gsub from, to
-          FileUtils.mv item, File.join(current_dir, name)
+          FileUtils.mv item, current_dir.join(name)
         end
       else
         Zip::File.open(current_zip) do |zip|
@@ -448,7 +448,7 @@ module Rfd
     # Create a new directory.
     def mkdir(dir)
       unless in_zip?
-        FileUtils.mkdir_p File.join(current_dir, dir)
+        FileUtils.mkdir_p current_dir.join(dir)
       else
         Zip::File.open(current_zip) do |zip|
           zip.dir.mkdir dir
@@ -460,7 +460,7 @@ module Rfd
     # Create a new empty file.
     def touch(filename)
       unless in_zip?
-        FileUtils.touch File.join(current_dir, filename)
+        FileUtils.touch current_dir.join(filename)
       else
         Zip::File.open(current_zip) do |zip|
           # zip.file.open(filename, 'w') {|_f| }  #HAXX this code creates an unneeded temporary file
@@ -490,7 +490,7 @@ module Rfd
         selected_items.each do |item|
           next if item.symlink?
           if item.directory?
-            Dir[File.join(item, '**/**')].each do |file|
+            Dir[item.join('**/**')].each do |file|
               zipfile.add file.sub("#{current_dir}/", ''), file
             end
           else
@@ -506,7 +506,7 @@ module Rfd
       unless in_zip?
         zips, gzs = selected_items.partition(&:zip?).tap {|z, others| break [z, *others.partition(&:gz?)]}
         zips.each do |item|
-          FileUtils.mkdir_p File.join(current_dir, item.basename)
+          FileUtils.mkdir_p current_dir.join(item.basename)
           Zip::File.open(item) do |zip|
             zip.each do |entry|
               FileUtils.mkdir_p File.join(item.basename, File.dirname(entry.to_s))
@@ -517,7 +517,7 @@ module Rfd
         gzs.each do |item|
           Zlib::GzipReader.open(item) do |gz|
             Gem::Package::TarReader.new(gz) do |tar|
-              dest_dir = File.join current_dir, (gz.orig_name || item.basename).sub(/\.tar$/, '')
+              dest_dir = current_dir.join (gz.orig_name || item.basename).sub(/\.tar$/, '')
               tar.each do |entry|
                 dest = nil
                 if entry.full_name == '././@LongLink'
@@ -712,7 +712,7 @@ module Rfd
     end
 
     def expand_path(path)
-      File.expand_path path.start_with?('/') || path.start_with?('~') ? path : current_dir ? File.join(current_dir, path) : path
+      File.expand_path path.start_with?('/') || path.start_with?('~') ? path : current_dir ? current_dir.join(path) : path
     end
 
     def load_item(path)

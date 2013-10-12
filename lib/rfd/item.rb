@@ -20,6 +20,10 @@ module Rfd
       @extname ||= File.extname name
     end
 
+    def join(*ary)
+      File.join path, ary
+    end
+
     def full_display_name
       n = @name.dup
       n << " -> #{target}" if symlink?

@@ -138,7 +138,10 @@ module Rfd
       end
 
       def close_all
-        @panes.each {|p| Curses.delwin p}
+        @panes.each do |p|
+          Curses.wclear p
+          Curses.delwin p
+        end
       end
 
       def include_point?(pane: pane, y: nil, x: nil)

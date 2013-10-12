@@ -175,12 +175,10 @@ module Rfd
         cd_into_zip dir
       else
         target = expand_path dir
-        if File.readable? target
-          Dir.chdir target
-          @dir_history << current_dir if current_dir && pushd
-          @current_dir, @current_page, @current_row, @current_zip = target, 0, nil, nil
-          main.activate_pane 0
-        end
+        Dir.chdir target
+        @dir_history << current_dir if current_dir && pushd
+        @current_dir, @current_page, @current_row, @current_zip = target, 0, nil, nil
+        main.activate_pane 0
       end
     end
 

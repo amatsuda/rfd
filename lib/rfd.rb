@@ -303,7 +303,7 @@ module Rfd
     # Update the main window with the loaded files and directories. Also update the header.
     def draw_items
       main.draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
-      header_l.draw_path_and_page_number path: current_dir, current: current_page + 1, total: total_pages
+      header_l.draw_path_and_page_number path: current_dir.path, current: current_page + 1, total: total_pages
     end
 
     # Sort the loaded files and directories in already given sort order.

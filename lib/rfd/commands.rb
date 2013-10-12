@@ -206,15 +206,9 @@ module Rfd
     end
 
     # Split the main "w"indow into given number of columns.
-    # type the number of columns (1-9) right after ctrl-w
     def ctrl_w
-      if (c = get_char)
-        begin
-          num = Integer c
-        rescue ArgumentError
-          return
-        end
-        spawn_panes num
+      if @times
+        spawn_panes @times.to_i
         ls
       end
     end

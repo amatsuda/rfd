@@ -173,7 +173,7 @@ module Rfd
     def cd(dir, pushd: true)
       dir = load_item expand_path(dir) unless dir.is_a? Item
       if dir.zip?
-        cd_into_zip dir
+        @current_zip = dir
       else
         Dir.chdir dir
         @current_zip = nil
@@ -181,10 +181,6 @@ module Rfd
       @dir_history << current_dir if current_dir && pushd
       @current_dir, @current_page, @current_row = dir, 0, nil
       main.activate_pane 0
-    end
-
-    def cd_into_zip(zipfile)
-      @current_zip = zipfile
     end
 
     # cd to the previous directory.

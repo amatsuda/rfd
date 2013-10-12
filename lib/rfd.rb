@@ -367,11 +367,11 @@ module Rfd
     # Copy selected files and directories to the destination.
     def cp(dest)
       unless in_zip?
-        src = (m = marked_items).any? ? m.map(&:path) : current_item.path
+        src = (m = marked_items).any? ? m.map(&:path) : current_item
         FileUtils.cp_r src, expand_path(dest)
       else
         raise 'cping multiple items in .zip is not supported.' if selected_items.size > 1
-        Zip::File.open(current_zip.path) do |zip|
+        Zip::File.open(current_zip) do |zip|
           entry = zip.find_entry(selected_items.first.name).dup
           entry.name, entry.name_length = dest, dest.size
           zip.instance_variable_get(:@entry_set) << entry
@@ -383,7 +383,7 @@ module Rfd
     # Move selected files and directories to the destination.
     def mv(dest)
       unless in_zip?
-        src = (m = marked_items).any? ? m.map(&:path) : current_item.path
+        src = (m = marked_items).any? ? m.map(&:path) : current_item
         FileUtils.mv src, expand_path(dest)
       else
         raise 'mving multiple items in .zip is not supported.' if selected_items.size > 1
@@ -402,10 +402,10 @@ module Rfd
       unless in_zip?
         selected_items.each do |item|
           name = item.name.gsub from, to
-          FileUtils.mv item.path, File.join(current_dir, name)
+          FileUtils.mv item, File.join(current_dir, name)
         end
       else
-        Zip::File.open(current_zip.path) do |zip|
+        Zip::File.open(current_zip) do |zip|
           selected_items.each do |item|
             name = item.name.gsub from, to
             zip.rename item.name, name
@@ -439,7 +439,7 @@ module Rfd
       unless in_zip?
         FileUtils.rm_rf selected_items.map(&:path)
       else
-        Zip::File.open(current_zip.path) do |zip|
+        Zip::File.open(current_zip) do |zip|
           zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
             if entry.name_is_directory?
               zip.dir.delete entry.to_s
@@ -458,7 +458,7 @@ module Rfd
       unless in_zip?
         FileUtils.mkdir_p File.join(current_dir, dir)
       else
-        Zip::File.open(current_zip.path) do |zip|
+        Zip::File.open(current_zip) do |zip|
           zip.dir.mkdir dir
         end
       end
@@ -470,9 +470,9 @@ module Rfd
       unless in_zip?
         FileUtils.touch File.join(current_dir, filename)
       else
-        Zip::File.open(current_zip.path) do |zip|
+        Zip::File.open(current_zip) do |zip|
           # zip.file.open(filename, 'w') {|_f| }  #HAXX this code creates an unneeded temporary file
-          zip.instance_variable_get(:@entry_set) << Zip::Entry.new(current_zip.path, filename)
+          zip.instance_variable_get(:@entry_set) << Zip::Entry.new(current_zip, filename)
         end
       end
       ls
@@ -480,7 +480,7 @@ module Rfd
 
     # Create a symlink to the current file or directory.
     def symlink(name)
-      FileUtils.ln_s current_item.path, name
+      FileUtils.ln_s current_item, name
       ls
     end
 
@@ -498,11 +498,11 @@ module Rfd
         selected_items.each do |item|
           next if item.symlink?
           if item.directory?
-            Dir[File.join(item.path, '**/**')].each do |file|
+            Dir[File.join(item, '**/**')].each do |file|
               zipfile.add file.sub("#{current_dir}/", ''), file
             end
           else
-            zipfile.add item.name, item.path
+            zipfile.add item.name, item
           end
         end
       end
@@ -515,7 +515,7 @@ module Rfd
         zips, gzs = selected_items.partition(&:zip?).tap {|z, others| break [z, *others.partition(&:gz?)]}
         zips.each do |item|
           FileUtils.mkdir_p File.join(current_dir, item.basename)
-          Zip::File.open(item.path) do |zip|
+          Zip::File.open(item) do |zip|
             zip.each do |entry|
               FileUtils.mkdir_p File.join(File.join(item.basename, File.dirname(entry.to_s)))
               zip.extract(entry, File.join(item.basename, entry.to_s)) { true }
@@ -523,7 +523,7 @@ module Rfd
           end
         end
         gzs.each do |item|
-          Zlib::GzipReader.open(item.path) do |gz|
+          Zlib::GzipReader.open(item) do |gz|
             Gem::Package::TarReader.new(gz) do |tar|
               dest_dir = File.join current_dir, (gz.orig_name || item.basename).sub(/\.tar$/, '')
               tar.each do |entry|
@@ -551,7 +551,7 @@ module Rfd
           end
         end
       else
-        Zip::File.open(current_zip.path) do |zip|
+        Zip::File.open(current_zip) do |zip|
           zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
             FileUtils.mkdir_p File.join(current_zip.dir, current_zip.basename, File.dirname(entry.to_s))
             zip.extract(entry, File.join(current_zip.dir, current_zip.basename, entry.to_s)) { true }
@@ -662,7 +662,7 @@ module Rfd
         else
           begin
             tmpdir, tmpfile_name = nil
-            Zip::File.open(current_zip.path) do |zip|
+            Zip::File.open(current_zip) do |zip|
               tmpdir = Dir.mktmpdir
               FileUtils.mkdir_p File.join(tmpdir, File.dirname(current_item.name))
               tmpfile_name = File.join(tmpdir, current_item.name)
@@ -687,7 +687,7 @@ module Rfd
         else
           begin
             tmpdir, tmpfile_name = nil
-            Zip::File.open(current_zip.path) do |zip|
+            Zip::File.open(current_zip) do |zip|
               tmpdir = Dir.mktmpdir
               FileUtils.mkdir_p File.join(tmpdir, File.dirname(current_item.name))
               tmpfile_name = File.join(tmpdir, current_item.name)
@@ -720,7 +720,7 @@ module Rfd
     end
 
     def expand_path(path)
-      File.expand_path path.is_a?(Rfd::Item) ? path.path : path.start_with?('/') || path.start_with?('~') ? path : current_dir ? File.join(current_dir, path) : path
+      File.expand_path path.is_a?(Rfd::Item) ? path : path.start_with?('/') || path.start_with?('~') ? path : current_dir ? File.join(current_dir, path) : path
     end
 
     def osx?

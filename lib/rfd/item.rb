@@ -187,6 +187,10 @@ module Rfd
       "#{current_mark}#{mb_ljust(display_name, @window_width - 15)}#{size_or_dir.rjust(13)}"
     end
 
+    def to_str
+      path
+    end
+
     def <=>(o)
       if directory? && !o.directory?
         1

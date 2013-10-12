@@ -172,11 +172,11 @@ module Rfd
     # Change the current directory.
     def cd(dir, pushd: true)
       dir = load_item expand_path(dir) unless dir.is_a? Item
-      if dir.zip?
-        @current_zip = dir
-      else
+      unless dir.zip?
         Dir.chdir dir
         @current_zip = nil
+      else
+        @current_zip = dir
       end
       @dir_history << current_dir if current_dir && pushd
       @current_dir, @current_page, @current_row = dir, 0, nil

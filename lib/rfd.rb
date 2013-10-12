@@ -176,17 +176,15 @@ module Rfd
         cd_into_zip dir
       else
         Dir.chdir dir
-        @dir_history << current_dir if current_dir && pushd
-        @current_dir, @current_page, @current_row, @current_zip = dir, 0, nil, nil
-        main.activate_pane 0
+        @current_zip = nil
       end
+      @dir_history << current_dir if current_dir && pushd
+      @current_dir, @current_page, @current_row = dir, 0, nil
+      main.activate_pane 0
     end
 
     def cd_into_zip(zipfile)
       @current_zip = zipfile
-      @dir_history << current_dir if current_dir
-      @current_dir, @current_page, @current_row = zipfile, 0, nil
-      main.activate_pane 0
     end
 
     # cd to the previous directory.

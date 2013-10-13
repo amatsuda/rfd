@@ -16,15 +16,136 @@ rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS
 
 Mac OS X Mountain Lion, Mac OS X Lion
 
-## Usage
+## Start Me Up
 
 Open up your terminal and type in:
 
     % rfd
 
-You can command rfd by pressing some chars on your keyboard, just like Vim.
+You can also pass in a starting directory name, which is defaulted to `.`.
 
-All available commands are defined here. https://github.com/amatsuda/rfd/tree/master/lib/rfd/commands.rb
+    % rfd ~/src/rails
+
+## Commands
+
+You can command rfd by pressing some chars on your keyboard, just like Vim. If you're totally unfamiliar with this sort of command system, I recommend you to play with `vimtutor` before you go any further.
+
+All available commands in rfd are defined as Ruby methods here. https://github.com/amatsuda/rfd/tree/master/lib/rfd/commands.rb
+
+### Changing the current directory
+
+* **\<Enter\>**: cd into the directory where the cursor is on.
+* **\<Delete\>** (or \<Backspace\> on you keyboard, probably?): Go up to the upper directory (cd ..).
+* **-**: Get back to where you once belonged (popd).
+
+### Moving the cursor
+
+* **j**: Move downward.
+* **k**: Move upward.
+* **h**: Move to the left column. At the left end column, move to the right end column at the previous page.
+* **l**: Move to the right column. At the right end column, move to the left end column at the next page.
+
+### The {count} parameter
+
+Some commands such as `j` or `k` take a number parameter called {count}. For passing a {count} parameter, just type in a number prior to the command.
+For example, `3j` moves the cursor to 3 lines below, and `999k` will take your cursor to 999 lines above.
+
+### Jumping the cursor
+
+* **H**: Move to the top of the current page.
+* **M**: Move to the middle of the current page.
+* **L**: Move to the bottom of the current page.
+
+### Switching the page
+
+* **ctrl-n, ctrl-f**: Move to the top of the next page.
+* **ctrl-p, ctrl-b**: Move to the top of the previous page.
+* **g**: Move to the top of the first page.
+* **G**: Move to the bottom of the last page.
+
+### Finding a file / directory
+
+You can find a file by typing the first letter of it immediately after the find commands.
+
+* **f{char}**: Move to the next file / directory of which name starts with the given char.
+* **F{char}**: Move to the previous file / directory of which name starts with the given char.
+* **n**: Repeat the last `f` or `F`.
+
+### Searching, sorting
+
+For commands like these that require a parameter string, type the parameter in the command line at the bottom of the screen, and press \<Enter\>.
+
+* **/**: Grep the current directory with the given parameter. The parameter will be interpreted as Ruby Regexp (e.g. `.*\.rb$`).
+* **s**: Sort files / directories in the current directory in the given order.
+    * (none): by name
+    * r     : reverse order by name
+    * s, S  : order by file size
+    * sr, Sr: reverse order by file size
+    * t     : order by mtime
+    * tr    : reverse order by mtime
+    * c     : order by ctime
+    * cr    : reverse order by ctime
+    * u     : order by atime
+    * ur    : reverse order by atime
+    * e     : order by extname
+    * er    : reverse order by extname
+
+### Marking files / directories
+
+You can send a command to the file / directory on which the cursor is on. Or, you can send a command to multiple files / directories at once by marking them first.
+The mark is drawn as a `*` char on the left of each file / directory name.
+
+* **\<Space\>**: Mark / unmark current file / directory.
+* **ctrl-a**: Mark / unmark all file / directories in the current directory.
+
+### Manipulating files / directories
+
+As stated above, you can send a command to one or more files / directories. In this document, the term "selected items" means "(the marked files / directories) || (the file / directory on which the cursor is on)".
+
+* **c**: Copy selected items (cp).
+* **m**: Move selected items (mv).
+* **d**: Move selected items into the Trash.
+* **D**: Delete selected items.
+* **r**: Rename selected items.
+
+### Creating files / directories
+
+* **t**: Create a new file (touch).
+* **K**: Creat a new directory (mkdir).
+* **S**: Create new symlink to the current file / directory (ln -s).
+
+### Attributes
+
+* **a**: Change permission of selected items (chmod).
+* **w**: Change the owner of of selected items (chown).
+
+### Viewing, Editing, Opening
+
+* **\<Enter\>**: View current file with the system $VIEWER such as `less`.
+* **v**: View current file with the system $VIEWER such as `less`.
+* **e**: Edit current file with the system $EDITOR such as `vim`.
+* **o**: Send the `open` command.
+
+### Manipulating archives
+
+* **u**: Unarchive .zip, .gz, or .tar.gz file into the current directory.
+* **z**: Archive selected items into a .zip file with the given name.
+
+### Handling .zip files
+
+You can `cd` into a .zip file as if it's just a directory, then unarchive selected items, view files in it, and even create new files or edit files in the archive.
+
+### Splitting columns
+
+* **ctrl-w**: Change the window split size to the {count} value (e.g. `4<C-w>` to split the window into 4 columns). The default number of columns is 2.
+
+### Misc
+
+* **ctrl-l**: Refresh the whole screen.
+* **C**: Copy selected items' paths to the clipboard.
+* **O**: Open a new terminal window at the current directory.
+* **!**: Execute a shell command.
+* **q**: Quit the app.
 
 ## Contributing
 

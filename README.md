@@ -110,7 +110,7 @@ As stated above, you can send a command to one or more files / directories. In t
 * **m**: Move selected items (mv).
 * **d**: Move selected items into the Trash.
 * **D**: Delete selected items.
-* **r**: Rename selected items.
+* **r**: Rename selected items. This command takes a sed-like argument separated by a `/`. For example, changing all .html files' extention to .html.erb could be done by `\.html$/.html.erb`.
 
 ### Creating files / directories
 
@@ -120,8 +120,8 @@ As stated above, you can send a command to one or more files / directories. In t
 
 ### Attributes
 
-* **a**: Change permission of selected items (chmod).
-* **w**: Change the owner of of selected items (chown).
+* **a**: Change permission of selected items (chmod). Takes chmod-like argument such as `g+w`, `755`.
+* **w**: Change the owner of of selected items (chown). Takes chown-like argument such as `alice`, `nobody:nobody`.
 
 ### Viewing, Editing, Opening
 

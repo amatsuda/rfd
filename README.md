@@ -18,7 +18,7 @@ Mac OS X Mountain Lion, Mac OS X Lion
 
 ## Screenshot
 
-![screenshot](https://www.evernote.com/shard/s20/sh/0bec8345-46c6-45f9-989b-c979b060f5a6/1cffd4c54b30204426251d8561c084a2/res/659f4073-10cc-48f5-a3d2-eb5fe54fba45/skitch.png?resizeSmall&width=768)
+![screenshot](https://www.evernote.com/shard/s20/sh/a0a275ee-39b5-4ba4-9374-8534f4ee2a24/377c504f45f17a75eb2ea12bd015b6ee/res/981b4186-3f78-4925-a798-845226dd544b/skitch.png)
 
 ## Start Me Up
 

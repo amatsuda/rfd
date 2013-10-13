@@ -1,5 +1,4 @@
 require 'ffi-ncurses'
-require 'ffi-ncurses/mouse'
 Curses = FFI::NCurses
 require 'fileutils'
 require 'tmpdir'

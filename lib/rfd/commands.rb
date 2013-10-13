@@ -78,6 +78,11 @@ module Rfd
       raise StopIteration if ask 'Are you sure want to exit? (y/n)'
     end
 
+    # "q"uit the app!
+    def q!
+      raise StopIteration
+    end
+
     # "r"ename selected files and directories.
     def r
       process_command_line preset_command: 'rename'

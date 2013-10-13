@@ -394,7 +394,7 @@ module Rfd
       unless in_zip?
         selected_items.each do |item|
           name = item.name.gsub from, to
-          FileUtils.mv item, current_dir.join(name)
+          FileUtils.mv item, current_dir.join(name) if item.name != name
         end
       else
         Zip::File.open(current_zip) do |zip|

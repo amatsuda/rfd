@@ -16,6 +16,10 @@ rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS
 
 Mac OS X Mountain Lion, Mac OS X Lion
 
+## Screenshot
+
+![screenshot](https://www.evernote.com/shard/s20/sh/0bec8345-46c6-45f9-989b-c979b060f5a6/1cffd4c54b30204426251d8561c084a2/res/659f4073-10cc-48f5-a3d2-eb5fe54fba45/skitch.png?resizeSmall&width=768)
+
 ## Start Me Up
 
 Open up your terminal and type in:

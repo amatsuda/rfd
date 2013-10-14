@@ -39,7 +39,7 @@ All available commands in rfd are defined as Ruby methods here. https://github.c
 ### Changing the current directory
 
 * **\<Enter\>**: cd into the directory where the cursor is on.
-* **\<Delete\>** (or \<Backspace\> on you keyboard, probably?): Go up to the upper directory (cd ..).
+* **\<Delete\>** (or \<Backspace\> on your keyboard, probably?): Go up to the upper directory (cd ..).
 * **-**: Get back to where you once belonged (popd).
 
 ### Moving the cursor

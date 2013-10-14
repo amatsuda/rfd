@@ -113,6 +113,11 @@ module Rfd
       process_command_line preset_command: 'chown'
     end
 
+    # "y"ank selected file / directory names.
+    def y
+      yank
+    end
+
     # Archive selected files and directories into a "z"ip file.
     def z
       process_command_line preset_command: 'zip'

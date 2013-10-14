@@ -1,6 +1,6 @@
 # rfd (Ruby on Files & Directories)
 
-rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS filer, "FD".
+rfd is a terminal-based filesystem explorer, inpsired by the legendary freesoft MS-DOS filer, "FD".
 
 ## Installation
 
@@ -12,7 +12,7 @@ rfd is a terminal based File explorer, inpsired by the legendary freesoft MS-DOS
 * NCurses
 * (FFI)
 
-## Tested environment
+## Tested environments
 
 Mac OS X Mountain Lion, Mac OS X Lion
 
@@ -22,17 +22,18 @@ Mac OS X Mountain Lion, Mac OS X Lion
 
 ## Start Me Up
 
-Open up your terminal and type in:
+Open up your terminal and type:
 
     % rfd
 
-You can also pass in a starting directory name, which is defaulted to `.`.
+You can also pass in a starting directory name, which defaults to `.`.
 
     % rfd ~/src/rails
 
 ## Commands
 
-You can command rfd by pressing some chars on your keyboard, just like Vim. If you're totally unfamiliar with this sort of command system, I recommend you to play with `vimtutor` before you go any further.
+You can send commands to rfd by pressing some chars on your keyboard, just like Vim.
+If you're unfamiliar with this sort of command system, I recommend you to play with `vimtutor` before you go any further.
 
 All available commands in rfd are defined as Ruby methods here. https://github.com/amatsuda/rfd/tree/master/lib/rfd/commands.rb
 
@@ -44,10 +45,10 @@ All available commands in rfd are defined as Ruby methods here. https://github.c
 
 ### Moving the cursor
 
-* **j**: Move downward.
-* **k**: Move upward.
-* **h**: Move to the left column. At the left end column, move to the right end column at the previous page.
-* **l**: Move to the right column. At the right end column, move to the left end column at the next page.
+* **j**: Move down.
+* **k**: Move up.
+* **h**: Move left. At the leftmost column, move to the right end column at the previous page.
+* **l**: Move right. At the rightmost column, move to the left end column at the next page.
 
 ### The {count} parameter
 

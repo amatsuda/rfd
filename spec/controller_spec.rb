@@ -305,6 +305,19 @@ describe Rfd::Controller do
     it { should be_symlink File.join(tmpdir, 'aaa') }
   end
 
+  describe '#yank' do
+    before do
+      controller.find '.file1'
+      controller.toggle_mark
+      controller.find 'dir3'
+      controller.toggle_mark
+      controller.yank
+    end
+    it 'should be yanked' do
+      controller.instance_variable_get(:@yanked_items).map(&:name).should =~ %w(.file1 dir3)
+    end
+  end
+
   describe '#pbcopy' do
     before do
       controller.find '.file1'

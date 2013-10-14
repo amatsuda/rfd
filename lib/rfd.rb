@@ -52,7 +52,7 @@ module Rfd
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
-      @direction, @dir_history, @last_command, @times = nil, [], nil, nil
+      @direction, @dir_history, @last_command, @times, @yanked_items = nil, [], nil, nil, nil
     end
 
     # The main loop.
@@ -473,6 +473,11 @@ module Rfd
     def symlink(name)
       FileUtils.ln_s current_item, name
       ls
+    end
+
+    # Yank selected file / directory names.
+    def yank
+      @yanked_items = selected_items
     end
 
     # Copy selected files and directories' path into clipboard on OSX.

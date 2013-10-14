@@ -143,6 +143,10 @@ You can `cd` into a .zip file as if it's just a directory, then unarchive select
 
 * **ctrl-w**: Change the window split size to the {count} value (e.g. `4<C-w>` to split the window into 4 columns). The default number of columns is 2.
 
+### Using mouse
+
+Mouse is available if your terminal supports it. You can move the cursor by clicking on a file / directory. Double clicking on a file / directory is equivalent to pressing \<Enter\> on it.
+
 ### Misc
 
 * **ctrl-l**: Refresh the whole screen.
@@ -150,6 +154,11 @@ You can `cd` into a .zip file as if it's just a directory, then unarchive select
 * **O**: Open a new terminal window at the current directory.
 * **!**: Execute a shell command.
 * **q**: Quit the app.
+
+## How to manually execute a command, or how the commands are executed
+
+By pressing `:`, you can enter the command-line mode. Any string given in the command line after `:` will be executed as Ruby method call in the `Controller` instance.
+For instance, `:j` brings your cursor down, `:mkdir foo` makes a directory named "foo". And `:q!` of course works as you might expect, since `q!` method is implemented so.
 
 ## Contributing
 

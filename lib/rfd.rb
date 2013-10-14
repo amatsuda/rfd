@@ -307,33 +307,31 @@ module Rfd
 
     # Sort the loaded files and directories in already given sort order.
     def sort_items_according_to_current_direction
-      @items, unsorted = items.partition {|i| %w(. ..).include? i.name}
-      @items.sort!
-      @items += case @direction
+      case @direction
       when nil
-        unsorted.partition(&:directory?).flat_map(&:sort)
+        @items = items.shift(2) + items.partition(&:directory?).flat_map(&:sort)
       when 'r'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort.reverse}
       when 'S', 's'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| -i.size}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by {|i| -i.size}}
       when 'Sr', 'sr'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort_by(&:size)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:size)}
       when 't'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.mtime <=> x.mtime}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.mtime <=> x.mtime}}
       when 'tr'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort_by(&:mtime)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:mtime)}
       when 'c'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.ctime <=> x.ctime}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.ctime <=> x.ctime}}
       when 'cr'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort_by(&:ctime)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:ctime)}
       when 'u'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.atime <=> x.atime}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.atime <=> x.atime}}
       when 'ur'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort_by(&:atime)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:atime)}
       when 'e'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.extname <=> x.extname}}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort {|x, y| y.extname <=> x.extname}}
       when 'er'
-        unsorted.partition(&:directory?).flat_map {|arr| arr.sort_by(&:extname)}
+        @items = items.shift(2) + items.partition(&:directory?).flat_map {|arr| arr.sort_by(&:extname)}
       end
       items.each.with_index {|item, index| item.index = index}
     end

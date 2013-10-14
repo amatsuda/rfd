@@ -113,6 +113,13 @@ As stated above, you can send a command to one or more files / directories. In t
 * `D`: Delete selected items.
 * `r`: Rename selected items. This command takes a sed-like argument separated by a `/`. For example, changing all .html files' extention to .html.erb could be done by `\.html$/.html.erb`.
 
+### Yank and Paste
+
+`y` & `p` works just like Windows-c & Windows-v on explorer.exe.
+
+* `y`: Yank selected items.
+* `p`: Paste yanked items into the directory on which the cursor is, or into the current directory.
+
 ### Creating files / directories
 
 * `t`: Create a new file (touch).

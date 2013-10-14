@@ -259,7 +259,7 @@ module Rfd
         @items = Dir.foreach(current_dir).map {|fn|
           stat = File.lstat current_dir.join(fn)
           Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
-        }.to_a
+        }.to_a.partition {|i| %w(. ..).include? i.name}.flatten
       else
         @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: maxx),
           Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]

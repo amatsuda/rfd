@@ -73,6 +73,11 @@ module Rfd
       end
     end
 
+    # Paste yanked files / directories into the directory on which the cursor is, or into the current directory.
+    def p
+      paste
+    end
+
     # "q"uit the app.
     def q
       raise StopIteration if ask 'Are you sure want to exit? (y/n)'

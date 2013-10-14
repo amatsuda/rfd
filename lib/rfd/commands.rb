@@ -164,7 +164,7 @@ module Rfd
 
     # "O"pen terminal here.
     def O
-      dir = current_item.directory? ? current_item.path : current_dir
+      dir = current_item.directory? ? current_item.path : current_dir.path
       system %Q[osascript -e 'tell app "Terminal"
         do script "cd #{dir}"
       end tell'] if osx?

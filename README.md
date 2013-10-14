@@ -39,8 +39,8 @@ All available commands in rfd are defined as Ruby methods here. https://github.c
 
 ### Changing the current directory
 
-* `\<Enter\>`: cd into the directory where the cursor is on.
-* `\<Delete\>` (or \<Backspace\> on your keyboard, probably?): Go up to the upper directory (cd ..).
+* `<Enter>`: cd into the directory where the cursor is on.
+* `<Delete>` (or \<Backspace\> on your keyboard, probably?): Go up to the upper directory (cd ..).
 * `-`: Get back to where you once belonged (popd).
 
 ### Moving the cursor
@@ -100,7 +100,7 @@ For commands like these that require a parameter string, type the parameter in t
 You can send a command to the file / directory on which the cursor is on. Or, you can send a command to multiple files / directories at once by marking them first.
 The mark is drawn as a `*` char on the left of each file / directory name.
 
-* `\<Space\>`: Mark / unmark current file / directory.
+* `<Space>`: Mark / unmark current file / directory.
 * `ctrl-a`: Mark / unmark all file / directories in the current directory.
 
 ### Manipulating files / directories
@@ -126,7 +126,7 @@ As stated above, you can send a command to one or more files / directories. In t
 
 ### Viewing, Editing, Opening
 
-* `\<Enter\>`: View current file with the system $VIEWER such as `less`.
+* `<Enter>`: View current file with the system $VIEWER such as `less`.
 * `v`: View current file with the system $VIEWER such as `less`.
 * `e`: Edit current file with the system $EDITOR such as `vim`.
 * `o`: Send the `open` command.

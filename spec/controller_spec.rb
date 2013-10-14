@@ -318,6 +318,34 @@ describe Rfd::Controller do
     end
   end
 
+  describe '#paste' do
+    before do
+      controller.find '.file1'
+      controller.toggle_mark
+      controller.find 'dir3'
+      controller.toggle_mark
+      controller.yank
+    end
+    context 'when the cursor is on a directory' do
+      before do
+        controller.find 'dir1'
+        controller.paste
+      end
+      subject { File }
+      it { should be_exist File.join(tmpdir, 'dir1', '.file1') }
+      it { should be_exist File.join(tmpdir, 'dir1', 'dir3') }
+    end
+    context 'when the cursor is on a file' do
+      before do
+        controller.find 'file2'
+        controller.paste
+      end
+      subject { File }
+      it { should be_exist File.join(tmpdir, '.file1_2') }
+      it { should be_exist File.join(tmpdir, 'dir3_2') }
+    end
+  end
+
   describe '#pbcopy' do
     before do
       controller.find '.file1'

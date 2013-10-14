@@ -480,6 +480,29 @@ module Rfd
       @yanked_items = selected_items
     end
 
+    # Paste yanked files / directories here.
+    def paste
+      if @yanked_items
+        if current_item.directory?
+          FileUtils.cp_r @yanked_items.map(&:path), current_item
+        else
+          @yanked_items.each do |item|
+            if items.include? item
+              i = 1
+              while i += 1
+                new_item = Item.new dir: current_dir, name: "#{item.basename}_#{i}#{item.extname}", stat: item.stat, window_width: maxx
+                break unless File.exist? new_item.path
+              end
+              FileUtils.cp_r item, new_item
+            else
+              FileUtils.cp_r item, current_dir
+            end
+          end
+        end
+        ls
+      end
+    end
+
     # Copy selected files and directories' path into clipboard on OSX.
     def clipboard
       IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if osx?

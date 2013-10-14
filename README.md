@@ -14,7 +14,7 @@ rfd is a terminal-based filesystem explorer, inpsired by the legendary freesoft 
 
 ## Tested environments
 
-Mac OS X Mountain Lion, Mac OS X Lion
+Mac OS X Mountain Lion, Mac OS X Lion, Ubuntu 13.04
 
 ## Screenshot
 

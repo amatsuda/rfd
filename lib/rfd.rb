@@ -168,7 +168,7 @@ module Rfd
     end
 
     # Change the current directory.
-    def cd(dir, pushd: true)
+    def cd(dir = '~', pushd: true)
       dir = load_item expand_path(dir) unless dir.is_a? Item
       unless dir.zip?
         Dir.chdir dir

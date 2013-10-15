@@ -37,7 +37,6 @@ module Rfd
     init_curses
     rfd = Rfd::Controller.new
     rfd.cd dir
-    rfd.ls
     rfd
   end
 
@@ -180,14 +179,12 @@ module Rfd
       @dir_history << current_dir if current_dir && pushd
       @current_dir, @current_page, @current_row = dir, 0, nil
       main.activate_pane 0
+      ls
     end
 
     # cd to the previous directory.
     def popd
-      if @dir_history.any?
-        cd @dir_history.pop, pushd: false
-        ls
-      end
+      cd @dir_history.pop, pushd: false if @dir_history.any?
     end
 
     # Fetch files from current directory.

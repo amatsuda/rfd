@@ -42,6 +42,7 @@ All available commands in rfd are defined as Ruby methods here. https://github.c
 * `<Enter>`: cd into the directory where the cursor is on.
 * `<Delete>` (or \<Backspace\> on your keyboard, probably?): Go up to the upper directory (cd ..).
 * `-`: Get back to where you once belonged (popd).
+* `@`: cd to a directory given via the command-line window.
 
 ### Moving the cursor
 

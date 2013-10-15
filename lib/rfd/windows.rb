@@ -2,6 +2,35 @@ module Rfd
   class Window
     attr_reader :window
 
+    def self.draw_borders
+      Curses.attr_on Curses.COLOR_PAIR(Curses::COLOR_CYAN), nil
+      Curses.addch Curses::ACS_ULCORNER
+      (Curses.COLS - 32).times { Curses.addch Curses::ACS_HLINE }
+      Curses.addch Curses::ACS_TTEE
+      29.times { Curses.addch Curses::ACS_HLINE }
+      Curses.addch Curses::ACS_URCORNER
+
+      [*1..3, *5..(Curses.LINES - 3)].each do |i|
+        Curses.mvaddch i, 0, Curses::ACS_VLINE
+        Curses.mvaddch i, Curses.COLS - 1, Curses::ACS_VLINE
+      end
+      [1, 2, 3].each do |i|
+        Curses.mvaddch i, Curses.COLS - 31, Curses::ACS_VLINE
+      end
+
+      Curses.mvaddch 4, 0, Curses::ACS_LTEE
+      (Curses.COLS - 32).times { Curses.addch Curses::ACS_HLINE }
+      Curses.addch Curses::ACS_BTEE
+      29.times { Curses.addch Curses::ACS_HLINE }
+      Curses.addch Curses::ACS_RTEE
+
+      Curses.mvaddch Curses.LINES - 2, 0, Curses::ACS_LLCORNER
+      (Curses.COLS - 2).times { Curses.addch Curses::ACS_HLINE }
+      Curses.addch Curses::ACS_LRCORNER
+
+      Curses.standend
+    end
+
     def wmove(y, x = 0)
       Curses.wmove window, y, x
     end
@@ -46,18 +75,11 @@ module Rfd
     def wclrtoeol
       Curses.wclrtoeol window
     end
-
-    def draw_border(*border_param)
-      border_window = subwin maxy + 2, maxx + 2, begy - 1, begx - 1
-      Curses.wbkgd border_window, Curses.COLOR_PAIR(Curses::COLOR_CYAN)
-      Curses.wborder border_window, *border_param
-    end
   end
 
   class HeaderLeftWindow < Window
     def initialize
       @window = subwin 3, Curses.COLS - 32, 1, 1
-      draw_border 0, 0, 0, 0, 0, 0, Curses::ACS_LTEE, 0
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
@@ -88,7 +110,6 @@ module Rfd
   class HeaderRightWindow < Window
     def initialize
       @window = subwin 3, 29, 1, Curses.COLS - 30
-      draw_border 0, 0, 0, 0, Curses::ACS_TTEE, 0, Curses::ACS_BTEE, Curses::ACS_RTEE
     end
 
     def draw_marked_items(count: 0, size: 0)
@@ -150,10 +171,6 @@ module Rfd
     end
 
     def initialize(dir = '.')
-      border_window = subwin Curses.LINES - 5, Curses.COLS, 4, 0
-      Curses.wbkgd border_window, Curses::COLOR_PAIR(Curses::COLOR_CYAN)
-      Curses.box border_window, 0, 0
-
       spawn_panes 2
     end
 

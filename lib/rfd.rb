@@ -35,6 +35,7 @@ module Rfd
   # * +dir+ - The initial directory.
   def self.start(dir = '.')
     init_curses
+    Rfd::Window.draw_borders
     rfd = Rfd::Controller.new
     rfd.cd dir
     rfd

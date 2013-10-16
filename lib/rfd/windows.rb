@@ -79,10 +79,6 @@ module Rfd
       window.begy
     end
 
-    def subwin(height, width, top, left)
-      Curses.stdscr.subwin height, width, top, left
-    end
-
     def wclrtoeol
       window.clrtoeol
     end
@@ -90,7 +86,7 @@ module Rfd
 
   class HeaderLeftWindow < Window
     def initialize
-      @window = subwin 3, Curses.cols - 32, 1, 1
+      @window = Curses.stdscr.subwin 3, Curses.cols - 32, 1, 1
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
@@ -120,7 +116,7 @@ module Rfd
 
   class HeaderRightWindow < Window
     def initialize
-      @window = subwin 3, 29, 1, Curses.cols - 30
+      @window = Curses.stdscr.subwin 3, 29, 1, Curses.cols - 30
     end
 
     def draw_marked_items(count: 0, size: 0)
@@ -188,7 +184,7 @@ module Rfd
     def spawn_panes(num)
       @panes.close_all if defined? @panes
       width = (Curses.cols - 2) / num
-      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.lines - 7, width - 1, 5, width * i + 1)}
+      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << Curses.stdscr.subwin(Curses.lines - 7, width - 1, 5, width * i + 1)}
       @panes = Panes.new windows
       activate_pane 0
     end

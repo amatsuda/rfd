@@ -733,6 +733,9 @@ module Rfd
     ensure
       Curses.reset_prog_mode
       Curses.getch if pause
+      #NOTE needs to draw borders and ls again here since the stdlib Curses.refresh fails to retrieve the previous screen
+      Rfd::Window.draw_borders
+      ls
       Curses.refresh
     end
 

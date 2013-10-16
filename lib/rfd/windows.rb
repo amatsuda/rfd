@@ -55,11 +55,6 @@ module Rfd
       window.addstr str
     end
 
-    def mvwaddstr(y, x, str)
-      wmove y, x
-      window.addstr str
-    end
-
     def wclear
       window.clear
     end
@@ -238,7 +233,10 @@ module Rfd
     end
 
     def toggle_mark(item)
-      mvwaddstr item.index % maxy, 0, item.current_mark if item.toggle_mark
+      if item.toggle_mark
+        window.setpos item.index % maxy, 0
+        window.addstr item.current_mark
+      end
     end
   end
 

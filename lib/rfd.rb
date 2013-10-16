@@ -1,5 +1,4 @@
-require 'ffi-ncurses'
-Curses = FFI::NCurses
+require 'curses'
 require 'fileutils'
 require 'tmpdir'
 require 'rubygems/package'
@@ -14,19 +13,18 @@ module Rfd
 
   # :nodoc:
   def self.init_curses
-    Curses.initscr
+    Curses.init_screen
     Curses.raw
     Curses.noecho
     Curses.curs_set 0
-    Curses.keypad Curses.stdscr, true
+    Curses.stdscr.keypad = true
     Curses.start_color
 
     [Curses::COLOR_WHITE, Curses::COLOR_CYAN, Curses::COLOR_MAGENTA, Curses::COLOR_GREEN, Curses::COLOR_RED].each do |c|
       Curses.init_pair c, c, Curses::COLOR_BLACK
     end
 
-    Curses.mousemask Curses::ALL_MOUSE_EVENTS | Curses::REPORT_MOUSE_POSITION, nil
-    Curses.extend FFI::NCurses::Mouse
+    Curses.mousemask Curses::BUTTON1_CLICKED | Curses::BUTTON1_DOUBLE_CLICKED
   end
 
   # Start the app here!
@@ -57,14 +55,13 @@ module Rfd
 
     # The main loop.
     def run
-      mouse_event = Curses::MEVENT.new
       loop do
         begin
           number_pressed = false
-          case (c = Curses.getch)
-          when Curses::KEY_RETURN
+          case (c = Curses.getch).ord
+          when 10, 13  # enter, return
             enter
-          when Curses::KEY_ESCAPE
+          when 27
             q
           when 32  # space
             space
@@ -91,14 +88,16 @@ module Rfd
               debug "key: #{c}" if ENV['DEBUG']
             end
           when Curses::KEY_MOUSE
-            if Curses.getmouse(mouse_event) == Curses::OK
-              if Curses.BUTTON_CLICK(mouse_event[:bstate], 1) > 0
-                click y: mouse_event[:y], x: mouse_event[:x]
-              elsif Curses.BUTTON_DOUBLE_CLICK(mouse_event[:bstate], 1) > 0
-                double_click y: mouse_event[:y], x: mouse_event[:x]
+            if (mouse_event = Curses.getmouse)
+              case mouse_event.bstate
+              when Curses::BUTTON1_CLICKED
+                click y: mouse_event.y, x: mouse_event.x
+              when Curses::BUTTON1_DOUBLE_CLICKED
+                double_click y: mouse_event.y, x: mouse_event.x
               end
             end
           else
+            raise c
             debug "key: #{c}" if ENV['DEBUG']
           end
           @times = nil unless number_pressed
@@ -110,7 +109,7 @@ module Rfd
         end
       end
     ensure
-      Curses.endwin
+      Curses.close_screen
     end
 
     # Change the number of columns in the main window.
@@ -663,10 +662,10 @@ module Rfd
       command_line.set_prompt prompt
       command_line.wrefresh
       while (c = Curses.getch)
-        next unless [78, 89, 110, 121, 3, 27] .include? c  # N, Y, n, y, ^c, esc
+        next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
         command_line.wclear
         command_line.wrefresh
-        break [89, 121].include? c  # Y, y
+        break %[Y y].include? c  # Y, y
       end
     end
 
@@ -728,7 +727,7 @@ module Rfd
     private
     def execute_external_command(pause: false)
       Curses.def_prog_mode
-      Curses.endwin
+      Curses.close_screen
       yield
     ensure
       Curses.reset_prog_mode

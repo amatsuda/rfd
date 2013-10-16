@@ -1,85 +1,101 @@
 module Rfd
   class Window
+    ACS_URCORNER = 4194411
+    ACS_LRCORNER = 4194410
+    ACS_ULCORNER = 4194412
+    ACS_LLCORNER = 4194413
+    ACS_HLINE = 4194417
+    ACS_LTEE = 4194420
+    ACS_RTEE = 4194421
+    ACS_BTEE = 4194422
+    ACS_TTEE = 4194423
+    ACS_VLINE = 4194424
+
     attr_reader :window
 
     def self.draw_borders
-      Curses.attr_on Curses.COLOR_PAIR(Curses::COLOR_CYAN), nil
-      Curses.addch Curses::ACS_ULCORNER
-      (Curses.COLS - 32).times { Curses.addch Curses::ACS_HLINE }
-      Curses.addch Curses::ACS_TTEE
-      29.times { Curses.addch Curses::ACS_HLINE }
-      Curses.addch Curses::ACS_URCORNER
+      Curses.attron Curses.color_pair(Curses::COLOR_CYAN) do
+        Curses.addch ACS_ULCORNER
+        (Curses.cols - 32).times { Curses.addch ACS_HLINE }
+        Curses.addch ACS_TTEE
+        29.times { Curses.addch ACS_HLINE }
+        Curses.addch ACS_URCORNER
 
-      [*1..3, *5..(Curses.LINES - 3)].each do |i|
-        Curses.mvaddch i, 0, Curses::ACS_VLINE
-        Curses.mvaddch i, Curses.COLS - 1, Curses::ACS_VLINE
+        [*1..3, *5..(Curses.lines - 3)].each do |i|
+          Curses.setpos i, 0
+          Curses.addch ACS_VLINE
+          Curses.setpos i, Curses.cols - 1
+          Curses.addch ACS_VLINE
+        end
+        [1, 2, 3].each do |i|
+          Curses.setpos i, Curses.cols - 31
+          Curses.addch ACS_VLINE
+        end
+
+        Curses.setpos 4, 0
+        Curses.addch ACS_LTEE
+        (Curses.cols - 32).times { Curses.addch ACS_HLINE }
+        Curses.addch ACS_BTEE
+        29.times { Curses.addch ACS_HLINE }
+        Curses.addch ACS_RTEE
+
+        Curses.setpos Curses.lines - 2, 0
+        Curses.addch ACS_LLCORNER
+        (Curses.cols - 2).times { Curses.addch ACS_HLINE }
+        Curses.addch ACS_LRCORNER
       end
-      [1, 2, 3].each do |i|
-        Curses.mvaddch i, Curses.COLS - 31, Curses::ACS_VLINE
-      end
-
-      Curses.mvaddch 4, 0, Curses::ACS_LTEE
-      (Curses.COLS - 32).times { Curses.addch Curses::ACS_HLINE }
-      Curses.addch Curses::ACS_BTEE
-      29.times { Curses.addch Curses::ACS_HLINE }
-      Curses.addch Curses::ACS_RTEE
-
-      Curses.mvaddch Curses.LINES - 2, 0, Curses::ACS_LLCORNER
-      (Curses.COLS - 2).times { Curses.addch Curses::ACS_HLINE }
-      Curses.addch Curses::ACS_LRCORNER
-
-      Curses.standend
     end
 
     def wmove(y, x = 0)
-      Curses.wmove window, y, x
+      window.setpos y, x
     end
 
     def waddstr(str, clear_to_eol_before_add: false)
       wclrtoeol if clear_to_eol_before_add
-      Curses.waddstr window, str
+      window.addstr str
     end
 
     def mvwaddstr(y, x, str)
-      Curses.mvwaddstr window, y, x, str
+      wmove y, x
+      window.addstr str
     end
 
     def wclear
-      Curses.wclear window
+      window.clear
     end
 
     def wrefresh
-      Curses.wrefresh window
+      window.refresh
     end
 
     def maxx
-      Curses.getmaxx window
+      window.maxx
     end
 
     def maxy
-      Curses.getmaxy window
+      window.maxy
     end
 
     def begx
-      Curses.getbegx window
+      window.begx
     end
 
     def begy
-      Curses.getbegy window
+      window.begy
     end
 
     def subwin(height, width, top, left)
-      Curses.derwin Curses.stdscr, height, width, top, left
+      Curses.stdscr.subwin height, width, top, left
     end
 
     def wclrtoeol
-      Curses.wclrtoeol window
+      window.clrtoeol
     end
   end
 
   class HeaderLeftWindow < Window
     def initialize
-      @window = subwin 3, Curses.COLS - 32, 1, 1
+      @window = subwin 3, Curses.cols - 32, 1, 1
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
@@ -109,7 +125,7 @@ module Rfd
 
   class HeaderRightWindow < Window
     def initialize
-      @window = subwin 3, 29, 1, Curses.COLS - 30
+      @window = subwin 3, 29, 1, Curses.cols - 30
     end
 
     def draw_marked_items(count: 0, size: 0)
@@ -160,13 +176,13 @@ module Rfd
 
       def close_all
         @panes.each do |p|
-          Curses.wclear p
-          Curses.delwin p
+          p.clear
+          p.close
         end
       end
 
       def include_point?(pane: pane, y: nil, x: nil)
-        (y >= Curses.getbegy(pane)) && (Curses.getbegy(pane) + Curses.getmaxy(pane) > y) && (x >= Curses.getbegx(pane)) && (Curses.getbegx(pane) + Curses.getmaxx(pane) > x)
+        (y >= pane.begy) && (pane.begy + pane.maxy > y) && (x >= pane.begx) && (pane.begx + pane.maxx > x)
       end
     end
 
@@ -176,8 +192,8 @@ module Rfd
 
     def spawn_panes(num)
       @panes.close_all if defined? @panes
-      width = (Curses.COLS - 2) / num
-      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.LINES - 7, width - 1, 5, width * i + 1)}
+      width = (Curses.cols - 2) / num
+      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << subwin(Curses.lines - 7, width - 1, 5, width * i + 1)}
       @panes = Panes.new windows
       activate_pane 0
     end
@@ -199,9 +215,10 @@ module Rfd
     end
 
     def draw_item(item, current: false)
-      Curses.wattr_set window, current ? Curses::A_UNDERLINE : Curses::A_NORMAL, item.color, nil
-      mvwaddstr item.index % maxy, 0, "#{item.to_s}\n"
-      Curses.wstandend window
+      window.setpos item.index % maxy, 0
+      window.attron(Curses.color_pair(item.color) | (current ? Curses::A_UNDERLINE : Curses::A_NORMAL)) do
+        window.addstr "#{item.to_s}\n"
+      end
       wrefresh
     end
 
@@ -213,10 +230,8 @@ module Rfd
         wclear
         wmove 0
         items[maxy * index, maxy * (index + 1)].each do |item|
-          Curses.wattr_set window, Curses::A_NORMAL, item.color, nil
-          waddstr "#{item.to_s}\n"
+          window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { waddstr "#{item.to_s}\n" }
         end if items[maxy * index, maxy * (index + 1)]
-        Curses.wstandend window
         wrefresh
       end
       activate_pane original_active_pane_index
@@ -229,34 +244,34 @@ module Rfd
 
   class CommandLineWindow < Window
     def initialize
-      @window = subwin 1, Curses.COLS, Curses.LINES - 1, 0
+      @window = Curses.stdscr.subwin 1, Curses.cols, Curses.lines - 1, 0
     end
 
     def set_prompt(str)
-      Curses.wattr_set window, Curses::A_BOLD, Curses::COLOR_WHITE, nil
-      wmove 0
-      wclrtoeol
-      waddstr str
-      Curses.wstandend window
+      window.attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
+        wmove 0
+        wclrtoeol
+        waddstr str
+      end
     end
 
     def get_command(prompt: nil)
       Curses.echo
       startx = prompt ? prompt.size : 1
-      s = ' ' * 100
-      Curses.mvwgetstr window, 0, startx, s
+      window.setpos 0, startx
+      s = window.getstr
       "#{prompt[1..-1] if prompt}#{s.strip}"
     ensure
       Curses.noecho
     end
 
     def show_error(str)
-      Curses.wattr_set window, Curses::A_BOLD, Curses::COLOR_RED, nil
-      wmove 0
-      wclrtoeol
-      waddstr str
+      window.attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
+        wmove 0
+        wclrtoeol
+        waddstr str
+      end
       wrefresh
-      Curses.wstandend window
     end
   end
 end

@@ -20,7 +20,7 @@ describe Rfd::Controller do
   end
 
   after :all do
-    Curses.endwin
+    Curses.close_screen
   end
 
   let(:tmpdir) { File.join __dir__, 'tmpdir' }

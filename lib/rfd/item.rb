@@ -101,7 +101,11 @@ module Rfd
 
     def directory?
       @directory ||= if symlink?
-        File.stat(path).directory?
+        begin
+          File.stat(path).directory?
+        rescue Errno::ENOENT
+          false
+        end
       else
         stat.directory?
       end

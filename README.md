@@ -10,7 +10,6 @@ rfd is a terminal-based filesystem explorer, inpsired by the legendary freesoft 
 
 * Ruby 2.0, Ruby 2.1
 * NCurses
-* (FFI)
 
 ## Tested environments
 

@@ -165,6 +165,7 @@ module Rfd
 
       header_l.draw_current_file_info item
       header_l.wrefresh
+      @current_row
     end
 
     # Change the current directory.

@@ -51,7 +51,7 @@ module Rfd
     end
 
     def waddstr(str, clear_to_eol_before_add: false)
-      wclrtoeol if clear_to_eol_before_add
+      window.clrtoeol if clear_to_eol_before_add
       window.addstr str
     end
 
@@ -77,10 +77,6 @@ module Rfd
 
     def begy
       window.begy
-    end
-
-    def wclrtoeol
-      window.clrtoeol
     end
   end
 
@@ -132,7 +128,7 @@ module Rfd
 
     def debug(s)
       wmove 0, 0
-      wclrtoeol
+      window.clrtoeol
       waddstr s.to_s
       wrefresh
     end
@@ -244,7 +240,7 @@ module Rfd
     def set_prompt(str)
       window.attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
         wmove 0
-        wclrtoeol
+        window.clrtoeol
         waddstr str
       end
     end
@@ -262,7 +258,7 @@ module Rfd
     def show_error(str)
       window.attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
         wmove 0
-        wclrtoeol
+        window.clrtoeol
         waddstr str
       end
       wrefresh

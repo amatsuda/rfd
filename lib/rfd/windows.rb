@@ -11,7 +11,7 @@ module Rfd
     ACS_TTEE = 4194423
     ACS_VLINE = 4194424
 
-    attr_reader :window
+    attr_reader :window, :maxy, :maxx, :begy, :begx
 
     def self.draw_borders
       Curses.attron Curses.color_pair(Curses::COLOR_CYAN) do
@@ -46,6 +46,10 @@ module Rfd
       end
     end
 
+    def initialize
+      @window = Curses.stdscr.subwin @maxy, @maxx, @begy, @begx
+    end
+
     def wmove(y, x = 0)
       window.setpos y, x
     end
@@ -62,27 +66,12 @@ module Rfd
     def wrefresh
       window.refresh
     end
-
-    def maxx
-      window.maxx
-    end
-
-    def maxy
-      window.maxy
-    end
-
-    def begx
-      window.begx
-    end
-
-    def begy
-      window.begy
-    end
   end
 
   class HeaderLeftWindow < Window
     def initialize
-      @window = Curses.stdscr.subwin 3, Curses.cols - 32, 1, 1
+      @maxy, @maxx, @begy, @begx = 3, Curses.cols - 32, 1, 1
+      super
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
@@ -112,7 +101,8 @@ module Rfd
 
   class HeaderRightWindow < Window
     def initialize
-      @window = Curses.stdscr.subwin 3, 29, 1, Curses.cols - 30
+      @maxy, @maxx, @begy, @begx = 3, 29, 1, Curses.cols - 30
+      super
     end
 
     def draw_marked_items(count: 0, size: 0)
@@ -174,13 +164,15 @@ module Rfd
     end
 
     def initialize(dir = '.')
+      @maxy, @begy = Curses.lines - 7, 5
       spawn_panes 2
     end
 
     def spawn_panes(num)
       @panes.close_all if defined? @panes
       width = (Curses.cols - 2) / num
-      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << Curses.stdscr.subwin(Curses.lines - 7, width - 1, 5, width * i + 1)}
+      @maxx = width - 1
+      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << Curses.stdscr.subwin(maxy, maxx, begy, width * i + 1)}
       @panes = Panes.new windows
       activate_pane 0
     end
@@ -195,6 +187,11 @@ module Rfd
 
     def window
       @panes.active
+    end
+
+    # overriding attr_reader
+    def begx
+      window.begx
     end
 
     def max_items
@@ -234,7 +231,8 @@ module Rfd
 
   class CommandLineWindow < Window
     def initialize
-      @window = Curses.stdscr.subwin 1, Curses.cols, Curses.lines - 1, 0
+      @maxy, @maxx, @begy, @begx = 1, Curses.cols, Curses.lines - 1, 0
+      super
     end
 
     def set_prompt(str)

@@ -125,68 +125,38 @@ module Rfd
   end
 
   class MainWindow < Window
-    class Panes
-      attr_reader :current_index
-
-      def initialize(panes)
-        @panes, @current_index = panes, 0
-      end
-
-      def active
-        @panes[@current_index]
-      end
-
-      def activate(index)
-        @current_index = index if index < @panes.size
-      end
-
-      def get_index_by_point(y: nil, x: nil)
-        @panes.each.with_index do |p, i|
-          return i if include_point? pane: p, y: y, x: x
-        end if y && x
-        nil
-      end
-
-      def size
-        @panes.size
-      end
-
-      def close_all
-        @panes.each do |p|
-          p.clear
-          p.close
-        end
-      end
-
-      def include_point?(pane: pane, y: nil, x: nil)
-        (y >= pane.begy) && (pane.begy + pane.maxy > y) && (x >= pane.begx) && (pane.begx + pane.maxx > x)
-      end
-    end
-
+    attr_reader :current_index
     def initialize(dir = '.')
-      @maxy, @begy = Curses.lines - 7, 5
+      @maxy, @begy, @current_index = Curses.lines - 7, 5, 0
+
       spawn_panes 2
     end
 
+    def newpad(items)
+      if defined? @window
+        @window.clear
+        @window.close
+      end
+      columns = items.size / maxy + 1
+
+      @window = Curses::Pad.new maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
+      draw_items_to_each_pane items
+    end
+
     def spawn_panes(num)
-      @panes.close_all if defined? @panes
-      width = (Curses.cols - 2) / num
-      @maxx = width - 1
-      windows = 0.upto(num - 1).inject([]) {|arr, i| arr << Curses.stdscr.subwin(maxy, maxx, begy, width * i + 1)}
-      @panes = Panes.new windows
-      activate_pane 0
+      @number_of_panes = num
+    end
+
+    def display(page)
+      @window.refresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
     end
 
     def activate_pane(num)
-      @panes.activate num
+      @current_index = num
     end
 
     def pane_index_at(y: nil, x: nil)
-      @panes.get_index_by_point y: y, x: x
-    end
-
-    def window
-      @panes.active
+      (y >= window.begy) && (window.begy + window.maxy > y) && (x / width)
     end
 
     # overriding attr_reader
@@ -194,31 +164,28 @@ module Rfd
       window.begx
     end
 
+    def width
+      (Curses.cols - 2) / @number_of_panes
+    end
+
     def max_items
-      maxy * @panes.size
+      maxy * @number_of_panes
     end
 
     def draw_item(item, current: false)
-      window.setpos item.index % maxy, 0
+      window.setpos item.index % maxy, width * @current_index
       window.attron(Curses.color_pair(item.color) | (current ? Curses::A_UNDERLINE : Curses::A_NORMAL)) do
-        window.addstr "#{item.to_s}\n"
+        window.addstr item.to_s
       end
-      wrefresh
     end
 
     def draw_items_to_each_pane(items)
-      original_active_pane_index = @panes.current_index
-
-      0.upto(@panes.size - 1) do |index|
-        activate_pane index
-        wclear
-        wmove 0
-        items[maxy * index, maxy * (index + 1)].each do |item|
-          window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { waddstr "#{item.to_s}\n" }
-        end if items[maxy * index, maxy * (index + 1)]
-        wrefresh
+      items.each_slice(maxy).each.with_index do |arr, col_index|
+        arr.each.with_index do |item, i|
+          @window.setpos i, width * col_index
+          @window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { @window.addstr item.to_s }
+        end
       end
-      activate_pane original_active_pane_index
     end
 
     def toggle_mark(item)

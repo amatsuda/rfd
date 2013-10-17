@@ -34,6 +34,7 @@ module Rfd
   def self.start(dir = '.')
     init_curses
     Rfd::Window.draw_borders
+    Curses.refresh
     rfd = Rfd::Controller.new
     rfd.cd dir
     rfd
@@ -114,6 +115,7 @@ module Rfd
     # Change the number of columns in the main window.
     def spawn_panes(num)
       main.spawn_panes num
+      draw_items
       @current_row = @current_page = 0
     end
 
@@ -146,14 +148,11 @@ module Rfd
     def move_cursor(row = nil)
       if row
         page, item_index_in_page = row.divmod max_items
-        if page != current_page
-          switch_page page
-        else
-          if (prev_item = items[current_row])
-            main.draw_item prev_item
-          end
+        if (prev_item = items[current_row])
+          main.draw_item prev_item
         end
-        main.activate_pane item_index_in_page / maxy
+        switch_page page if page != current_page
+        main.activate_pane row / maxy
         @current_row = row
       else
         @current_row = 0
@@ -161,6 +160,7 @@ module Rfd
 
       item = items[current_row]
       main.draw_item item, current: true
+      main.display current_page
 
       header_l.draw_current_file_info item
       header_l.wrefresh
@@ -255,16 +255,16 @@ module Rfd
       unless in_zip?
         @items = Dir.foreach(current_dir).map {|fn|
           stat = File.lstat current_dir.join(fn)
-          Item.new dir: current_dir, name: fn, stat: stat, window_width: maxx
+          Item.new dir: current_dir, name: fn, stat: stat, window_width: main.width
         }.to_a.partition {|i| %w(. ..).include? i.name}.flatten
       else
-        @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: maxx),
-          Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: maxx)]
+        @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: main.width),
+          Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: main.width)]
         zf = Zip::File.new current_dir
         zf.each {|entry|
           next if entry.name_is_directory?
           stat = zf.file.stat entry.name
-          @items << Item.new(dir: current_dir, name: entry.name, stat: stat, window_width: maxx)
+          @items << Item.new(dir: current_dir, name: entry.name, stat: stat, window_width: main.width)
         }
       end
     end
@@ -298,7 +298,9 @@ module Rfd
 
     # Update the main window with the loaded files and directories. Also update the header.
     def draw_items
-      main.draw_items_to_each_pane (@displayed_items = items[current_page * max_items, max_items])
+      main.newpad items
+      @displayed_items = items[current_page * max_items, max_items]
+      main.display current_page
       header_l.draw_path_and_page_number path: current_dir.path, current: current_page + 1, total: total_pages
     end
 
@@ -597,8 +599,9 @@ module Rfd
     # ==== Parameters
     # * +page+ - Target page number
     def switch_page(page)
-      @current_page = page
-      draw_items
+      main.display (@current_page = page)
+      @displayed_items = items[current_page * max_items, max_items]
+      header_l.draw_path_and_page_number path: current_dir.path, current: current_page + 1, total: total_pages
     end
 
     # Update the header information concerning currently marked files or directories.

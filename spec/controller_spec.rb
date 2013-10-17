@@ -31,8 +31,8 @@ describe Rfd::Controller do
   describe '#spawn_panes' do
     before { controller.spawn_panes 3 }
 
-    subject { controller.main.instance_variable_get :@panes }
-    it { should have(3).panes }
+    subject { controller.main.instance_variable_get :@number_of_panes }
+    it { should  == 3 }
   end
 
   describe '#current_item' do
@@ -89,8 +89,8 @@ describe Rfd::Controller do
         before do
           controller.move_cursor 5
         end
-        subject { controller.main.instance_variable_get :@panes }
-        its(:current_index) { should == 1 }
+        subject { controller.main.instance_variable_get :@current_index }
+        it { should == 1 }
       end
 
       context 'When moving to the second page' do

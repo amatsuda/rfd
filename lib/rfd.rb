@@ -620,7 +620,7 @@ module Rfd
     # Get a char as a String from user input.
     def get_char
       c = Curses.getch
-      c.chr if (0..255) === c
+      c if (0..255) === c.ord
     end
 
     # Accept user input, and directly execute it as a Ruby method call to the controller.

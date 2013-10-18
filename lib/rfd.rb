@@ -97,7 +97,6 @@ module Rfd
               end
             end
           else
-            raise c
             debug "key: #{c}" if ENV['DEBUG']
           end
           @times = nil unless number_pressed

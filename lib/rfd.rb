@@ -59,12 +59,12 @@ module Rfd
       loop do
         begin
           number_pressed = false
-          case (c = Curses.getch).ord
+          case (c = Curses.getch)
           when 10, 13  # enter, return
             enter
-          when 27
+          when 27  # ESC
             q
-          when 32  # space
+          when ' '  # space
             space
           when 127  # DEL
             del
@@ -79,12 +79,12 @@ module Rfd
           when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
             chr = ((c - 1 + 65) ^ 0b0100000).chr
             public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
-          when 48..57  # ?0..?9
-            public_send c.chr
+          when ?0..?9
+            public_send c
             number_pressed = true
-          when 0..255
-            if respond_to? c.chr
-              public_send c.chr
+          when ?!..?~
+            if respond_to? c
+              public_send c
             else
               debug "key: #{c}" if ENV['DEBUG']
             end
@@ -668,7 +668,7 @@ module Rfd
         next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
         command_line.wclear
         command_line.wrefresh
-        break %[Y y].include? c  # Y, y
+        break (c == 'y') || (c == 'Y')
       end
     end
 

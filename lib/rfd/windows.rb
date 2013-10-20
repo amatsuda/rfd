@@ -38,7 +38,7 @@ module Rfd
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wmove 0
       window.clrtoeol
-      window.addstr @path_and_page_number
+      window << @path_and_page_number
       wrefresh
     end
 
@@ -51,14 +51,14 @@ module Rfd
       @current_file_name = "File: #{current_file_name}"
       wmove 1
       window.clrtoeol
-      window.addstr @current_file_name
+      window << @current_file_name
     end
 
     def draw_stat(item)
       @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
       wmove 2
       window.clrtoeol
-      window.addstr @stat
+      window << @stat
     end
   end
 
@@ -71,20 +71,20 @@ module Rfd
     def draw_marked_items(count: 0, size: 0)
       wmove 1
       window.clrtoeol
-      window.addstr %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+      window << %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
       wmove 2
       window.clrtoeol
-      window.addstr %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+      window << %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
       wrefresh
     end
 
     def debug(s)
       wmove 0, 0
       window.clrtoeol
-      window.addstr s.to_s
+      window << s.to_s
       wrefresh
     end
   end
@@ -140,7 +140,7 @@ module Rfd
     def draw_item(item, current: false)
       window.setpos item.index % maxy, width * @current_index
       window.attron(Curses.color_pair(item.color) | (current ? Curses::A_UNDERLINE : Curses::A_NORMAL)) do
-        window.addstr item.to_s
+        window << item.to_s
       end
     end
 
@@ -148,7 +148,7 @@ module Rfd
       items.each_slice(maxy).each.with_index do |arr, col_index|
         arr.each.with_index do |item, i|
           @window.setpos i, width * col_index
-          @window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { @window.addstr item.to_s }
+          @window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { @window << item.to_s }
         end
       end
     end
@@ -156,7 +156,7 @@ module Rfd
     def toggle_mark(item)
       if item.toggle_mark
         window.setpos item.index % maxy, 0
-        window.addstr item.current_mark
+        window << item.current_mark
       end
     end
   end
@@ -171,7 +171,7 @@ module Rfd
       window.attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
         wmove 0
         window.clrtoeol
-        window.addstr str
+        window << str
       end
     end
 
@@ -189,7 +189,7 @@ module Rfd
       window.attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
         wmove 0
         window.clrtoeol
-        window.addstr str
+        window << str
       end
       wrefresh
     end

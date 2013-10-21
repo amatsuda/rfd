@@ -113,7 +113,7 @@ module Rfd
     end
 
     def display(page)
-      @window.refresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
+      window.refresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
     end
 
     def activate_pane(num)
@@ -147,8 +147,8 @@ module Rfd
     def draw_items_to_each_pane(items)
       items.each_slice(maxy).each.with_index do |arr, col_index|
         arr.each.with_index do |item, i|
-          @window.setpos i, width * col_index
-          @window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { @window << item.to_s }
+          window.setpos i, width * col_index
+          window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { window << item.to_s }
         end
       end
     end

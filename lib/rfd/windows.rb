@@ -13,8 +13,8 @@ module Rfd
       end
     end
 
-    def initialize(maxy: nil, maxx: nil, begy: nil, begx: nil)
-      @window = Curses.stdscr.subwin maxy, maxx, begy, begx unless defined? @window
+    def initialize(maxy: nil, maxx: nil, begy: nil, begx: nil, window: nil)
+      @window = window || Curses.stdscr.subwin(maxy, maxx, begy, begx)
       super @window
     end
 
@@ -86,8 +86,7 @@ module Rfd
 
     def initialize(dir = '.')
       @maxy, @begy, @current_index, @number_of_panes = Curses.lines - 7, 5, 0, 2
-      @window = Curses::Pad.new maxy, Curses.cols - 2
-      super()
+      super window: Curses::Pad.new(maxy, Curses.cols - 2)
     end
 
     def newpad(items)

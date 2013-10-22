@@ -163,7 +163,7 @@ module Rfd
       main.display current_page
 
       header_l.draw_current_file_info item
-      header_l.wrefresh
+      header_l.refresh
       @current_row
     end
 
@@ -637,11 +637,11 @@ module Rfd
       if cmd && !cmd.empty? && respond_to?(cmd)
         self.public_send cmd, *args
         command_line.clear
-        command_line.wrefresh
+        command_line.refresh
       end
     rescue Interrupt
       command_line.clear
-      command_line.wrefresh
+      command_line.refresh
     end
 
     # Accept user input, and directly execute it in an external shell.
@@ -654,7 +654,7 @@ module Rfd
     rescue Interrupt
     ensure
       command_line.clear
-      command_line.wrefresh
+      command_line.refresh
     end
 
     # Let the user answer y or n.
@@ -663,11 +663,11 @@ module Rfd
     # * +prompt+ - Prompt message
     def ask(prompt = '(y/n)')
       command_line.set_prompt prompt
-      command_line.wrefresh
+      command_line.refresh
       while (c = Curses.getch)
         next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
         command_line.clear
-        command_line.wrefresh
+        command_line.refresh
         break (c == 'y') || (c == 'Y')
       end
     end

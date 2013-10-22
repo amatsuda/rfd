@@ -192,7 +192,7 @@ module Rfd
       draw_items
       move_cursor current_row
       draw_marked_items
-      header_r.wrefresh
+      header_r.refresh
     end
 
     # "b"ack to the previous page.
@@ -279,7 +279,7 @@ module Rfd
       toggle_mark
       j
       draw_marked_items
-      header_r.wrefresh
+      header_r.refresh
     end
 
     # cd to the upper hierarchy.

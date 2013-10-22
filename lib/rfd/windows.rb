@@ -21,10 +21,6 @@ module Rfd
     def wmove(y, x = 0)
       window.setpos y, x
     end
-
-    def wrefresh
-      window.refresh
-    end
   end
 
   class HeaderLeftWindow < Window
@@ -37,7 +33,7 @@ module Rfd
       wmove 0
       window.clrtoeol
       window << %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
-      wrefresh
+      refresh
     end
 
     def draw_current_file_info(current_file)
@@ -74,14 +70,14 @@ module Rfd
       wmove 2
       window.clrtoeol
       window << %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
-      wrefresh
+      refresh
     end
 
     def debug(s)
       wmove 0, 0
       window.clrtoeol
       window << s.to_s
-      wrefresh
+      refresh
     end
   end
 
@@ -186,7 +182,7 @@ module Rfd
         window.clrtoeol
         window << str
       end
-      wrefresh
+      refresh
     end
   end
 end

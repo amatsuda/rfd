@@ -12,8 +12,7 @@ module Rfd
     end
 
     def initialize(maxy: nil, maxx: nil, begy: nil, begx: nil, window: nil)
-      @window = window || Curses.stdscr.subwin(maxy, maxx, begy, begx)
-      super @window
+      super window || Curses.stdscr.subwin(maxy, maxx, begy, begx)
     end
 
     def wmove(y, x = 0)

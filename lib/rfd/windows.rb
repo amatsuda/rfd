@@ -69,7 +69,7 @@ module Rfd
     end
 
     def debug(s)
-      wmove 0, 0
+      setpos 0, 0
       clrtoeol
       self << s.to_s
       refresh

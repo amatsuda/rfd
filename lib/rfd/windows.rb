@@ -2,7 +2,7 @@ require 'delegate'
 
 module Rfd
   class Window < DelegateClass(Curses::Window)
-    attr_reader :window, :maxy, :maxx, :begy, :begx
+    attr_reader :window
 
     def self.draw_borders
       [[5, Curses.stdscr.maxx, 0, 0], [5, Curses.cols - 30, 0, 0], [Curses.stdscr.maxy - 5, Curses.stdscr.maxx, 4, 0]].each do |height, width, top, left|
@@ -25,8 +25,7 @@ module Rfd
 
   class HeaderLeftWindow < Window
     def initialize
-      @maxy, @maxx, @begy, @begx = 3, Curses.cols - 32, 1, 1
-      super maxy: @maxy, maxx: @maxx, begy: @begy, begx: @begx
+      super maxy: 3, maxx: Curses.cols - 32, begy: 1, begx: 1
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
@@ -56,8 +55,7 @@ module Rfd
 
   class HeaderRightWindow < Window
     def initialize
-      @maxy, @maxx, @begy, @begx = 3, 29, 1, Curses.cols - 30
-      super maxy: @maxy, maxx: @maxx, begy: @begy, begx: @begx
+      super maxy: 3, maxx: 29, begy: 1, begx: Curses.cols - 30
     end
 
     def draw_marked_items(count: 0, size: 0)
@@ -82,11 +80,11 @@ module Rfd
   end
 
   class MainWindow < Window
-    attr_reader :current_index
+    attr_reader :current_index, :begy
 
     def initialize(dir = '.')
-      @maxy, @begy, @current_index, @number_of_panes = Curses.lines - 7, 5, 0, 2
-      super window: Curses::Pad.new(maxy, Curses.cols - 2)
+      @begy, @current_index, @number_of_panes = 5, 0, 2
+      super window: Curses::Pad.new(Curses.lines - 7, Curses.cols - 2)
     end
 
     def newpad(items)
@@ -153,8 +151,7 @@ module Rfd
 
   class CommandLineWindow < Window
     def initialize
-      @maxy, @maxx, @begy, @begx = 1, Curses.cols, Curses.lines - 1, 0
-      super maxy: @maxy, maxx: @maxx, begy: @begy, begx: @begx
+      super maxy: 1, maxx: Curses.cols, begy: Curses.lines - 1, begx: 0
     end
 
     def set_prompt(str)

@@ -254,8 +254,7 @@ module Rfd
     def fetch_items_from_filesystem_or_zip
       unless in_zip?
         @items = Dir.foreach(current_dir).map {|fn|
-          stat = File.lstat current_dir.join(fn)
-          Item.new dir: current_dir, name: fn, stat: stat, window_width: main.width
+          Item.new dir: current_dir, name: fn, window_width: main.width
         }.to_a.partition {|i| %w(. ..).include? i.name}.flatten
       else
         @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: main.width),
@@ -746,7 +745,6 @@ module Rfd
     end
 
     def load_item(path)
-      stat = File.lstat path
       Item.new dir: File.dirname(path), name: File.basename(path), stat: stat, window_width: maxx
     end
 

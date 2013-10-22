@@ -8,6 +8,7 @@ module Rfd
       @path, @dir, @name, @stat, @window_width, @marked = path, dir, name, stat, window_width, false
       @dir = File.dirname path unless dir
       @name = File.basename path unless name
+      @stat = File.lstat self.path unless stat
     end
 
     def path

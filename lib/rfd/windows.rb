@@ -89,9 +89,7 @@ module Rfd
   class MainWindow < Window
     attr_reader :current_index
     def initialize(dir = '.')
-      @maxy, @begy, @current_index, @window = Curses.lines - 7, 5, 0, nil
-
-      spawn_panes 2
+      @maxy, @begy, @current_index, @number_of_panes, @window = Curses.lines - 7, 5, 0, 2, nil
     end
 
     def newpad(items)

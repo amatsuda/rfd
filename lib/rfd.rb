@@ -51,6 +51,7 @@ module Rfd
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
+      @debug = DebugWindow.new if ENV['DEBUG']
       @direction, @dir_history, @last_command, @times, @yanked_items = nil, [], nil, nil, nil
     end
 
@@ -759,7 +760,7 @@ module Rfd
     end
 
     def debug(str)
-      header_r.debug str
+      @debug.debug str
     end
   end
 end

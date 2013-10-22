@@ -109,7 +109,7 @@ module Rfd
     end
 
     def pane_index_at(y: nil, x: nil)
-      (y >= window.begy) && (window.begy + window.maxy > y) && (x / width)
+      (y >= begy) && (begy + maxy > y) && (x / width)
     end
 
     # overriding attr_reader

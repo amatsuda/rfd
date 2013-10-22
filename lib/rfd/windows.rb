@@ -19,10 +19,6 @@ module Rfd
       window.setpos y, x
     end
 
-    def waddstr(str)
-      window.addstr str
-    end
-
     def wclear
       window.clear
     end
@@ -42,7 +38,7 @@ module Rfd
       @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wmove 0
       window.clrtoeol
-      waddstr @path_and_page_number
+      window.addstr @path_and_page_number
       wrefresh
     end
 
@@ -55,14 +51,14 @@ module Rfd
       @current_file_name = "File: #{current_file_name}"
       wmove 1
       window.clrtoeol
-      waddstr @current_file_name
+      window.addstr @current_file_name
     end
 
     def draw_stat(item)
       @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
       wmove 2
       window.clrtoeol
-      waddstr @stat
+      window.addstr @stat
     end
   end
 
@@ -75,13 +71,13 @@ module Rfd
     def draw_marked_items(count: 0, size: 0)
       wmove 1
       window.clrtoeol
-      waddstr %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+      window.addstr %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
       wmove 2
       window.clrtoeol
-      waddstr %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+      window.addstr %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
       wrefresh
     end
 

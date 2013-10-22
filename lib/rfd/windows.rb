@@ -161,9 +161,8 @@ module Rfd
     end
 
     def show_error(str)
+      deleteln
       attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
-        setpos 0, 0
-        clrtoeol
         self << str
       end
       refresh

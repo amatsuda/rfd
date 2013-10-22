@@ -112,11 +112,6 @@ module Rfd
       (y >= begy) && (begy + maxy > y) && (x / width)
     end
 
-    # overriding attr_reader
-    def begx
-      window.begx
-    end
-
     def width
       (Curses.cols - 2) / @number_of_panes
     end

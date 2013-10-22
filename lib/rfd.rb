@@ -254,16 +254,16 @@ module Rfd
     def fetch_items_from_filesystem_or_zip
       unless in_zip?
         @items = Dir.foreach(current_dir).map {|fn|
-          Item.new dir: current_dir, name: fn, window_width: main.width
+          load_item dir: current_dir, name: fn
         }.to_a.partition {|i| %w(. ..).include? i.name}.flatten
       else
-        @items = [Item.new(dir: current_dir, name: '.', stat: File.stat(current_dir), window_width: main.width),
-          Item.new(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)), window_width: main.width)]
+        @items = [load_item(dir: current_dir, name: '.', stat: File.stat(current_dir)),
+          load_item(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)))]
         zf = Zip::File.new current_dir
         zf.each {|entry|
           next if entry.name_is_directory?
           stat = zf.file.stat entry.name
-          @items << Item.new(dir: current_dir, name: entry.name, stat: stat, window_width: main.width)
+          @items << load_item(dir: current_dir, name: entry.name, stat: stat)
         }
       end
     end
@@ -488,7 +488,7 @@ module Rfd
             if items.include? item
               i = 1
               while i += 1
-                new_item = Item.new dir: current_dir, name: "#{item.basename}_#{i}#{item.extname}", stat: item.stat, window_width: maxx
+                new_item = load_item dir: current_dir, name: "#{item.basename}_#{i}#{item.extname}", stat: item.stat
                 break unless File.exist? new_item.path
               end
               FileUtils.cp_r item, new_item
@@ -744,8 +744,8 @@ module Rfd
       File.expand_path path.start_with?('/') || path.start_with?('~') ? path : current_dir ? current_dir.join(path) : path
     end
 
-    def load_item(path: nil, dir: nil, name: nil)
-      Item.new dir: dir || File.dirname(path), name: name || File.basename(path), window_width: main.width
+    def load_item(path: nil, dir: nil, name: nil, stat: nil)
+      Item.new dir: dir || File.dirname(path), name: name || File.basename(path), stat: stat, window_width: main.width
     end
 
     def osx?

@@ -80,6 +80,7 @@ module Rfd
 
   class MainWindow < Window
     attr_reader :current_index, :begy
+    attr_writer :number_of_panes
 
     def initialize(dir = '.')
       @begy, @current_index, @number_of_panes = 5, 0, 2
@@ -93,10 +94,6 @@ module Rfd
       resize maxy, newx if newx != maxx
 
       draw_items_to_each_pane items
-    end
-
-    def spawn_panes(num)
-      @number_of_panes = num
     end
 
     def display(page)

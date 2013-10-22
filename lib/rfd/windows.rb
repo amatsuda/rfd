@@ -96,14 +96,10 @@ module Rfd
     end
 
     def newpad(items)
+      @window.clear
       columns = items.size / maxy + 1
-      if @window
-        @window.clear
-        newx = width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
-        @window.resize maxy, newx if newx != window.maxx
-      else
-        @window = Curses::Pad.new maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
-      end
+      newx = width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
+      @window.resize maxy, newx if newx != window.maxx
 
       draw_items_to_each_pane items
     end

@@ -1,49 +1,20 @@
 module Rfd
   class Window
-    ACS_URCORNER = 4194411
-    ACS_LRCORNER = 4194410
-    ACS_ULCORNER = 4194412
-    ACS_LLCORNER = 4194413
-    ACS_HLINE = 4194417
-    ACS_LTEE = 4194420
-    ACS_RTEE = 4194421
-    ACS_BTEE = 4194422
-    ACS_TTEE = 4194423
-    ACS_VLINE = 4194424
-
     attr_reader :window, :maxy, :maxx, :begy, :begx
 
     def self.draw_borders
-      Curses.attron Curses.color_pair(Curses::COLOR_CYAN) do
-        Curses.addch ACS_ULCORNER
-        (Curses.cols - 32).times { Curses.addch ACS_HLINE }
-        Curses.addch ACS_TTEE
-        29.times { Curses.addch ACS_HLINE }
-        Curses.addch ACS_URCORNER
-
-        [*1..3, *5..(Curses.lines - 3)].each do |i|
-          Curses.setpos i, 0
-          Curses.addch ACS_VLINE
-          Curses.setpos i, Curses.cols - 1
-          Curses.addch ACS_VLINE
-        end
-        [1, 2, 3].each do |i|
-          Curses.setpos i, Curses.cols - 31
-          Curses.addch ACS_VLINE
-        end
-
-        Curses.setpos 4, 0
-        Curses.addch ACS_LTEE
-        (Curses.cols - 32).times { Curses.addch ACS_HLINE }
-        Curses.addch ACS_BTEE
-        29.times { Curses.addch ACS_HLINE }
-        Curses.addch ACS_RTEE
-
-        Curses.setpos Curses.lines - 2, 0
-        Curses.addch ACS_LLCORNER
-        (Curses.cols - 2).times { Curses.addch ACS_HLINE }
-        Curses.addch ACS_LRCORNER
-      end
+      w = Curses.stdscr.subwin 5, Curses.stdscr.maxx, 0, 0
+      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
+      w.box 0, 0
+      w.close
+      w = Curses.stdscr.subwin 5, Curses.cols - 30, 0, 0
+      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
+      w.box 0, 0
+      w.close
+      w = Curses.stdscr.subwin Curses.stdscr.maxy - 5, Curses.stdscr.maxx, 4, 0
+      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
+      w.box 0, 0
+      w.close
     end
 
     def initialize

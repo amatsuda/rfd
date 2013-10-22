@@ -636,11 +636,11 @@ module Rfd
       cmd, *args = command_line.get_command(prompt: prompt).split(' ')
       if cmd && !cmd.empty? && respond_to?(cmd)
         self.public_send cmd, *args
-        command_line.wclear
+        command_line.clear
         command_line.wrefresh
       end
     rescue Interrupt
-      command_line.wclear
+      command_line.clear
       command_line.wrefresh
     end
 
@@ -653,7 +653,7 @@ module Rfd
       end
     rescue Interrupt
     ensure
-      command_line.wclear
+      command_line.clear
       command_line.wrefresh
     end
 
@@ -666,7 +666,7 @@ module Rfd
       command_line.wrefresh
       while (c = Curses.getch)
         next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
-        command_line.wclear
+        command_line.clear
         command_line.wrefresh
         break (c == 'y') || (c == 'Y')
       end

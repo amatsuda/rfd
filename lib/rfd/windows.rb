@@ -22,10 +22,6 @@ module Rfd
       window.setpos y, x
     end
 
-    def wclear
-      window.clear
-    end
-
     def wrefresh
       window.refresh
     end

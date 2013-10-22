@@ -116,7 +116,6 @@ module Rfd
     # Change the number of columns in the main window.
     def spawn_panes(num)
       main.number_of_panes = num
-      draw_items
       @current_row = @current_page = 0
     end
 

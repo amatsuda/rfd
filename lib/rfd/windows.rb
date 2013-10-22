@@ -95,13 +95,14 @@ module Rfd
     end
 
     def newpad(items)
+      columns = items.size / maxy + 1
       if defined? @window
         @window.clear
-        @window.close
+        @window.resize maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
+      else
+        @window = Curses::Pad.new maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
       end
-      columns = items.size / maxy + 1
 
-      @window = Curses::Pad.new maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
       draw_items_to_each_pane items
     end
 

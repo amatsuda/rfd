@@ -35,10 +35,9 @@ module Rfd
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
-      @path_and_page_number = %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wmove 0
       window.clrtoeol
-      window << @path_and_page_number
+      window << %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       wrefresh
     end
 

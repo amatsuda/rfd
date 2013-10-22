@@ -14,6 +14,12 @@ module Rfd
     def initialize(maxy: nil, maxx: nil, begy: nil, begx: nil, window: nil)
       super window || Curses.stdscr.subwin(maxy, maxx, begy, begx)
     end
+
+    def writeln(row, str)
+      setpos row, 0
+      clrtoeol
+      self << str
+    end
   end
 
   class HeaderLeftWindow < Window
@@ -22,9 +28,7 @@ module Rfd
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
-      setpos 0, 0
-      clrtoeol
-      self << %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
+      writeln 0, %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       refresh
     end
 
@@ -34,15 +38,11 @@ module Rfd
     end
 
     def draw_current_filename(current_file_name)
-      setpos 1, 0
-      clrtoeol
-      self << "File: #{current_file_name}"
+      writeln 1, "File: #{current_file_name}"
     end
 
     def draw_stat(item)
-      setpos 2, 0
-      clrtoeol
-      self << "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
+      writeln 2, "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
     end
   end
 
@@ -52,15 +52,11 @@ module Rfd
     end
 
     def draw_marked_items(count: 0, size: 0)
-      setpos 0, 0
-      clrtoeol
-      self << %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+      writeln 0, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
-      setpos 1, 0
-      clrtoeol
-      self << %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
+      writeln 1, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
       refresh
     end
   end
@@ -71,9 +67,7 @@ module Rfd
     end
 
     def debug(s)
-      setpos 0, 0
-      clrtoeol
-      self << s.to_s
+      writeln 0, s.to_s
       refresh
     end
   end
@@ -147,9 +141,7 @@ module Rfd
 
     def set_prompt(str)
       attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
-        setpos 0, 0
-        clrtoeol
-        self << str
+        writeln 0, str
       end
     end
 
@@ -165,9 +157,7 @@ module Rfd
 
     def show_error(str)
       attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
-        setpos 0, 0
-        clrtoeol
-        self << str
+        writeln 0, str
       end
       refresh
     end

@@ -14,10 +14,6 @@ module Rfd
     def initialize(maxy: nil, maxx: nil, begy: nil, begx: nil, window: nil)
       super window || Curses.stdscr.subwin(maxy, maxx, begy, begx)
     end
-
-    def wmove(y, x = 0)
-      setpos y, x
-    end
   end
 
   class HeaderLeftWindow < Window
@@ -26,7 +22,7 @@ module Rfd
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
-      wmove 0
+      setpos 0, 0
       clrtoeol
       self << %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       refresh
@@ -38,13 +34,13 @@ module Rfd
     end
 
     def draw_current_filename(current_file_name)
-      wmove 1
+      setpos 1, 0
       clrtoeol
       self << "File: #{current_file_name}"
     end
 
     def draw_stat(item)
-      wmove 2
+      setpos 2, 0
       clrtoeol
       self << "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
     end
@@ -56,13 +52,13 @@ module Rfd
     end
 
     def draw_marked_items(count: 0, size: 0)
-      wmove 1
+      setpos 1, 0
       clrtoeol
       self << %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
-      wmove 2
+      setpos 2, 0
       clrtoeol
       self << %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
       refresh
@@ -148,7 +144,7 @@ module Rfd
 
     def set_prompt(str)
       attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
-        wmove 0
+        setpos 0, 0
         clrtoeol
         self << str
       end
@@ -166,7 +162,7 @@ module Rfd
 
     def show_error(str)
       attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
-        wmove 0
+        setpos 0, 0
         clrtoeol
         self << str
       end

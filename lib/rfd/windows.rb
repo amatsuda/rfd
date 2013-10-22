@@ -3,18 +3,12 @@ module Rfd
     attr_reader :window, :maxy, :maxx, :begy, :begx
 
     def self.draw_borders
-      w = Curses.stdscr.subwin 5, Curses.stdscr.maxx, 0, 0
-      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
-      w.box 0, 0
-      w.close
-      w = Curses.stdscr.subwin 5, Curses.cols - 30, 0, 0
-      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
-      w.box 0, 0
-      w.close
-      w = Curses.stdscr.subwin Curses.stdscr.maxy - 5, Curses.stdscr.maxx, 4, 0
-      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
-      w.box 0, 0
-      w.close
+      [[5, Curses.stdscr.maxx, 0, 0], [5, Curses.cols - 30, 0, 0], [Curses.stdscr.maxy - 5, Curses.stdscr.maxx, 4, 0]].each do |height, width, top, left|
+        w = Curses.stdscr.subwin height, width, top, left
+        w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
+        w.box 0, 0
+        w.close
+      end
     end
 
     def initialize

@@ -53,10 +53,9 @@ module Rfd
     end
 
     def draw_stat(item)
-      @stat = "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
       wmove 2
       window.clrtoeol
-      window << @stat
+      window << "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
     end
   end
 

@@ -98,7 +98,8 @@ module Rfd
       columns = items.size / maxy + 1
       if @window
         @window.clear
-        @window.resize maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
+        newx = width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
+        @window.resize maxy, newx if newx != window.maxx
       else
         @window = Curses::Pad.new maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
       end

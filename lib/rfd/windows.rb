@@ -89,14 +89,14 @@ module Rfd
   class MainWindow < Window
     attr_reader :current_index
     def initialize(dir = '.')
-      @maxy, @begy, @current_index = Curses.lines - 7, 5, 0
+      @maxy, @begy, @current_index, @window = Curses.lines - 7, 5, 0, nil
 
       spawn_panes 2
     end
 
     def newpad(items)
       columns = items.size / maxy + 1
-      if defined? @window
+      if @window
         @window.clear
         @window.resize maxy, width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
       else

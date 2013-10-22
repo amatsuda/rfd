@@ -169,7 +169,7 @@ module Rfd
 
     # Change the current directory.
     def cd(dir = '~', pushd: true)
-      dir = load_item expand_path(dir) unless dir.is_a? Item
+      dir = load_item path: expand_path(dir) unless dir.is_a? Item
       unless dir.zip?
         Dir.chdir dir
         @current_zip = nil
@@ -744,8 +744,8 @@ module Rfd
       File.expand_path path.start_with?('/') || path.start_with?('~') ? path : current_dir ? current_dir.join(path) : path
     end
 
-    def load_item(path)
-      Item.new dir: File.dirname(path), name: File.basename(path), stat: stat, window_width: maxx
+    def load_item(path: nil, dir: nil, name: nil)
+      Item.new dir: dir || File.dirname(path), name: name || File.basename(path), window_width: maxx
     end
 
     def osx?

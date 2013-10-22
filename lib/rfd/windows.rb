@@ -88,7 +88,7 @@ module Rfd
     end
 
     def newpad(items)
-      @window.clear
+      clear
       columns = items.size / maxy + 1
       newx = width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
       resize maxy, newx if newx != maxx

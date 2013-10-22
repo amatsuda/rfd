@@ -13,8 +13,8 @@ module Rfd
       end
     end
 
-    def initialize
-      @window = Curses.stdscr.subwin @maxy, @maxx, @begy, @begx unless defined? @window
+    def initialize(maxy: nil, maxx: nil, begy: nil, begx: nil)
+      @window = Curses.stdscr.subwin maxy, maxx, begy, begx unless defined? @window
       super @window
     end
 
@@ -26,7 +26,7 @@ module Rfd
   class HeaderLeftWindow < Window
     def initialize
       @maxy, @maxx, @begy, @begx = 3, Curses.cols - 32, 1, 1
-      super
+      super maxy: @maxy, maxx: @maxx, begy: @begy, begx: @begx
     end
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
@@ -57,7 +57,7 @@ module Rfd
   class HeaderRightWindow < Window
     def initialize
       @maxy, @maxx, @begy, @begx = 3, 29, 1, Curses.cols - 30
-      super
+      super maxy: @maxy, maxx: @maxx, begy: @begy, begx: @begx
     end
 
     def draw_marked_items(count: 0, size: 0)
@@ -155,7 +155,7 @@ module Rfd
   class CommandLineWindow < Window
     def initialize
       @maxy, @maxx, @begy, @begx = 1, Curses.cols, Curses.lines - 1, 0
-      super
+      super maxy: @maxy, maxx: @maxx, begy: @begy, begx: @begx
     end
 
     def set_prompt(str)

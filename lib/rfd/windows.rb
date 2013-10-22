@@ -90,7 +90,8 @@ module Rfd
     attr_reader :current_index
 
     def initialize(dir = '.')
-      @maxy, @begy, @current_index, @number_of_panes, @window = Curses.lines - 7, 5, 0, 2, nil
+      @maxy, @begy, @current_index, @number_of_panes = Curses.lines - 7, 5, 0, 2
+      @window = Curses::Pad.new maxy, Curses.cols - 2
       super()
     end
 

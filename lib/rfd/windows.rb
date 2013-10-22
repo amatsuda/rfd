@@ -19,7 +19,7 @@ module Rfd
     end
 
     def wmove(y, x = 0)
-      window.setpos y, x
+      setpos y, x
     end
   end
 
@@ -31,7 +31,7 @@ module Rfd
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
       wmove 0
-      window.clrtoeol
+      clrtoeol
       window << %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
       refresh
     end
@@ -43,13 +43,13 @@ module Rfd
 
     def draw_current_filename(current_file_name)
       wmove 1
-      window.clrtoeol
+      clrtoeol
       window << "File: #{current_file_name}"
     end
 
     def draw_stat(item)
       wmove 2
-      window.clrtoeol
+      clrtoeol
       window << "      #{item.size_or_dir.ljust(13)}#{item.mtime} #{item.mode}"
     end
   end
@@ -62,20 +62,20 @@ module Rfd
 
     def draw_marked_items(count: 0, size: 0)
       wmove 1
-      window.clrtoeol
+      clrtoeol
       window << %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
     end
 
     def draw_total_items(count: 0, size: 0)
       wmove 2
-      window.clrtoeol
+      clrtoeol
       window << %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
       refresh
     end
 
     def debug(s)
       wmove 0, 0
-      window.clrtoeol
+      clrtoeol
       window << s.to_s
       refresh
     end
@@ -94,7 +94,7 @@ module Rfd
       @window.clear
       columns = items.size / maxy + 1
       newx = width * (((columns - 1) / @number_of_panes + 1) * @number_of_panes)
-      @window.resize maxy, newx if newx != window.maxx
+      resize maxy, newx if newx != maxx
 
       draw_items_to_each_pane items
     end
@@ -104,7 +104,7 @@ module Rfd
     end
 
     def display(page)
-      window.refresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
+      refresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
     end
 
     def activate_pane(num)
@@ -129,8 +129,8 @@ module Rfd
     end
 
     def draw_item(item, current: false)
-      window.setpos item.index % maxy, width * @current_index
-      window.attron(Curses.color_pair(item.color) | (current ? Curses::A_UNDERLINE : Curses::A_NORMAL)) do
+      setpos item.index % maxy, width * @current_index
+      attron(Curses.color_pair(item.color) | (current ? Curses::A_UNDERLINE : Curses::A_NORMAL)) do
         window << item.to_s
       end
     end
@@ -138,15 +138,15 @@ module Rfd
     def draw_items_to_each_pane(items)
       items.each_slice(maxy).each.with_index do |arr, col_index|
         arr.each.with_index do |item, i|
-          window.setpos i, width * col_index
-          window.attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { window << item.to_s }
+          setpos i, width * col_index
+          attron(Curses.color_pair(item.color) | Curses::A_NORMAL) { window << item.to_s }
         end
       end
     end
 
     def toggle_mark(item)
       if item.toggle_mark
-        window.setpos item.index % maxy, 0
+        setpos item.index % maxy, 0
         window << item.current_mark
       end
     end
@@ -159,9 +159,9 @@ module Rfd
     end
 
     def set_prompt(str)
-      window.attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
+      attron(Curses.color_pair(Curses::COLOR_WHITE) | Curses::A_BOLD) do
         wmove 0
-        window.clrtoeol
+        clrtoeol
         window << str
       end
     end
@@ -169,17 +169,17 @@ module Rfd
     def get_command(prompt: nil)
       Curses.echo
       startx = prompt ? prompt.size : 1
-      window.setpos 0, startx
-      s = window.getstr
+      setpos 0, startx
+      s = getstr
       "#{prompt[1..-1] if prompt}#{s.strip}"
     ensure
       Curses.noecho
     end
 
     def show_error(str)
-      window.attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
+      attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
         wmove 0
-        window.clrtoeol
+        clrtoeol
         window << str
       end
       refresh

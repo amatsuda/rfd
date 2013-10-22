@@ -147,10 +147,10 @@ module Rfd
     # The row number can be out of range of the current page.
     def move_cursor(row = nil)
       if row
-        page, item_index_in_page = row.divmod max_items
         if (prev_item = items[current_row])
           main.draw_item prev_item
         end
+        page = row / max_items
         switch_page page if page != current_page
         main.activate_pane row / maxy
         @current_row = row

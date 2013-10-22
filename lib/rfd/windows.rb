@@ -2,8 +2,6 @@ require 'delegate'
 
 module Rfd
   class Window < DelegateClass(Curses::Window)
-    attr_reader :window
-
     def self.draw_borders
       [[5, Curses.stdscr.maxx, 0, 0], [5, Curses.cols - 30, 0, 0], [Curses.stdscr.maxy - 5, Curses.stdscr.maxx, 4, 0]].each do |height, width, top, left|
         w = Curses.stdscr.subwin height, width, top, left

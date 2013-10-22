@@ -1,5 +1,7 @@
+require 'delegate'
+
 module Rfd
-  class Window
+  class Window < DelegateClass(Curses::Window)
     attr_reader :window, :maxy, :maxx, :begy, :begx
 
     def self.draw_borders
@@ -13,6 +15,7 @@ module Rfd
 
     def initialize
       @window = Curses.stdscr.subwin @maxy, @maxx, @begy, @begx unless defined? @window
+      super @window
     end
 
     def wmove(y, x = 0)

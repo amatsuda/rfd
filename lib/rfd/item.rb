@@ -4,8 +4,10 @@ module Rfd
     attr_reader :name, :dir, :stat
     attr_accessor :index
 
-    def initialize(dir: nil, name: nil, stat: nil, window_width: nil)
-      @dir, @name, @stat, @window_width, @marked = dir, name, stat, window_width, false
+    def initialize(path: nil, dir: nil, name: nil, stat: nil, window_width: nil)
+      @path, @dir, @name, @stat, @window_width, @marked = path, dir, name, stat, window_width, false
+      @dir = File.dirname path unless dir
+      @name = File.basename path unless name
     end
 
     def path

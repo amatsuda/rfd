@@ -12,7 +12,7 @@ module Rfd
     end
 
     def initialize
-      @window = Curses.stdscr.subwin @maxy, @maxx, @begy, @begx
+      @window = Curses.stdscr.subwin @maxy, @maxx, @begy, @begx unless defined? @window
     end
 
     def wmove(y, x = 0)
@@ -88,8 +88,10 @@ module Rfd
 
   class MainWindow < Window
     attr_reader :current_index
+
     def initialize(dir = '.')
       @maxy, @begy, @current_index, @number_of_panes, @window = Curses.lines - 7, 5, 0, 2, nil
+      super()
     end
 
     def newpad(items)

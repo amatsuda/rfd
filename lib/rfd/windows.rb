@@ -47,10 +47,9 @@ module Rfd
     end
 
     def draw_current_filename(current_file_name)
-      @current_file_name = "File: #{current_file_name}"
       wmove 1
       window.clrtoeol
-      window << @current_file_name
+      window << "File: #{current_file_name}"
     end
 
     def draw_stat(item)

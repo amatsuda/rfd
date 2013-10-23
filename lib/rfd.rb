@@ -745,7 +745,7 @@ module Rfd
     end
 
     def load_item(path: nil, dir: nil, name: nil)
-      Item.new dir: dir || File.dirname(path), name: name || File.basename(path), window_width: maxx
+      Item.new dir: dir || File.dirname(path), name: name || File.basename(path), window_width: main.width
     end
 
     def osx?

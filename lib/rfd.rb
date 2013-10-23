@@ -280,11 +280,6 @@ module Rfd
       move_cursor items.size - index - 1 if index
     end
 
-    # Width of the currently active pane.
-    def maxx
-      main.maxx
-    end
-
     # Height of the currently active pane.
     def maxy
       main.maxy

@@ -342,6 +342,7 @@ module Rfd
       fetch_items_from_filesystem_or_zip
       @items = items.shift(2) + items.select {|i| i.name =~ regexp}
       sort_items_according_to_current_direction
+      draw_items
       switch_page 0
       move_cursor 0
 

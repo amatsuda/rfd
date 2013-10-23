@@ -76,7 +76,7 @@ module Rfd
     attr_reader :current_index, :begy
     attr_writer :number_of_panes
 
-    def initialize(dir = '.')
+    def initialize
       @begy, @current_index, @number_of_panes = 5, 0, 2
       super window: Curses::Pad.new(Curses.lines - 7, Curses.cols - 2)
     end

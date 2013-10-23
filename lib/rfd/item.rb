@@ -128,10 +128,8 @@ module Rfd
       @zip_ ||= begin
         if directory?
           false
-        elsif symlink?
-          File.binread(target, 4).unpack('V').first == 0x04034b50
         else
-          File.binread(path, 4).unpack('V').first == 0x04034b50
+          File.binread(realpath, 4).unpack('V').first == 0x04034b50
         end
       rescue
         false
@@ -142,10 +140,8 @@ module Rfd
       @gz_ ||= begin
         if directory?
           false
-        elsif symlink?
-          File.binread(target, 2).unpack('n').first == 0x1f8b
         else
-          File.binread(path, 2).unpack('n').first == 0x1f8b
+          File.binread(realpath, 2).unpack('n').first == 0x1f8b
         end
       rescue
         false
@@ -154,6 +150,10 @@ module Rfd
 
     def target
       File.readlink path if symlink?
+    end
+
+    def realpath
+      @realpath ||= File.realpath path
     end
 
     def toggle_mark

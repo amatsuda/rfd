@@ -246,17 +246,17 @@ module Rfd
     end
 
     # Change current directory (cd).
-    define_method('@') do
+    define_method(:'@') do
       process_command_line preset_command: 'cd'
     end
 
     # Execute a shell command in an external shell.
-    define_method('!') do
+    define_method(:!) do
       process_shell_command
     end
 
     # Execute a command in the controller context.
-    define_method(':') do
+    define_method(:':') do
       process_command_line
     end
 

@@ -127,10 +127,7 @@ module Rfd
     end
 
     def toggle_mark(item)
-      if item.toggle_mark
-        setpos item.index % maxy, 0
-        self << item.current_mark
-      end
+      item.toggle_mark
     end
   end
 

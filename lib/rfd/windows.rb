@@ -29,13 +29,13 @@ module Rfd
 
     def draw_path_and_page_number(path: nil, current: 1, total: nil)
       writeln 0, %Q[Page: #{"#{current}/ #{total}".ljust(11)}  Path: #{path}]
-      refresh
+      noutrefresh
     end
 
     def draw_current_file_info(current_file)
       draw_current_filename current_file.full_display_name
       draw_stat current_file
-      refresh
+      noutrefresh
     end
 
     private
@@ -55,11 +55,12 @@ module Rfd
 
     def draw_marked_items(count: 0, size: 0)
       writeln 0, %Q[#{"#{count}Marked".rjust(11)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(16)}]
+      noutrefresh
     end
 
     def draw_total_items(count: 0, size: 0)
       writeln 1, %Q[#{"#{count}Files".rjust(10)} #{size.to_s.reverse.gsub( /(\d{3})(?=\d)/, '\1,').reverse.rjust(17)}]
-      refresh
+      noutrefresh
     end
   end
 
@@ -70,7 +71,7 @@ module Rfd
 
     def debug(s)
       writeln 0, s.to_s
-      refresh
+      noutrefresh
     end
   end
 
@@ -93,7 +94,7 @@ module Rfd
     end
 
     def display(page)
-      refresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
+      noutrefresh 0, (Curses.cols - 2) * page, begy, 1, begy + maxy - 1, Curses.cols - 2
     end
 
     def activate_pane(num)
@@ -158,7 +159,7 @@ module Rfd
       attron(Curses.color_pair(Curses::COLOR_RED) | Curses::A_BOLD) do
         writeln 0, str
       end
-      refresh
+      noutrefresh
     end
   end
 end

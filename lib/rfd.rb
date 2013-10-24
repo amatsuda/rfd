@@ -34,9 +34,10 @@ module Rfd
   def self.start(dir = '.')
     init_curses
     Rfd::Window.draw_borders
-    Curses.refresh
+    Curses.stdscr.noutrefresh
     rfd = Rfd::Controller.new
     rfd.cd dir
+    Curses.doupdate
     rfd
   end
 
@@ -101,6 +102,7 @@ module Rfd
           else
             debug "key: #{c}" if ENV['DEBUG']
           end
+          Curses.doupdate
           @times = nil unless number_pressed
         rescue StopIteration
           raise
@@ -631,11 +633,11 @@ module Rfd
       if cmd && !cmd.empty? && respond_to?(cmd)
         self.public_send cmd, *args
         command_line.clear
-        command_line.refresh
+        command_line.noutrefresh
       end
     rescue Interrupt
       command_line.clear
-      command_line.refresh
+      command_line.noutrefresh
     end
 
     # Accept user input, and directly execute it in an external shell.
@@ -648,7 +650,7 @@ module Rfd
     rescue Interrupt
     ensure
       command_line.clear
-      command_line.refresh
+      command_line.noutrefresh
     end
 
     # Let the user answer y or n.
@@ -661,7 +663,7 @@ module Rfd
       while (c = Curses.getch)
         next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
         command_line.clear
-        command_line.refresh
+        command_line.noutrefresh
         break (c == 'y') || (c == 'Y')
       end
     end

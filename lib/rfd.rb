@@ -163,7 +163,6 @@ module Rfd
       main.display current_page
 
       header_l.draw_current_file_info item
-      header_l.refresh
       @current_row
     end
 

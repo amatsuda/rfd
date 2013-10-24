@@ -35,6 +35,7 @@ module Rfd
     def draw_current_file_info(current_file)
       draw_current_filename current_file.full_display_name
       draw_stat current_file
+      refresh
     end
 
     private

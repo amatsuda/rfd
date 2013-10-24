@@ -37,6 +37,7 @@ module Rfd
       draw_stat current_file
     end
 
+    private
     def draw_current_filename(current_file_name)
       writeln 1, "File: #{current_file_name}"
     end

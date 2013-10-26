@@ -276,8 +276,8 @@ module Rfd
     # Toggle mark, and move down.
     def space
       toggle_mark
-      j
       draw_marked_items
+      j
     end
 
     # cd to the upper hierarchy.

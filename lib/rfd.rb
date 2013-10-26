@@ -61,7 +61,7 @@ module Rfd
       loop do
         begin
           number_pressed = false
-          case (c = Curses.getch)
+          ret = case (c = Curses.getch)
           when 10, 13  # enter, return
             enter
           when 27  # ESC
@@ -102,7 +102,7 @@ module Rfd
           else
             debug "key: #{c}" if ENV['DEBUG']
           end
-          Curses.doupdate
+          Curses.doupdate if ret
           @times = nil unless number_pressed
         rescue StopIteration
           raise

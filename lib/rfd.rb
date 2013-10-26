@@ -633,9 +633,10 @@ module Rfd
       command_line.set_prompt prompt
       cmd, *args = command_line.get_command(prompt: prompt).split(' ')
       if cmd && !cmd.empty? && respond_to?(cmd)
-        self.public_send cmd, *args
+        ret = self.public_send cmd, *args
         command_line.clear
         command_line.noutrefresh
+        ret
       end
     rescue Interrupt
       command_line.clear

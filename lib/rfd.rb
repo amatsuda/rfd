@@ -181,6 +181,7 @@ module Rfd
       @current_dir, @current_page, @current_row = dir, 0, nil
       main.activate_pane 0
       ls
+      @current_dir
     end
 
     # cd to the previous directory.

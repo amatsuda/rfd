@@ -589,7 +589,7 @@ module Rfd
 
     # Number of pages in the current directory.
     def total_pages
-      items.size / max_items + 1
+      (items.size - 1) / max_items + 1
     end
 
     # Move to the given page number.

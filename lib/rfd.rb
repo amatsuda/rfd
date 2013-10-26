@@ -201,6 +201,7 @@ module Rfd
 
       draw_marked_items
       draw_total_items
+      true
     end
 
     # Sort the whole files and directories in the current directory, then refresh the screen.

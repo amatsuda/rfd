@@ -190,8 +190,8 @@ module Rfd
       mark = marked_items.size != (items.size - 2)  # exclude . and ..
       items.each {|i| i.toggle_mark unless i.marked? == mark}
       draw_items
-      move_cursor current_row
       draw_marked_items
+      move_cursor current_row
     end
 
     # "b"ack to the previous page.

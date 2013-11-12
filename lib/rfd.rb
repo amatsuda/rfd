@@ -346,10 +346,9 @@ module Rfd
       @items = items.shift(2) + items.select {|i| i.name =~ regexp}
       sort_items_according_to_current_direction
       draw_items
+      draw_total_items
       switch_page 0
       move_cursor 0
-
-      draw_total_items
     end
 
     # Copy selected files and directories to the destination.

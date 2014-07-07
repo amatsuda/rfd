@@ -384,7 +384,7 @@ module Rfd
     # ==== Parameters
     # * +pattern+ - / separated Regexp like string
     def rename(pattern)
-      from, to = pattern.split '/'
+      from, to = pattern.sub(/^\//, '').sub(/\/$/, '').split '/'
       from = Regexp.new from
       unless in_zip?
         selected_items.each do |item|

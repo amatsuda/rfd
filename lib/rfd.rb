@@ -382,10 +382,14 @@ module Rfd
     # Rename selected files and directories.
     #
     # ==== Parameters
-    # * +pattern+ - / separated Regexp like string
+    # * +pattern+ - new filename, or a shash separated Regexp like string
     def rename(pattern)
       from, to = pattern.sub(/^\//, '').sub(/\/$/, '').split '/'
-      from = Regexp.new from
+      if to.nil?
+        from, to = current_item.name, from
+      else
+        from = Regexp.new from
+      end
       unless in_zip?
         selected_items.each do |item|
           name = item.name.gsub from, to

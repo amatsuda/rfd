@@ -627,6 +627,12 @@ module Rfd
       c if (0..255) === c.ord
     end
 
+    def clear_command_line
+      command_line.writeln 0, ""
+      command_line.clear
+      command_line.noutrefresh
+    end
+
     # Accept user input, and directly execute it as a Ruby method call to the controller.
     #
     # ==== Parameters
@@ -637,13 +643,11 @@ module Rfd
       cmd, *args = command_line.get_command(prompt: prompt).split(' ')
       if cmd && !cmd.empty? && respond_to?(cmd)
         ret = self.public_send cmd, *args
-        command_line.clear
-        command_line.noutrefresh
+        clear_command_line
         ret
       end
     rescue Interrupt
-      command_line.clear
-      command_line.noutrefresh
+      clear_command_line
     end
 
     # Accept user input, and directly execute it in an external shell.

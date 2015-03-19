@@ -19,6 +19,7 @@ module Rfd
       setpos row, 0
       clrtoeol
       self << str
+      refresh
     end
   end
 
@@ -145,14 +146,28 @@ module Rfd
       end
     end
 
+    def getstr_with_echo
+      str = ""
+      loop do
+        case (c = Curses.getch)
+        when 27
+          raise Interrupt
+        when 10, 13
+          break
+        else
+          self << c
+          refresh
+          str << c
+        end
+      end
+      str
+    end
+
     def get_command(prompt: nil)
-      Curses.echo
       startx = prompt ? prompt.size : 1
       setpos 0, startx
-      s = getstr
+      s = getstr_with_echo
       "#{prompt[1..-1] if prompt}#{s.strip}"
-    ensure
-      Curses.noecho
     end
 
     def show_error(str)

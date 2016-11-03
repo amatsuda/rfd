@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Rfd
   module Commands
     # Change permission ("A"ttributes) of selected files and directories.

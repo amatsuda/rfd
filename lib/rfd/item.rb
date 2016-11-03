@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Rfd
   class Item
     include Comparable

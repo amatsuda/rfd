@@ -346,16 +346,18 @@ describe Rfd::Controller do
     end
   end
 
-  describe '#pbcopy' do
-    before do
-      controller.find '.file1'
-      controller.toggle_mark
-      controller.find 'dir3'
-      controller.toggle_mark
-      controller.clipboard
-    end
-    it 'copies the selected paths into clipboard' do
-      `pbpaste`.should == "#{File.join(tmpdir, 'dir3')} #{File.join(tmpdir, '.file1')}"
+  if RbConfig::CONFIG['host_os'] =~ /darwin/
+    describe '#pbcopy' do
+      before do
+        controller.find '.file1'
+        controller.toggle_mark
+        controller.find 'dir3'
+        controller.toggle_mark
+        controller.clipboard
+      end
+      it 'copies the selected paths into clipboard' do
+        `pbpaste`.should == "#{File.join(tmpdir, 'dir3')} #{File.join(tmpdir, '.file1')}"
+      end
     end
   end
 

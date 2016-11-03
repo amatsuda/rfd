@@ -748,7 +748,7 @@ module Rfd
     end
 
     def expand_path(path)
-      File.expand_path path.start_with?('/') || path.start_with?('~') ? path : current_dir ? current_dir.join(path) : path
+      File.expand_path path.start_with?('/', '~') ? path : current_dir ? current_dir.join(path) : path
     end
 
     def load_item(path: nil, dir: nil, name: nil, stat: nil)

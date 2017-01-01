@@ -512,7 +512,7 @@ module Rfd
     # Archive selected files and directories into a .zip file.
     def zip(zipfile_name)
       return unless zipfile_name
-      zipfile_name << '.zip' unless zipfile_name.end_with? '.zip'
+      zipfile_name += '.zip' unless zipfile_name.end_with? '.zip'
 
       Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
         selected_items.each do |item|

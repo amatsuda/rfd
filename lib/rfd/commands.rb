@@ -231,7 +231,8 @@ module Rfd
     # Number of times to repeat the next command.
     (?0..?9).each do |n|
       define_method(n) do
-        (@times ||= '') << n
+        @times ||= ''
+        @times += n
       end
     end
 

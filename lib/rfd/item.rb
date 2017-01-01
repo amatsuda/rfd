@@ -84,9 +84,9 @@ module Rfd
     def mode
       @mode ||= begin
         m = stat.mode
-        ret = directory? ? 'd' : symlink? ? 'l' : '-'
-        [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ret) do |str, s|
-          str << "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
+        ft = directory? ? 'd' : symlink? ? 'l' : '-'
+        ret = [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ft) do |str, s|
+          str += "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
         end
         if m & 04000 != 0
           ret[3] = directory? ? 's' : 'S'

@@ -81,8 +81,9 @@ module Rfd
     attr_reader :current_index, :begy
     attr_writer :number_of_panes
 
-    def initialize
+    def initialize(current_style = nil)
       @begy, @current_index, @number_of_panes = 5, 0, 2
+      @current_style = current_style || Curses::A_UNDERLINE
       super window: Curses::Pad.new(Curses.lines - 7, Curses.cols - 2)
     end
 
@@ -117,7 +118,7 @@ module Rfd
 
     def draw_item(item, current: false)
       setpos item.index % maxy, width * @current_index
-      attron(Curses.color_pair(item.color) | (current ? Curses::A_UNDERLINE : Curses::A_NORMAL)) do
+      attron(Curses.color_pair(item.color) | (current ? @current_style : Curses::A_NORMAL)) do
         self << item.to_s
       end
     end

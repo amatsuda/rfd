@@ -32,11 +32,11 @@ module Rfd
   #
   # ==== Parameters
   # * +dir+ - The initial directory.
-  def self.start(dir = '.')
+  def self.start(dir = '.', options)
     init_curses
     Rfd::Window.draw_borders
     Curses.stdscr.noutrefresh
-    rfd = Rfd::Controller.new
+    rfd = Rfd::Controller.new options
     rfd.cd dir
     Curses.doupdate
     rfd
@@ -48,8 +48,8 @@ module Rfd
     attr_reader :header_l, :header_r, :main, :command_line, :items, :displayed_items, :current_row, :current_page, :current_dir, :current_zip
 
     # :nodoc:
-    def initialize
-      @main = MainWindow.new
+    def initialize(options)
+      @main = MainWindow.new options[:current_style]
       @header_l = HeaderLeftWindow.new
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new

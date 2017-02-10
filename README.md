@@ -1,6 +1,6 @@
 # rfd (Ruby on Files & Directories)
 
-rfd is a terminal-based filesystem explorer, inpsired by the legendary freesoft MS-DOS filer, "FD".
+rfd is a terminal-based filesystem explorer, inspired by the legendary freesoft MS-DOS filer, "FD".
 
 ## Installation
 
@@ -111,7 +111,7 @@ As stated above, you can send a command to one or more files / directories. In t
 * `m`: Move selected items (mv).
 * `d`: Move selected items into the Trash.
 * `D`: Delete selected items.
-* `r`: Rename selected items. This command takes a sed-like argument separated by a `/`. For example, changing all .html files' extention to .html.erb could be done by `\.html$/.html.erb`.
+* `r`: Rename selected items. This command takes a sed-like argument separated by a `/`. For example, changing all .html files' extension to .html.erb could be done by `\.html$/.html.erb`.
 
 ### Yank and Paste
 

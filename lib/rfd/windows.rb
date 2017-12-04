@@ -148,7 +148,7 @@ module Rfd
     end
 
     def getstr_with_echo
-      str = ""
+      str = "".dup
       loop do
         case (c = Curses.getch)
         when 27

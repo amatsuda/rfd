@@ -1,6 +1,22 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 require File.expand_path('../../lib/rfd', __FILE__)
+require 'optparse'
 
-rfd = Rfd.start ARGV[0] || '.'
+options = {}
+
+OptionParser.new do |opts|
+  opts.on "--current-style STYLE", /underline|reverse/, "Current file effect `underline` or `reverse`. Default is `underline`." do |style|
+    options[:current_style] = case style
+                              when 'reverse'
+                                Curses::A_REVERSE
+                              else
+                                Curses::A_UNDERLINE
+                              end
+  end
+
+  opts.parse! ARGV
+end
+
+rfd = Rfd.start(ARGV[0] || '.', options)
 rfd.run

@@ -8,7 +8,7 @@ describe Rfd::Controller do
   around do |example|
     @stdout = capture(:stdout) do
       FileUtils.cp_r File.join(__dir__, 'testdir'), tmpdir
-      @rfd = Rfd.start tmpdir
+      @rfd = Rfd.start tmpdir, options
       def (@rfd.main).maxy
         3
       end
@@ -25,9 +25,24 @@ describe Rfd::Controller do
   end
 
   let(:tmpdir) { File.join __dir__, 'tmpdir' }
+  let(:options) { {} }
   let!(:controller) { @rfd }
   subject { controller }
   let(:items) { controller.items }
+
+  describe '#initialize' do
+    context 'When options has :current_style key' do
+      let(:options) { { current_style: Curses::A_REVERSE } }
+
+      subject { controller.main.instance_variable_get :@current_style }
+      it { should == Curses::A_REVERSE }
+    end
+
+    context 'When options has not :current_style key' do
+      subject { controller.main.instance_variable_get :@current_style }
+      it { should == Curses::A_UNDERLINE }
+    end
+  end
 
   describe '#spawn_panes' do
     before { controller.spawn_panes 3 }

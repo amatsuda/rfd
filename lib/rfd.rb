@@ -673,8 +673,7 @@ module Rfd
       command_line.refresh
       while (c = Curses.getch)
         next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
-        command_line.clear
-        command_line.noutrefresh
+        clear_command_line
         break (c == 'y') || (c == 'Y')
       end
     end

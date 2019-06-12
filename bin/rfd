@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 require File.expand_path('../../lib/rfd', __FILE__)
+require 'optparse'
 
-rfd = Rfd.start ARGV[0] || '.'
+options = ARGV.getopts 'l:'
+
+rfd = Rfd.start ARGV[0] || '.', log: options['l']
 rfd.run

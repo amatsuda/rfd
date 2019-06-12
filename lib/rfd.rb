@@ -32,7 +32,12 @@ module Rfd
   #
   # ==== Parameters
   # * +dir+ - The initial directory.
-  def self.start(dir = '.')
+  def self.start(dir = '.', log: nil)
+    if log
+      require_relative 'rfd/logging'
+      Rfd.log_to log
+    end
+
     init_curses
     Rfd::Window.draw_borders
     Curses.stdscr.noutrefresh

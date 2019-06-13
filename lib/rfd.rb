@@ -10,7 +10,7 @@ require_relative 'rfd/item'
 require_relative 'rfd/windows'
 
 module Rfd
-  VERSION = Gem.loaded_specs['rfd'].version.to_s
+  VERSION = Gem.loaded_specs['rfd'] ? Gem.loaded_specs['rfd'].version.to_s : '0'
 
   # :nodoc:
   def self.init_curses

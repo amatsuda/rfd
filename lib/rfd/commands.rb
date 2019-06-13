@@ -186,6 +186,11 @@ module Rfd
       process_command_line preset_command: 'symlink'
     end
 
+    # "T"ouch the current file. This updates current item's timestamp (equivalent to `touch -t`).
+    def T
+      process_command_line preset_command: 'touch_t', default_argument: current_item.mtime.tr(': -', '')
+    end
+
     # Mark or unmark "a"ll files and directories.
     def ctrl_a
       mark = marked_items.size != (items.size - 2)  # exclude . and ..

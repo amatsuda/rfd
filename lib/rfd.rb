@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'curses'
 require 'fileutils'
+require 'time'
 require 'tmpdir'
 require 'rubygems/package'
 require 'zip'
@@ -477,6 +478,15 @@ module Rfd
     # Create a symlink to the current file or directory.
     def symlink(name)
       FileUtils.ln_s current_item, name
+      ls
+    end
+
+    # Change the timestamp of the selected files and directories.
+    #
+    # ==== Parameters
+    # * +timestamp+ - A string that can be parsed with `Time.parse`. Note that this parameter is not compatible with UNIX `touch -t`.
+    def touch_t(timestamp)
+      FileUtils.touch selected_items, mtime: Time.parse(timestamp)
       ls
     end
 

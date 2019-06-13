@@ -147,8 +147,14 @@ module Rfd
       end
     end
 
-    def getstr_with_echo
-      str = "".dup
+    def getstr_with_echo(default = nil)
+      str = default || ''.dup
+
+      unless str.empty?
+        self << str
+        refresh
+      end
+
       loop do
         case (c = Curses.getch)
         when 27, 3  # ESC, C-c
@@ -172,10 +178,10 @@ module Rfd
       str
     end
 
-    def get_command(prompt: nil)
+    def get_command(prompt: nil, default: nil)
       startx = prompt ? prompt.size : 1
       setpos 0, startx
-      s = getstr_with_echo
+      s = getstr_with_echo default
       "#{prompt[1..-1] if prompt}#{s.strip}"
     end
 

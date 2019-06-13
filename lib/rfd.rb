@@ -642,10 +642,11 @@ module Rfd
     #
     # ==== Parameters
     # * +preset_command+ - A command that would be displayed at the command line before user input.
-    def process_command_line(preset_command: nil)
+    # * +default_argument+ - A default argument for the command.
+    def process_command_line(preset_command: nil, default_argument: nil)
       prompt = preset_command ? ":#{preset_command} " : ':'
       command_line.set_prompt prompt
-      cmd, *args = command_line.get_command(prompt: prompt).split(' ')
+      cmd, *args = command_line.get_command(prompt: prompt, default: default_argument).split(' ')
       if cmd && !cmd.empty? && respond_to?(cmd)
         ret = self.public_send cmd, *args
         clear_command_line

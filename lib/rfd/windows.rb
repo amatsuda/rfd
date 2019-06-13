@@ -163,6 +163,7 @@ module Rfd
           refresh
           str.chop!
         else
+          Rfd.log "#{__method__}: #{c}"
           self << c
           refresh
           str << c

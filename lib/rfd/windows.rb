@@ -156,6 +156,8 @@ module Rfd
         when 10, 13
           break
         when 127, 263  # delete
+          raise Interrupt if curx == 1
+
           setpos cury, curx - 1
           delch
           refresh

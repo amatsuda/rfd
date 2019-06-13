@@ -8,6 +8,7 @@ require 'zip/filesystem'
 require_relative 'rfd/commands'
 require_relative 'rfd/item'
 require_relative 'rfd/windows'
+require_relative 'rfd/logging'
 
 module Rfd
   VERSION = Gem.loaded_specs['rfd'] ? Gem.loaded_specs['rfd'].version.to_s : '0'
@@ -33,10 +34,7 @@ module Rfd
   # ==== Parameters
   # * +dir+ - The initial directory.
   def self.start(dir = '.', log: nil)
-    if log
-      require_relative 'rfd/logging'
-      Rfd.log_to log
-    end
+    Rfd.log_to log if log
 
     init_curses
     Rfd::Window.draw_borders

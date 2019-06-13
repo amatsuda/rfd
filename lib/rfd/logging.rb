@@ -13,6 +13,10 @@ module Rfd
       Rfd::Controller.include Logging
     end
 
+    def log(str)
+      Rfd.logger.debug str if Rfd.logger
+    end
+
     attr_reader :logger
   end
 

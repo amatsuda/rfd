@@ -151,7 +151,7 @@ module Rfd
       str = "".dup
       loop do
         case (c = Curses.getch)
-        when 27
+        when 27, 3  # ESC, C-c
           raise Interrupt
         when 10, 13
           break

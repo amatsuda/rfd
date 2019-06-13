@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = '0.6.9'
   spec.authors       = ["Akira Matsuda"]
   spec.email         = ["ronnie@dio.jp"]
-  spec.description   = 'Ruby on Files & Directories'
+  spec.description   = 'A Ruby filer that runs on terminal'
   spec.summary       = 'Ruby on Files & Directories'
   spec.homepage      = 'https://github.com/amatsuda/rfd'
   spec.license       = "MIT"

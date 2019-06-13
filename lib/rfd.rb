@@ -472,7 +472,9 @@ module Rfd
           zip.instance_variable_get(:@entry_set) << Zip::Entry.new(current_zip, filename)
         end
       end
+
       ls
+      move_cursor items.index {|i| i.name == filename}
     end
 
     # Create a symlink to the current file or directory.

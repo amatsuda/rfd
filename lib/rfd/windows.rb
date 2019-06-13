@@ -155,6 +155,11 @@ module Rfd
           raise Interrupt
         when 10, 13
           break
+        when 127, 263  # delete
+          setpos cury, curx - 1
+          delch
+          refresh
+          str.chop!
         else
           self << c
           refresh

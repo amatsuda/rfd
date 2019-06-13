@@ -37,12 +37,10 @@ module Rfd
         n = full_display_name
         if mb_size(n) <= @window_width - 15
           n
+        elsif symlink?
+          mb_left n, @window_width - 16
         else
-          if symlink?
-            mb_left n, @window_width - 16
-          else
-            "#{mb_left(basename, @window_width - 16 - extname.size)}…#{extname}"
-          end
+          "#{mb_left(basename, @window_width - 16 - extname.size)}…#{extname}"
         end
       end
     end

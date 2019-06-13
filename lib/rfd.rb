@@ -111,6 +111,7 @@ module Rfd
         rescue StopIteration
           raise
         rescue => e
+          Rfd.logger.error e if Rfd.logger
           command_line.show_error e.to_s
           raise if ENV['DEBUG']
         end

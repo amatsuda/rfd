@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "rfd"
-  spec.version       = '0.6.9'
+  spec.version       = '0.7.0'
   spec.authors       = ["Akira Matsuda"]
   spec.email         = ["ronnie@dio.jp"]
   spec.description   = 'A Ruby filer that runs on terminal'

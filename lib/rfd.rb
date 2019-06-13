@@ -570,7 +570,7 @@ module Rfd
                 end
                 dest ||= File.join dest_dir, entry.full_name
                 if entry.directory?
-                  FileUtils.mkdir_p dest, :mode => entry.header.mode
+                  FileUtils.mkdir_p dest, mode: entry.header.mode
                 elsif entry.file?
                   FileUtils.mkdir_p dest_dir
                   File.open(dest, 'wb') {|f| f.print entry.read}

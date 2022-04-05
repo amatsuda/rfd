@@ -21,6 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'curses', '>= 1.0.0'
   spec.add_dependency 'rubyzip', '>= 1.0.0'
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency "rake", "< 11.0"
+  spec.add_development_dependency "rake"
   spec.add_development_dependency 'rspec', "< 2.99"
 end

@@ -25,7 +25,7 @@ module Rfd
       mod = Module.new do
         (m.instance_methods - Object.instance_methods).each do |meth|
           Rfd.logger.info meth
-          define_method(meth) {|*args, &block| Rfd.logger.debug "calling #{meth}(#{args.inspect})"; super(*args, &block) }
+          define_method(meth) {|*args, **kw, &block| Rfd.logger.debug "calling #{meth}(args: #{args.inspect}, kw: #{kw.inspect})"; super(*args, **kw, &block) }
         end
       end
       m.prepend mod

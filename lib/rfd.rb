@@ -6,10 +6,12 @@ require 'tmpdir'
 require 'rubygems/package'
 require 'zip'
 require 'zip/filesystem'
+require 'reline'
 require_relative 'rfd/commands'
 require_relative 'rfd/item'
 require_relative 'rfd/windows'
 require_relative 'rfd/logging'
+require_relative 'rfd/reline_ext'
 
 module Rfd
   VERSION = Gem.loaded_specs['rfd'] ? Gem.loaded_specs['rfd'].version.to_s : '0'

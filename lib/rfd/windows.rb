@@ -147,41 +147,15 @@ module Rfd
       end
     end
 
-    def getstr_with_echo(default = nil)
-      str = default || ''.dup
-
-      unless str.empty?
-        self << str
-        refresh
-      end
-
-      loop do
-        case (c = Curses.getch)
-        when 27, 3  # ESC, C-c
-          raise Interrupt
-        when 10, 13
-          break
-        when 127, 263  # delete
-          raise Interrupt if curx == 1
-
-          setpos cury, curx - 1
-          delch
-          refresh
-          str.chop!
-        else
-          Rfd.log "#{__method__}: #{c}"
-          self << c
-          refresh
-          str << c
-        end
-      end
-      str
-    end
-
     def get_command(prompt: nil, default: nil)
       startx = prompt ? prompt.size : 1
       setpos 0, startx
-      s = getstr_with_echo default
+      # Passing the default string to Reline
+      Reline.pre_input_hook = -> {
+        Reline.insert_text default || ''
+      }
+      s = Reline.readline prompt
+      Rfd.logger.info "reline: #{s}"
       "#{prompt[1..-1] if prompt}#{s.strip}"
     end
 

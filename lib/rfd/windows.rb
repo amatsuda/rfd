@@ -154,7 +154,7 @@ module Rfd
       Reline.pre_input_hook = -> {
         Reline.insert_text default || ''
       }
-      s = Reline.readline prompt
+      s = Reline.readline prompt, true
       Rfd.logger.info "reline: #{s}"
       "#{prompt[1..-1] if prompt}#{s.strip}"
     end

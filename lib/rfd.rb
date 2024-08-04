@@ -661,7 +661,7 @@ module Rfd
       prompt = preset_command ? ":#{preset_command} " : ':'
       command_line.set_prompt prompt
       cmd, *args = command_line.get_command(prompt: prompt, default: default_argument).split(' ')
-      if cmd && !cmd.empty? && respond_to?(cmd)
+      if cmd && !cmd.empty?
         ret = self.public_send cmd, *args
         clear_command_line
         ret

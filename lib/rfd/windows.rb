@@ -7,8 +7,39 @@ module Rfd
       [[5, Curses.stdscr.maxx, 0, 0], [5, Curses.cols - 30, 0, 0], [Curses.stdscr.maxy - 5, Curses.stdscr.maxx, 4, 0]].each do |height, width, top, left|
         w = Curses.stdscr.subwin height, width, top, left
         w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
-        w.box 0, 0
+        draw_ncursesw_border(w, height, width)
         w.close
+      end
+    end
+
+    # Draw borders using ncursesw box drawing characters
+    def self.draw_ncursesw_border(window, height, width)
+      if defined?(Curses::ACS_ULCORNER)
+        # Use ncursesw ACS (Alternative Character Set) constants when available
+        window.box(Curses::ACS_VLINE, Curses::ACS_HLINE)
+      else
+        # Fallback to Unicode box drawing characters for terminals that support them
+        begin
+          window.setpos(0, 0)
+          window << '╭'
+          (width - 2).times { window << '─' }
+          window << '╮'
+
+          (1..(height - 2)).each do |y|
+            window.setpos(y, 0)
+            window << '│'
+            window.setpos(y, width - 1)
+            window << '│'
+          end
+
+          window.setpos(height - 1, 0)
+          window << '╰'
+          (width - 2).times { window << '─' }
+          window << '╯'
+        rescue Encoding::InvalidByteSequenceError, ArgumentError
+          # Final fallback to ASCII characters
+          window.box(0, 0)
+        end
       end
     end
 

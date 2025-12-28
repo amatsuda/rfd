@@ -516,9 +516,10 @@ module Rfd
             if items.include? item
               i = 0
               while i += 1
-                new_item = load_item dir: current_dir, name: "#{item.basename}_#{i}#{item.extname}", stat: item.stat
-                break unless File.exist? new_item.path
+                new_path = current_dir.join("#{item.basename}_#{i}#{item.extname}")
+                break unless File.exist? new_path
               end
+              new_item = new_path
               FileUtils.cp_r item, new_item
             else
               FileUtils.cp_r item, current_dir

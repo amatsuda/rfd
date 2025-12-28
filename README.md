@@ -8,12 +8,20 @@ rfd is a terminal-based filesystem explorer, inspired by the legendary freesoft 
 
 ## Requirements
 
-* Ruby 2.0, Ruby 2.1
-* NCurses
+* Ruby 2.0 or newer
+* NCurses with wide character support (ncursesw) recommended for best Unicode display
+
+### macOS: Setting up ncursesw for Unicode borders
+
+macOS comes with an older system ncurses that doesn't fully support Unicode. For proper Unicode box-drawing characters, install and link Homebrew's ncurses before installing the curses gem:
+
+    % brew install ncurses
+    % brew link --force ncurses
+    % gem install curses
 
 ## Tested environments
 
-Mac OS X Mountain Lion, Mac OS X Lion, Ubuntu 13.04
+Mac OS X Mountain Lion and newer, Ubuntu 13.04 and newer
 
 ## Screenshot
 

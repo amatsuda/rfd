@@ -193,7 +193,10 @@ module Rfd
       else
         @current_zip = dir
       end
-      @dir_history << current_dir if current_dir && pushd
+      if current_dir && pushd
+        @dir_history << current_dir
+        @dir_history.shift if @dir_history.size > 100
+      end
       @current_dir, @current_page, @current_row = dir, 0, nil
       main.activate_pane 0
       ls

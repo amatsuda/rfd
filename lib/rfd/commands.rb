@@ -68,9 +68,9 @@ module Rfd
     # "o"pen selected files and directories with the OS "open" command.
     def o
       if selected_items.any?
-        system "open #{selected_items.map {|i| %Q["#{i.path}"]}.join(' ')}"
+        system 'open', *selected_items.map(&:path)
       elsif %w(. ..).include? current_item.name
-        system %Q[open "#{current_item.path}"]
+        system 'open', current_item.path
       end
     end
 
@@ -176,9 +176,8 @@ module Rfd
     # "O"pen terminal here.
     def O
       dir = current_item.directory? ? current_item.path : current_dir.path
-      system %Q[osascript -e 'tell app "Terminal"
-        do script "cd #{dir}"
-      end tell'] if osx?
+      escaped_dir = dir.gsub('\\', '\\\\\\\\').gsub('"', '\\"')
+      system 'osascript', '-e', %Q[tell app "Terminal" to do script "cd \\"#{escaped_dir}\\""] if osx?
     end
 
     # "S"ymlink the current file or directory

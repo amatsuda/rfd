@@ -712,7 +712,7 @@ module Rfd
       execute_external_command do
         editor = ENV['EDITOR'] || 'vim'
         unless in_zip?
-          system %Q[#{editor} "#{current_item.path}"]
+          system editor, current_item.path
         else
           begin
             tmpdir, tmpfile_name = nil
@@ -721,7 +721,7 @@ module Rfd
               FileUtils.mkdir_p File.join(tmpdir, File.dirname(current_item.name))
               tmpfile_name = File.join(tmpdir, current_item.name)
               File.open(tmpfile_name, 'w') {|f| f.puts zip.file.read(current_item.name)}
-              system %Q[#{editor} "#{tmpfile_name}"]
+              system editor, tmpfile_name
               zip.add(current_item.name, tmpfile_name) { true }
             end
             ls
@@ -737,7 +737,7 @@ module Rfd
       pager = ENV['PAGER'] || 'less'
       execute_external_command do
         unless in_zip?
-          system %Q[#{pager} "#{current_item.path}"]
+          system pager, current_item.path
         else
           begin
             tmpdir, tmpfile_name = nil
@@ -747,7 +747,7 @@ module Rfd
               tmpfile_name = File.join(tmpdir, current_item.name)
               File.open(tmpfile_name, 'w') {|f| f.puts zip.file.read(current_item.name)}
             end
-            system %Q[#{pager} "#{tmpfile_name}"]
+            system pager, tmpfile_name
           ensure
             FileUtils.remove_entry_secure tmpdir if tmpdir
           end

@@ -147,6 +147,16 @@ module Rfd
       end
     end
 
+    def image?
+      @image ||= begin
+        return false if directory?
+        magic = File.binread(realpath, 8)
+        (magic[0..3] == "\x89PNG") || (magic[0..2] == "\xFF\xD8\xFF") || (magic[0..2] == 'GIF')
+      rescue
+        false
+      end
+    end
+
     def target
       File.readlink path if symlink?
     end

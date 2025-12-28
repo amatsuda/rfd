@@ -18,6 +18,9 @@ module Rfd
 
   # :nodoc:
   def self.init_curses
+    # Set locale for proper wide character support
+    ENV['LC_ALL'] ||= 'en_US.UTF-8'
+
     Curses.init_screen
     Curses.raw
     Curses.noecho

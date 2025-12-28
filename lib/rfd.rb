@@ -370,6 +370,8 @@ module Rfd
       sort_items_according_to_current_direction
       draw_items
       draw_total_items
+    rescue RegexpError => e
+      command_line.show_error "Invalid regex: #{e.message}"
       switch_page 0
       move_cursor 0
     end
@@ -427,6 +429,8 @@ module Rfd
         end
       end
       ls
+    rescue RegexpError => e
+      command_line.show_error "Invalid regex: #{e.message}"
     end
 
     # Soft delete selected files and directories.

@@ -150,8 +150,10 @@ module Rfd
     def image?
       @image ||= begin
         return false if directory?
-        magic = File.binread(realpath, 8)
-        (magic[0..3] == "\x89PNG") || (magic[0..2] == "\xFF\xD8\xFF") || (magic[0..2] == 'GIF')
+        magic = File.binread(realpath, 8).bytes
+        (magic[0..3] == [0x89, 0x50, 0x4E, 0x47]) ||  # PNG
+          (magic[0..2] == [0xFF, 0xD8, 0xFF]) ||      # JPEG
+          (magic[0..2] == [0x47, 0x49, 0x46])         # GIF
       rescue
         false
       end

@@ -768,6 +768,19 @@ module Rfd
       end
     end
 
+    def view_image
+      return view unless current_item.image?
+      execute_external_command(pause: true) do
+        if kitty?
+          system 'kitty', '+kitten', 'icat', current_item.path
+        elsif sixel?
+          system('img2sixel', current_item.path) || system('chafa', '-f', 'sixel', current_item.path)
+        elsif osx?
+          system 'open', current_item.path
+        end
+      end
+    end
+
     def move_cursor_by_click(y: nil, x: nil)
       if (idx = main.pane_index_at(y: y, x: x))
         row = current_page * max_items + main.maxy * idx + y - main.begy
@@ -808,6 +821,16 @@ module Rfd
 
     def osx?
       @_osx ||= RbConfig::CONFIG['host_os'] =~ /darwin/
+    end
+
+    def kitty?
+      return @_kitty if defined?(@_kitty)
+      @_kitty = (ENV['TERM'] == 'xterm-kitty') || (ENV['KITTY_WINDOW_ID'])
+    end
+
+    def sixel?
+      return @_sixel if defined?(@_sixel)
+      @_sixel = (ENV['TERM_PROGRAM'] == 'iTerm.app') || ENV['TERM']&.include?('mlterm') || (ENV['TERM'] == 'foot')
     end
 
     def in_zip?

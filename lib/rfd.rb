@@ -558,11 +558,13 @@ module Rfd
       unless in_zip?
         zips, gzs = selected_items.partition(&:zip?).tap {|z, others| break [z, *others.partition(&:gz?)]}
         zips.each do |item|
-          FileUtils.mkdir_p current_dir.join(item.basename)
+          dest_dir = current_dir.join(item.basename)
+          FileUtils.mkdir_p dest_dir
           Zip::File.open(item) do |zip|
             zip.each do |entry|
-              FileUtils.mkdir_p File.join(item.basename, File.dirname(entry.to_s))
-              zip.extract(entry, File.join(item.basename, entry.to_s)) { true }
+              dest_path = safe_extract_path(dest_dir, entry.to_s)
+              FileUtils.mkdir_p File.dirname(dest_path)
+              zip.extract(entry, dest_path) { true }
             end
           end
         end
@@ -573,14 +575,14 @@ module Rfd
               tar.each do |entry|
                 dest = nil
                 if entry.full_name == '././@LongLink'
-                  dest = File.join dest_dir, entry.read.strip
+                  dest = safe_extract_path(dest_dir, entry.read.strip)
                   next
                 end
-                dest ||= File.join dest_dir, entry.full_name
+                dest ||= safe_extract_path(dest_dir, entry.full_name)
                 if entry.directory?
                   FileUtils.mkdir_p dest, mode: entry.header.mode
                 elsif entry.file?
-                  FileUtils.mkdir_p dest_dir
+                  FileUtils.mkdir_p File.dirname(dest)
                   File.open(dest, 'wb') {|f| f.print entry.read}
                   FileUtils.chmod entry.header.mode, dest
                 elsif entry.header.typeflag == '2'  # symlink
@@ -595,10 +597,12 @@ module Rfd
           end
         end
       else
+        dest_dir = File.join(current_zip.dir, current_zip.basename)
         Zip::File.open(current_zip) do |zip|
           zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
-            FileUtils.mkdir_p File.join(current_zip.dir, current_zip.basename, File.dirname(entry.to_s))
-            zip.extract(entry, File.join(current_zip.dir, current_zip.basename, entry.to_s)) { true }
+            dest_path = safe_extract_path(dest_dir, entry.to_s)
+            FileUtils.mkdir_p File.dirname(dest_path)
+            zip.extract(entry, dest_path) { true }
           end
         end
       end
@@ -774,6 +778,15 @@ module Rfd
 
     def expand_path(path)
       File.expand_path path.start_with?('/', '~') ? path : current_dir ? current_dir.join(path) : path
+    end
+
+    # Safely resolve an archive entry path within a destination directory.
+    # Prevents path traversal attacks (e.g., ../../etc/passwd).
+    def safe_extract_path(dest_dir, entry_name)
+      dest_dir = File.expand_path(dest_dir)
+      dest_path = File.expand_path(File.join(dest_dir, entry_name))
+      raise "Path traversal detected: #{entry_name}" unless dest_path.start_with?(dest_dir + '/')
+      dest_path
     end
 
     def load_item(path: nil, dir: nil, name: nil, stat: nil)

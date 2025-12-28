@@ -12,34 +12,34 @@ module Rfd
       end
     end
 
+    # Detect if linked against ncursesw (not ncurses)
+    def self.ncursesw?
+      return @ncursesw if defined?(@ncursesw)
+
+      bundle = $LOADED_FEATURES.find { |f| f =~ /curses\.bundle|curses\.so/ }
+      @ncursesw = bundle && `otool -L "#{bundle}" 2>/dev/null`.include?('libncursesw')
+    end
+
     # Draw borders using ncursesw box drawing characters
     def self.draw_ncursesw_border(window, height, width)
-      if defined?(Curses::ACS_ULCORNER)
-        # Use ncursesw ACS (Alternative Character Set) constants when available
-        window.box(Curses::ACS_VLINE, Curses::ACS_HLINE)
-      else
-        # Fallback to Unicode box drawing characters for terminals that support them
-        begin
-          window.setpos(0, 0)
-          window << '╭'
-          (width - 2).times { window << '─' }
-          window << '╮'
+      if ncursesw?
+        # Use Unicode box drawing characters with ncursesw
+        h_line = '─' * (width - 2)
+        window.setpos(0, 0)
+        window.addstr("╭#{h_line}╮")
 
-          (1..(height - 2)).each do |y|
-            window.setpos(y, 0)
-            window << '│'
-            window.setpos(y, width - 1)
-            window << '│'
-          end
-
-          window.setpos(height - 1, 0)
-          window << '╰'
-          (width - 2).times { window << '─' }
-          window << '╯'
-        rescue Encoding::InvalidByteSequenceError, ArgumentError
-          # Final fallback to ASCII characters
-          window.box(0, 0)
+        (1..(height - 2)).each do |y|
+          window.setpos(y, 0)
+          window.addstr('│')
+          window.setpos(y, width - 1)
+          window.addstr('│')
         end
+
+        window.setpos(height - 1, 0)
+        window.addstr("╰#{h_line}╯")
+      else
+        # Fallback to standard box drawing for system ncurses
+        window.box(0, 0)
       end
     end
 

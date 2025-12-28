@@ -513,7 +513,7 @@ module Rfd
         else
           @yanked_items.each do |item|
             if items.include? item
-              i = 1
+              i = 0
               while i += 1
                 new_item = load_item dir: current_dir, name: "#{item.basename}_#{i}#{item.extname}", stat: item.stat
                 break unless File.exist? new_item.path

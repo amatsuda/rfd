@@ -242,6 +242,7 @@ module Rfd
     def sort(direction = nil)
       @direction, @current_page = direction, 0
       sort_items_according_to_current_direction
+      draw_items
       switch_page 0
       move_cursor 0
     end

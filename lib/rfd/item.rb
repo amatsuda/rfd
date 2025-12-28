@@ -83,18 +83,18 @@ module Rfd
       @mode ||= begin
         m = stat.mode
         ft = directory? ? 'd' : symlink? ? 'l' : '-'
-        ret = [(m & 0700) / 64, (m & 070) / 8, m & 07].inject(ft) do |str, s|
-          str += "#{s & 4 == 4 ? 'r' : '-'}#{s & 2 == 2 ? 'w' : '-'}#{s & 1 == 1 ? 'x' : '-'}"
+        owner = (m >> 6) & 07
+        group = (m >> 3) & 07
+        other = m & 07
+        ret = [owner, group, other].inject(ft) do |str, perms|
+          str + "#{perms & 4 != 0 ? 'r' : '-'}#{perms & 2 != 0 ? 'w' : '-'}#{perms & 1 != 0 ? 'x' : '-'}"
         end
-        if m & 04000 != 0
-          ret[3] = directory? ? 's' : 'S'
-        end
-        if m & 02000 != 0
-          ret[6] = directory? ? 's' : 'S'
-        end
-        if m & 01000 == 512
-          ret[-1] = directory? ? 't' : 'T'
-        end
+        # setuid: 's' if execute set, 'S' if not
+        ret[3] = (owner & 1 != 0 ? 's' : 'S') if m & 04000 != 0
+        # setgid: 's' if execute set, 'S' if not
+        ret[6] = (group & 1 != 0 ? 's' : 'S') if m & 02000 != 0
+        # sticky: 't' if execute set, 'T' if not
+        ret[9] = (other & 1 != 0 ? 't' : 'T') if m & 01000 != 0
         ret
       end
     end

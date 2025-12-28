@@ -33,6 +33,9 @@ module Rfd
     end
 
     Curses.mousemask Curses::BUTTON1_CLICKED | Curses::BUTTON1_DOUBLE_CLICKED
+
+    # Enable extended key codes for better Unicode support
+    Curses.stdscr.keypad = true
   end
 
   # Start the app here!

@@ -186,7 +186,7 @@ module Rfd
         Reline.insert_text default || ''
       }
       s = Reline.readline prompt, true
-      Rfd.logger.info "reline: #{s}"
+      Rfd.logger.info "reline: #{s}" if Rfd.logger
       "#{prompt[1..-1] if prompt}#{s.strip}"
     end
 

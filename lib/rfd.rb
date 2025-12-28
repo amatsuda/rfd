@@ -196,6 +196,9 @@ module Rfd
       main.activate_pane 0
       ls
       @current_dir
+    rescue Errno::EACCES, Errno::ENOENT => e
+      command_line.show_error e.message
+      nil
     end
 
     # cd to the previous directory.
@@ -284,6 +287,11 @@ module Rfd
           end
         end
       end
+    rescue Errno::EACCES => e
+      command_line.show_error e.message
+      @items ||= []
+    rescue Zip::Error => e
+      command_line.show_error "ZIP error: #{e.message}"
     end
 
     # Focus at the first file or directory of which name starts with the given String.

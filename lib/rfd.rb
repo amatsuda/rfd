@@ -26,6 +26,7 @@ module Rfd
     Curses.noecho
     Curses.curs_set 0
     Curses.stdscr.keypad = true
+    print "\e[?25l"  # Hide cursor via ANSI escape sequence
     Curses.start_color
 
     [Curses::COLOR_WHITE, Curses::COLOR_CYAN, Curses::COLOR_MAGENTA, Curses::COLOR_GREEN, Curses::COLOR_RED].each do |c|
@@ -126,6 +127,7 @@ module Rfd
         end
       end
     ensure
+      print "\e[?25h"  # Restore cursor
       Curses.close_screen
     end
 

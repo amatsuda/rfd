@@ -334,6 +334,73 @@ module Rfd
       end
     end
 
+    HELP_TEXT = <<~HELP
+      Navigation
+        j/k, ↑/↓     Move cursor up/down
+        h/l, ←/→     Move cursor left/right (between panes)
+        g/G, Home/End  Go to first/last item
+        H/M/L        Go to top/middle/bottom of screen
+        f{char}      Find file starting with {char}
+        n            Repeat last find
+        Ctrl-n/p     Next/previous page
+        Enter        Open directory or view file
+        Backspace    Go to parent directory
+        -            Go back to previous directory
+        ~            Go to home directory
+        @            Change directory (cd)
+
+      File Operations
+        Space        Mark/unmark file
+        Ctrl-a       Mark/unmark all
+        c/m/r        Copy/move/rename
+        d/D          Trash/delete
+        t/K          Touch file / mkdir
+        y/p          Yank/paste
+        z/u          Zip/unarchive
+        a/w          Chmod/chown
+        S            Create symlink
+
+      Viewing
+        v/e          View/edit file
+        o            Open with system viewer
+        P            Toggle preview window
+        /            Search (grep)
+        s            Sort
+
+      Other
+        C            Copy path to clipboard
+        O            Open terminal here
+        Ctrl-w{n}    Set number of panes
+        !            Execute shell command
+        :            Execute rfd command
+        q            Quit
+        ?            This help
+    HELP
+
+    def help
+      lines = HELP_TEXT.lines
+      h = [lines.size + 2, Curses.lines - 6].min
+      w = [lines.map(&:size).max + 4, Curses.cols - 4].min
+      y = (Curses.lines - h) / 2
+      x = (Curses.cols - w) / 2
+
+      win = Curses::Window.new(h, w, y, x)
+      win.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
+      Rfd::Window.draw_ncursesw_border(win, h, w)
+      win.setpos(0, 2)
+      win.addstr(' Help (press any key to close) ')
+
+      win.bkgdset Curses.color_pair(Curses::COLOR_WHITE)
+      lines.first(h - 2).each_with_index do |line, i|
+        win.setpos(i + 1, 2)
+        win.addstr(line.chomp[0, w - 4])
+      end
+      win.refresh
+      Curses.getch
+      win.close
+      move_cursor current_row
+    end
+
     private
 
     def execute_external_command(pause: false)

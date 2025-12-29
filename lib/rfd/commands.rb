@@ -275,6 +275,11 @@ module Rfd
       process_command_line
     end
 
+    # Show help screen.
+    define_method(:'?') do
+      help
+    end
+
     # cd into a directory, or view a file.
     def enter
       if current_item.name == '.'  # do nothing

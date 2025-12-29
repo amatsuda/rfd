@@ -250,6 +250,11 @@ module Rfd
       popd
     end
 
+    # Jump to home directory.
+    define_method(:'~') do
+      cd '~'
+    end
+
     # Search files and directories from the current directory.
     def /
       process_command_line preset_command: 'grep'

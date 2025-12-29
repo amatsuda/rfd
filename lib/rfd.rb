@@ -827,8 +827,18 @@ module Rfd
           w.addstr(name[0, max_width].ljust(max_width))
         end
       elsif current_item.image?
-        w.setpos(w.maxy / 2, 1)
-        w.addstr('[Image file]'.center(max_width))
+        w.refresh
+        if kitty?
+          # Clear any previous image in this area
+          print "\e_Ga=d,d=C\e\\"
+          # Display image using Kitty graphics protocol with --place
+          img_w, img_h = max_width, w.maxy - 2
+          img_x, img_y = w.begx + 1, w.begy + 1
+          system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{img_w}x#{img_h}@#{img_x}x#{img_y}", current_item.path, out: '/dev/tty', err: '/dev/null'
+        else
+          w.setpos(w.maxy / 2, 1)
+          w.addstr('[Image file]'.center(max_width))
+        end
       else
         lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue nil
         if lines

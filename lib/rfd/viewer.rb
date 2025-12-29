@@ -155,13 +155,71 @@ module Rfd
     end
 
     def preview_text(w, max_width)
-      lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue nil
-      if lines
-        render_text_lines(w, lines, max_width)
-      else
+      content = File.read(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace) rescue nil
+      unless content
         w.setpos(w.maxy / 2, 1)
         w.addstr('[Binary file]'.center(max_width))
+        return
       end
+
+      # Try syntax highlighting with Rouge
+      lexer = Rouge::Lexer.guess(filename: current_item.name, source: content) rescue nil
+      if lexer && !lexer.is_a?(Rouge::Lexers::PlainText)
+        preview_code(w, max_width, content, lexer)
+      else
+        render_text_lines(w, content.lines.first(w.maxy - 2), max_width)
+      end
+    end
+
+    def preview_code(w, max_width, content, lexer)
+      tokens = lexer.lex(content)
+      row, col = 1, 0
+      w.setpos(row, 1)
+
+      tokens.each do |token_type, token_text|
+        color = rouge_token_color(token_type)
+        token_text.each_char do |c|
+          break if row > w.maxy - 2
+          if c == "\n"
+            # Fill rest of line with spaces
+            w.addstr(' ' * (max_width - col)) if col < max_width
+            row += 1
+            col = 0
+            w.setpos(row, 1) if row <= w.maxy - 2
+          else
+            next if col >= max_width
+            char_width = c.bytesize == 1 ? 1 : 2
+            next if col + char_width > max_width
+            w.attron(color) { w.addstr(c) }
+            col += char_width
+          end
+        end
+      end
+      # Fill remaining lines
+      while row <= w.maxy - 2
+        w.addstr(' ' * (max_width - col))
+        row += 1
+        col = 0
+        w.setpos(row, 1) if row <= w.maxy - 2
+      end
+    end
+
+    ROUGE_COLORS = {
+      'Comment' => Curses::COLOR_GREEN,
+      'Keyword' => Curses::COLOR_CYAN,
+      'Name.Function' => Curses::COLOR_MAGENTA,
+      'Name.Class' => Curses::COLOR_MAGENTA,
+      'Literal.String' => Curses::COLOR_RED,
+      'Literal.Number' => Curses::COLOR_RED,
+      'Operator' => Curses::COLOR_CYAN,
+    }.freeze
+
+    def rouge_token_color(token_type)
+      token_str = token_type.qualname
+      ROUGE_COLORS.each do |prefix, color|
+        return Curses.color_pair(color) if token_str.start_with?(prefix)
+      end
+      Curses::A_NORMAL
     end
 
     def preview_markdown(w, max_width)

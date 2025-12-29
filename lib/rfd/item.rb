@@ -188,6 +188,10 @@ module Rfd
       !directory? && %w[.md .markdown].include?(extname.downcase)
     end
 
+    def audio?
+      !directory? && %w[.mp3 .wav .flac .ogg .m4a .aac .aiff .wma].include?(extname.downcase)
+    end
+
     def target
       File.readlink path if symlink?
     end

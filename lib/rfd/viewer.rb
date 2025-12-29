@@ -61,6 +61,18 @@ module Rfd
       end
     end
 
+    def play_audio
+      return view unless current_item.audio?
+      command_line.writeln 0, "Playing: #{current_item.name} (press any key to stop)"
+      command_line.refresh
+      player_pid = spawn_audio_player(current_item.path)
+      Curses.getch
+      Process.kill('TERM', player_pid) rescue nil
+      Process.wait(player_pid) rescue nil
+      clear_command_line
+      true
+    end
+
     def preview
       if @preview_window
         @preview_window.close
@@ -269,6 +281,25 @@ module Rfd
     def kitty?
       return @_kitty if defined?(@_kitty)
       @_kitty = (ENV['TERM'] == 'xterm-kitty') || (ENV['KITTY_WINDOW_ID']) || (ENV['TERM_PROGRAM'] == 'ghostty')
+    end
+
+    def spawn_audio_player(path)
+      if osx?
+        Process.spawn('afplay', path, out: '/dev/null', err: '/dev/null')
+      else
+        # Try mpv, ffplay, or aplay in order
+        %w[mpv ffplay aplay].each do |player|
+          if system("which #{player} > /dev/null 2>&1")
+            args = case player
+                   when 'mpv' then ['--no-video', '--really-quiet', path]
+                   when 'ffplay' then ['-nodisp', '-autoexit', '-loglevel', 'quiet', path]
+                   else [path]
+                   end
+            return Process.spawn(player, *args, out: '/dev/null', err: '/dev/null')
+          end
+        end
+        Process.spawn('cat', '/dev/null')  # Dummy process if no player found
+      end
     end
 
     def sixel?

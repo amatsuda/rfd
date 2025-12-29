@@ -296,6 +296,8 @@ module Rfd
         cd current_item
       elsif current_item.image?
         view_image
+      elsif current_item.audio?
+        play_audio
       elsif current_item.pdf?
         system 'open', current_item.path if osx?
       else

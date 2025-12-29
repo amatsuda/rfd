@@ -35,12 +35,12 @@ module Rfd
     def display_name
       @display_name ||= begin
         n = full_display_name
-        if mb_size(n) <= @window_width - 15
+        if mb_size(n) <= @window_width - 18
           n
         elsif symlink?
-          mb_left n, @window_width - 16
+          mb_left n, @window_width - 19
         else
-          "#{mb_left(basename, @window_width - 16 - extname.size)}…#{extname}"
+          "#{mb_left(basename, @window_width - 19 - extname.size)}…#{extname}"
         end
       end
     end
@@ -210,6 +210,78 @@ module Rfd
       marked? ? '*' : ' '
     end
 
+    # Nerd Font icons (requires Nerd Font installed)
+    ICON_DIRECTORY = "\uf07c"  #
+    ICON_SYMLINK   = "\uf0c1"  #
+    ICON_EXEC      = "\uf013"  #
+    ICON_FILE      = "\uf15b"  #
+    ICON_RUBY      = "\ue791"  #
+    ICON_PYTHON    = "\ue73c"  #
+    ICON_JS        = "\ue74e"  #
+    ICON_TS        = "\ue628"  #
+    ICON_HTML      = "\ue736"  #
+    ICON_CSS       = "\ue749"  #
+    ICON_JSON      = "\ue60b"  #
+    ICON_MARKDOWN  = "\ue73e"  #
+    ICON_SHELL     = "\uf489"  #
+    ICON_C         = "\ue61e"  #
+    ICON_CPP       = "\ue61d"  #
+    ICON_GO        = "\ue626"  #
+    ICON_RUST      = "\ue7a8"  #
+    ICON_JAVA      = "\ue738"  #
+    ICON_PHP       = "\ue73d"  #
+    ICON_SWIFT     = "\ue755"  #
+    ICON_VIM       = "\ue62b"  #
+    ICON_LUA       = "\ue620"  #
+    ICON_SQL       = "\uf1c0"  #
+    ICON_PDF       = "\uf1c1"  #
+    ICON_ARCHIVE   = "\uf1c6"  #
+    ICON_IMAGE     = "\uf1c5"  #
+    ICON_AUDIO     = "\uf1c7"  #
+    ICON_VIDEO     = "\uf1c8"  #
+    ICON_FONT      = "\uf031"  #
+    ICON_LOCK      = "\uf023"  #
+    ICON_CONFIG    = "\ue615"  #
+    ICON_LOG       = "\uf18d"  #
+
+    FILE_ICONS = {
+      '.rb' => ICON_RUBY, '.rake' => ICON_RUBY, '.gemspec' => ICON_RUBY,
+      '.py' => ICON_PYTHON, '.pyc' => ICON_PYTHON,
+      '.js' => ICON_JS, '.mjs' => ICON_JS, '.cjs' => ICON_JS, '.jsx' => ICON_JS,
+      '.ts' => ICON_TS, '.tsx' => ICON_TS,
+      '.html' => ICON_HTML, '.htm' => ICON_HTML,
+      '.css' => ICON_CSS, '.scss' => ICON_CSS, '.sass' => ICON_CSS,
+      '.json' => ICON_JSON, '.yaml' => ICON_CONFIG, '.yml' => ICON_CONFIG,
+      '.md' => ICON_MARKDOWN, '.markdown' => ICON_MARKDOWN,
+      '.sh' => ICON_SHELL, '.bash' => ICON_SHELL, '.zsh' => ICON_SHELL,
+      '.c' => ICON_C, '.h' => ICON_C,
+      '.cpp' => ICON_CPP, '.hpp' => ICON_CPP, '.cc' => ICON_CPP,
+      '.go' => ICON_GO,
+      '.rs' => ICON_RUST,
+      '.java' => ICON_JAVA, '.jar' => ICON_JAVA,
+      '.php' => ICON_PHP,
+      '.swift' => ICON_SWIFT,
+      '.vim' => ICON_VIM,
+      '.lua' => ICON_LUA,
+      '.sql' => ICON_SQL,
+      '.pdf' => ICON_PDF,
+      '.zip' => ICON_ARCHIVE, '.tar' => ICON_ARCHIVE, '.gz' => ICON_ARCHIVE, '.rar' => ICON_ARCHIVE, '.7z' => ICON_ARCHIVE,
+      '.png' => ICON_IMAGE, '.jpg' => ICON_IMAGE, '.jpeg' => ICON_IMAGE, '.gif' => ICON_IMAGE, '.svg' => ICON_IMAGE, '.webp' => ICON_IMAGE, '.ico' => ICON_IMAGE,
+      '.mp3' => ICON_AUDIO, '.wav' => ICON_AUDIO, '.flac' => ICON_AUDIO, '.ogg' => ICON_AUDIO,
+      '.mp4' => ICON_VIDEO, '.avi' => ICON_VIDEO, '.mov' => ICON_VIDEO, '.mkv' => ICON_VIDEO, '.webm' => ICON_VIDEO,
+      '.ttf' => ICON_FONT, '.otf' => ICON_FONT, '.woff' => ICON_FONT,
+      '.lock' => ICON_LOCK,
+      '.env' => ICON_CONFIG,
+      '.log' => ICON_LOG,
+    }.freeze
+
+    def icon
+      return ICON_DIRECTORY if directory?
+      return ICON_SYMLINK if symlink?
+      return ICON_EXEC if executable?
+      FILE_ICONS[extname.downcase] || ICON_FILE
+    end
+
     def mb_left(str, size)
       len = 0
       index = str.each_char.with_index do |c, i|
@@ -232,7 +304,7 @@ module Rfd
     end
 
     def to_s
-      "#{current_mark}#{mb_ljust(display_name, @window_width - 15)}#{size_or_dir.rjust(13)}"
+      "#{current_mark}#{icon} #{mb_ljust(display_name, @window_width - 18)}#{size_or_dir.rjust(13)}"
     end
 
     def to_str

@@ -150,10 +150,23 @@ module Rfd
     def image?
       @image ||= begin
         return false if directory?
+        return true if svg?
         magic = File.binread(realpath, 8).bytes
         (magic[0..3] == [0x89, 0x50, 0x4E, 0x47]) ||  # PNG
           (magic[0..2] == [0xFF, 0xD8, 0xFF]) ||      # JPEG
           (magic[0..2] == [0x47, 0x49, 0x46])         # GIF
+      rescue
+        false
+      end
+    end
+
+    def svg?
+      @svg ||= begin
+        return false if directory?
+        return true if extname.downcase == '.svg'
+        # Check content for <svg tag
+        content = File.binread(realpath, 256)
+        content.include?('<svg')
       rescue
         false
       end

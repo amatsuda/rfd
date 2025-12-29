@@ -95,6 +95,13 @@ module Rfd
       w = @preview_window
       max_width = w.maxx - 2
       w.clear
+
+      # Hide preview for current directory (.)
+      if current_item.name == '.'
+        w.refresh
+        return
+      end
+
       w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
       Rfd::Window.draw_ncursesw_border(w, w.maxy, w.maxx)
       w.setpos(0, 2)

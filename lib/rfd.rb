@@ -929,7 +929,7 @@ module Rfd
 
     def kitty?
       return @_kitty if defined?(@_kitty)
-      @_kitty = (ENV['TERM'] == 'xterm-kitty') || (ENV['KITTY_WINDOW_ID'])
+      @_kitty = (ENV['TERM'] == 'xterm-kitty') || (ENV['KITTY_WINDOW_ID']) || (ENV['TERM_PROGRAM'] == 'ghostty')
     end
 
     def sixel?

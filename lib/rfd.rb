@@ -682,6 +682,7 @@ module Rfd
       command_line.writeln 0, ""
       command_line.clear
       command_line.noutrefresh
+      print "\e[?25l"  # Hide cursor
     end
 
     # Accept user input, and directly execute it as a Ruby method call to the controller.

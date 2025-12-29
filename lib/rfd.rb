@@ -67,7 +67,7 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
       @debug = DebugWindow.new if ENV['DEBUG']
-      @direction, @dir_history, @last_command, @times, @yanked_items = nil, [], nil, nil, nil
+      @direction, @dir_history, @last_command, @times, @yanked_items, @preview_window = nil, [], nil, nil, nil, nil
     end
 
     # The main loop.
@@ -181,6 +181,7 @@ module Rfd
       main.display current_page
 
       header_l.draw_current_file_info item
+      update_preview if @preview_window
       @current_row
     end
 
@@ -768,17 +769,49 @@ module Rfd
       end
     end
 
-    def view_image
-      return view unless current_item.image?
-      execute_external_command(pause: true) do
-        if kitty?
-          system 'kitty', '+kitten', 'icat', current_item.path
-        elsif sixel?
-          system('img2sixel', current_item.path) || system('chafa', '-f', 'sixel', current_item.path)
-        elsif osx?
-          system 'open', current_item.path
+    def preview
+      if @preview_window
+        @preview_window.close
+        @preview_window = nil
+        move_cursor current_row
+      else
+        popup_h = main.maxy
+        popup_w = main.width
+        popup_y = main.begy
+        popup_x = (main.current_index == 0) ? (main.width + 1) : 1
+        @preview_window = Curses::Window.new(popup_h, popup_w, popup_y, popup_x)
+        update_preview
+      end
+    end
+
+    def update_preview
+      return unless @preview_window
+      w = @preview_window
+      max_width = w.maxx - 2
+      w.clear
+      w.bkgdset Curses.color_pair(Curses::COLOR_CYAN)
+      Rfd::Window.draw_ncursesw_border(w, w.maxy, w.maxx)
+      w.setpos(0, 2)
+      w.addstr(" #{current_item.name} "[0, w.maxx - 4])
+
+      w.bkgdset Curses.color_pair(Curses::COLOR_WHITE)
+      unless current_item.directory?
+        lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue []
+        lines.each_with_index do |line, i|
+          w.setpos(i + 1, 1)
+          # Truncate line to fit display width (unicode-aware)
+          display_line = +''
+          display_width = 0
+          line.chomp.each_char do |c|
+            char_width = c.bytesize == 1 ? 1 : 2
+            break if display_width + char_width > max_width
+            display_line << c
+            display_width += char_width
+          end
+          w.addstr(display_line << ' ' * (max_width - display_width))
         end
       end
+      w.refresh
     end
 
     def move_cursor_by_click(y: nil, x: nil)

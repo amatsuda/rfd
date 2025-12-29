@@ -152,11 +152,23 @@ module Rfd
       @image ||= begin
         return false if directory?
         return true if svg?
+        return true if heic?
         magic = File.binread(realpath, 12).bytes
         (magic[0..3] == [0x89, 0x50, 0x4E, 0x47]) ||  # PNG
           (magic[0..2] == [0xFF, 0xD8, 0xFF]) ||      # JPEG
           (magic[0..2] == [0x47, 0x49, 0x46]) ||      # GIF
           (magic[0..3] == [0x52, 0x49, 0x46, 0x46] && magic[8..11] == [0x57, 0x45, 0x42, 0x50])  # WebP (RIFF....WEBP)
+      rescue
+        false
+      end
+    end
+
+    def heic?
+      @heic ||= begin
+        return false if directory?
+        return true if %w[.heic .heif].include?(extname.downcase)
+        magic = File.binread(realpath, 12).bytes
+        magic[4..7] == [0x66, 0x74, 0x79, 0x70]  # "ftyp" at offset 4
       rescue
         false
       end
@@ -275,7 +287,7 @@ module Rfd
       '.sql' => ICON_SQL,
       '.pdf' => ICON_PDF,
       '.zip' => ICON_ARCHIVE, '.tar' => ICON_ARCHIVE, '.gz' => ICON_ARCHIVE, '.rar' => ICON_ARCHIVE, '.7z' => ICON_ARCHIVE,
-      '.png' => ICON_IMAGE, '.jpg' => ICON_IMAGE, '.jpeg' => ICON_IMAGE, '.gif' => ICON_IMAGE, '.svg' => ICON_IMAGE, '.webp' => ICON_IMAGE, '.ico' => ICON_IMAGE,
+      '.png' => ICON_IMAGE, '.jpg' => ICON_IMAGE, '.jpeg' => ICON_IMAGE, '.gif' => ICON_IMAGE, '.svg' => ICON_IMAGE, '.webp' => ICON_IMAGE, '.ico' => ICON_IMAGE, '.heic' => ICON_IMAGE, '.heif' => ICON_IMAGE,
       '.mp3' => ICON_AUDIO, '.wav' => ICON_AUDIO, '.flac' => ICON_AUDIO, '.ogg' => ICON_AUDIO,
       '.mp4' => ICON_VIDEO, '.avi' => ICON_VIDEO, '.mov' => ICON_VIDEO, '.mkv' => ICON_VIDEO, '.webm' => ICON_VIDEO,
       '.ttf' => ICON_FONT, '.otf' => ICON_FONT, '.woff' => ICON_FONT,

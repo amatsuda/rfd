@@ -341,19 +341,36 @@ module Rfd
     # Display an image at the specified position using Kitty or Sixel graphics.
     # Returns true if image was displayed, false if no graphics support.
     def display_image(path, x:, y:, width:, height:)
+      converted = convert_heic_if_needed(path)
+      display_path = converted || path
       if kitty?
         print "\e_Ga=d,d=C\e\\"  # Clear previous image
-        system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{width}x#{height}@#{x}x#{y}", path, out: '/dev/tty', err: '/dev/null'
+        system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{width}x#{height}@#{x}x#{y}", display_path, out: '/dev/tty', err: '/dev/null'
         print "\e[?25l"  # Hide cursor
         true
       elsif sixel?
         print "\e[#{y};#{x}H"
-        system('img2sixel', '-w', (width * 10).to_s, path, out: '/dev/tty', err: '/dev/null') ||
-          system('chafa', '-f', 'sixel', '-s', "#{width}x#{height}", path, out: '/dev/tty', err: '/dev/null')
+        system('img2sixel', '-w', (width * 10).to_s, display_path, out: '/dev/tty', err: '/dev/null') ||
+          system('chafa', '-f', 'sixel', '-s', "#{width}x#{height}", display_path, out: '/dev/tty', err: '/dev/null')
         print "\e[?25l"  # Hide cursor
         true
       else
         false
+      end
+    ensure
+      File.unlink(converted) if converted && File.exist?(converted)
+    end
+
+    def convert_heic_if_needed(path)
+      return nil unless path.to_s.downcase.end_with?('.heic', '.heif')
+      tmpfile = File.join(Dir.tmpdir, "rfd_heic_#{$$}.png")
+      # Try sips (macOS), heif-convert (libheif), or ImageMagick
+      if system('sips', '-s', 'format', 'png', path, '--out', tmpfile, out: '/dev/null', err: '/dev/null') ||
+         system('heif-convert', path, tmpfile, out: '/dev/null', err: '/dev/null') ||
+         system('convert', path, tmpfile, out: '/dev/null', err: '/dev/null')
+        tmpfile
+      else
+        nil
       end
     end
 

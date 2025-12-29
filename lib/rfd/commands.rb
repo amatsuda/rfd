@@ -284,6 +284,8 @@ module Rfd
         v
       elsif current_item.directory? || current_item.zip?
         cd current_item
+      elsif current_item.image?
+        view_image
       else
         v
       end

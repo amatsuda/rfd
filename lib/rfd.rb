@@ -780,6 +780,29 @@ module Rfd
       end
     end
 
+    def view_image
+      return view unless current_item.image?
+      if kitty?
+        # Display image fullscreen using Kitty graphics
+        img_w, img_h = Curses.cols - 2, Curses.lines - 6
+        img_x, img_y = 1, 5
+        system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{img_w}x#{img_h}@#{img_x}x#{img_y}", current_item.path, out: '/dev/tty', err: '/dev/null'
+        Curses.getch
+        print "\e_Ga=d,d=C\e\\"  # Clear Kitty graphics
+        move_cursor current_row
+      elsif sixel?
+        # Display image using sixel at cursor position
+        print "\e[6;1H"  # Move cursor to row 6, col 1
+        # img2sixel with width constraint (pixels = cols * ~10)
+        system('img2sixel', '-w', ((Curses.cols - 2) * 10).to_s, current_item.path, out: '/dev/tty', err: '/dev/null') ||
+          system('chafa', '-f', 'sixel', '-s', "#{Curses.cols - 2}x#{Curses.lines - 6}", current_item.path, out: '/dev/tty', err: '/dev/null')
+        Curses.getch
+        move_cursor current_row
+      elsif osx?
+        system 'open', current_item.path
+      end
+    end
+
     def preview
       if @preview_window
         @preview_window.close

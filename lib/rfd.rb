@@ -376,6 +376,8 @@ module Rfd
         :            Execute rfd command
         q            Quit
         ?            This help
+
+      Environment: RFD_NO_ICONS=1 to disable file icons (icons require Nerd Font)
     HELP
 
     def help

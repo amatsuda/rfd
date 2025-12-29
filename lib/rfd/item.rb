@@ -35,12 +35,13 @@ module Rfd
     def display_name
       @display_name ||= begin
         n = full_display_name
-        if mb_size(n) <= @window_width - 18
+        offset = ENV['RFD_NO_ICONS'] ? 15 : 18
+        if mb_size(n) <= @window_width - offset
           n
         elsif symlink?
-          mb_left n, @window_width - 19
+          mb_left n, @window_width - offset - 1
         else
-          "#{mb_left(basename, @window_width - 19 - extname.size)}…#{extname}"
+          "#{mb_left(basename, @window_width - offset - 1 - extname.size)}…#{extname}"
         end
       end
     end
@@ -276,6 +277,7 @@ module Rfd
     }.freeze
 
     def icon
+      return '' if ENV['RFD_NO_ICONS']
       return ICON_DIRECTORY if directory?
       return ICON_SYMLINK if symlink?
       return ICON_EXEC if executable?
@@ -304,7 +306,11 @@ module Rfd
     end
 
     def to_s
-      "#{current_mark}#{icon} #{mb_ljust(display_name, @window_width - 18)}#{size_or_dir.rjust(13)}"
+      if ENV['RFD_NO_ICONS']
+        "#{current_mark}#{mb_ljust(display_name, @window_width - 15)}#{size_or_dir.rjust(13)}"
+      else
+        "#{current_mark}#{icon} #{mb_ljust(display_name, @window_width - 18)}#{size_or_dir.rjust(13)}"
+      end
     end
 
     def to_str

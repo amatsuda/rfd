@@ -342,7 +342,7 @@ module Rfd
         g/G, Home/End  Go to first/last item
         H/M/L        Go to top/middle/bottom of screen
         f{char}      Find file starting with {char}
-        n            Repeat last find
+        n/N          Repeat last find / in reverse
         Ctrl-n/p     Next/previous page
         Enter        Open directory or view file
         Backspace    Go to parent directory

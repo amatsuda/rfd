@@ -27,7 +27,7 @@ module Rfd
 
     # "f"ind the first file or directory of which name starts with the given String.
     def f
-      c = get_char and (@last_command = -> { find c }).call
+      c = get_char and (@last_command, @last_command_reverse = -> { find c }, -> { find_reverse c }) && @last_command.call
     end
 
     # Move the cursor to the top of the list.
@@ -63,6 +63,11 @@ module Rfd
     # Redo the latest f or F.
     def n
       @last_command.call if @last_command
+    end
+
+    # Redo the latest f or F in reverse direction.
+    def N
+      @last_command_reverse.call if @last_command_reverse
     end
 
     # "o"pen selected files and directories with the OS "open" command.
@@ -145,7 +150,7 @@ module Rfd
 
     # "f"ind the last file or directory of which name starts with the given String.
     def F
-      c = get_char and (@last_command = -> { find_reverse c }).call
+      c = get_char and (@last_command, @last_command_reverse = -> { find_reverse c }, -> { find c }) && @last_command.call
     end
 
     # Move the cursor to the top.

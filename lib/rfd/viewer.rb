@@ -124,6 +124,8 @@ module Rfd
         preview_directory(w, max_width)
       elsif current_item.image?
         preview_image(w, max_width)
+      elsif current_item.video?
+        preview_video(w, max_width)
       elsif current_item.pdf?
         preview_pdf(w, max_width)
       elsif current_item.markdown?
@@ -150,6 +152,35 @@ module Rfd
         w.setpos(w.maxy / 2, 1)
         w.addstr('[Image file]'.center(max_width))
       end
+    end
+
+    def preview_video(w, max_width)
+      # Get video metadata
+      metadata = video_metadata(current_item.path)
+      metadata_lines = metadata ? format_video_metadata(metadata, max_width) : []
+
+      # Reserve space for metadata at bottom
+      image_height = w.maxy - 2 - metadata_lines.size
+      thumbnail = extract_video_thumbnail(current_item.path)
+
+      w.refresh
+      if thumbnail && image_height > 2 && display_image(thumbnail, x: w.begx + 1, y: w.begy + 1, width: max_width, height: image_height)
+        # Image displayed, now show metadata below
+        metadata_lines.each_with_index do |line, i|
+          w.setpos(w.maxy - metadata_lines.size - 1 + i, 1)
+          w.addstr(line[0, max_width].ljust(max_width))
+        end
+      else
+        # No image support, show metadata centered
+        w.setpos(1, 1)
+        w.addstr('[Video file]'.center(max_width))
+        metadata_lines.each_with_index do |line, i|
+          w.setpos(3 + i, 1)
+          w.addstr(line[0, max_width].ljust(max_width))
+        end
+      end
+    ensure
+      File.unlink(thumbnail) if thumbnail && File.exist?(thumbnail)
     end
 
     def preview_pdf(w, max_width)
@@ -354,6 +385,46 @@ module Rfd
       end
     rescue
       nil
+    end
+
+    def extract_video_thumbnail(path)
+      return nil unless kitty? || sixel?
+      tmpfile = File.join(Dir.tmpdir, "rfd_video_thumb_#{$$}.png")
+      if system('ffmpeg', '-y', '-i', path, '-ss', '00:00:01', '-vframes', '1', '-q:v', '2', tmpfile,
+                out: '/dev/null', err: '/dev/null')
+        tmpfile
+      else
+        nil
+      end
+    end
+
+    def video_metadata(path)
+      output = IO.popen(['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', path], err: '/dev/null') { |io| io.read }
+      require 'json'
+      JSON.parse(output)
+    rescue
+      nil
+    end
+
+    def format_video_metadata(metadata, max_width)
+      lines = []
+      if (format = metadata['format'])
+        if (duration = format['duration'])
+          secs = duration.to_f
+          lines << "Duration: #{sprintf('%d:%02d:%02d', secs / 3600, (secs % 3600) / 60, secs % 60)}"
+        end
+        lines << "Size: #{(format['size'].to_i / 1024.0 / 1024).round(1)} MB" if format['size']
+      end
+      if (streams = metadata['streams'])
+        if (video = streams.find { |s| s['codec_type'] == 'video' })
+          lines << "#{video['width']}x#{video['height']} #{video['codec_name']&.upcase}"
+          lines << "#{video['r_frame_rate']&.split('/')&.then { |n, d| (n.to_f / d.to_f).round(1) }} fps" if video['r_frame_rate']
+        end
+        if (audio = streams.find { |s| s['codec_type'] == 'audio' })
+          lines << "Audio: #{audio['codec_name']&.upcase} #{audio['channels']}ch"
+        end
+      end
+      lines
     end
   end
 end

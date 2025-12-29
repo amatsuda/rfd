@@ -192,6 +192,10 @@ module Rfd
       !directory? && %w[.mp3 .wav .flac .ogg .m4a .aac .aiff .wma].include?(extname.downcase)
     end
 
+    def video?
+      !directory? && %w[.mp4 .avi .mov .mkv .webm .flv .wmv .m4v .mpeg .mpg].include?(extname.downcase)
+    end
+
     def target
       File.readlink path if symlink?
     end

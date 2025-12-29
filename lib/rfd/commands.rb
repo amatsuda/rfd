@@ -298,7 +298,7 @@ module Rfd
         view_image
       elsif current_item.audio?
         play_audio
-      elsif current_item.pdf?
+      elsif current_item.video? || current_item.pdf?
         system 'open', current_item.path if osx?
       else
         v

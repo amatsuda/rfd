@@ -305,9 +305,11 @@ module Rfd
 
     # Toggle mark, and move down.
     def space
-      toggle_mark
+      times.times do
+        toggle_mark
+        move_cursor (current_row + 1) % items.size
+      end
       draw_marked_items
-      j
     end
 
     # cd to the upper hierarchy.

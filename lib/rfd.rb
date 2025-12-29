@@ -51,6 +51,7 @@ module Rfd
     Curses.stdscr.noutrefresh
     rfd = Rfd::Controller.new
     rfd.cd dir
+    rfd.preview  # Show preview by default
     Curses.doupdate
     rfd
   end

@@ -782,21 +782,9 @@ module Rfd
 
     def view_image
       return view unless current_item.image?
-      if kitty?
-        # Display image fullscreen using Kitty graphics
-        img_w, img_h = Curses.cols - 2, Curses.lines - 6
-        img_x, img_y = 1, 5
-        system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{img_w}x#{img_h}@#{img_x}x#{img_y}", current_item.path, out: '/dev/tty', err: '/dev/null'
+      if display_image(current_item.path, x: 1, y: 5, width: Curses.cols - 2, height: Curses.lines - 6)
         Curses.getch
-        print "\e_Ga=d,d=C\e\\"  # Clear Kitty graphics
-        move_cursor current_row
-      elsif sixel?
-        # Display image using sixel at cursor position
-        print "\e[6;1H"  # Move cursor to row 6, col 1
-        # img2sixel with width constraint (pixels = cols * ~10)
-        system('img2sixel', '-w', ((Curses.cols - 2) * 10).to_s, current_item.path, out: '/dev/tty', err: '/dev/null') ||
-          system('chafa', '-f', 'sixel', '-s', "#{Curses.cols - 2}x#{Curses.lines - 6}", current_item.path, out: '/dev/tty', err: '/dev/null')
-        Curses.getch
+        print "\e_Ga=d,d=C\e\\" if kitty?  # Clear Kitty graphics
         move_cursor current_row
       elsif osx?
         system 'open', current_item.path
@@ -851,14 +839,7 @@ module Rfd
         end
       elsif current_item.image?
         w.refresh
-        if kitty?
-          # Clear any previous image in this area
-          print "\e_Ga=d,d=C\e\\"
-          # Display image using Kitty graphics protocol with --place
-          img_w, img_h = max_width, w.maxy - 2
-          img_x, img_y = w.begx + 1, w.begy + 1
-          system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{img_w}x#{img_h}@#{img_x}x#{img_y}", current_item.path, out: '/dev/tty', err: '/dev/null'
-        else
+        unless display_image(current_item.path, x: w.begx + 1, y: w.begy + 1, width: max_width, height: w.maxy - 2)
           w.setpos(w.maxy / 2, 1)
           w.addstr('[Image file]'.center(max_width))
         end
@@ -935,6 +916,23 @@ module Rfd
     def sixel?
       return @_sixel if defined?(@_sixel)
       @_sixel = (ENV['TERM_PROGRAM'] == 'iTerm.app') || ENV['TERM']&.include?('mlterm') || (ENV['TERM'] == 'foot')
+    end
+
+    # Display an image at the specified position using Kitty or Sixel graphics.
+    # Returns true if image was displayed, false if no graphics support.
+    def display_image(path, x:, y:, width:, height:)
+      if kitty?
+        print "\e_Ga=d,d=C\e\\"  # Clear previous image
+        system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{width}x#{height}@#{x}x#{y}", path, out: '/dev/tty', err: '/dev/null'
+        true
+      elsif sixel?
+        print "\e[#{y};#{x}H"
+        system('img2sixel', '-w', (width * 10).to_s, path, out: '/dev/tty', err: '/dev/null') ||
+          system('chafa', '-f', 'sixel', '-s', "#{width}x#{height}", path, out: '/dev/tty', err: '/dev/null')
+        true
+      else
+        false
+      end
     end
 
     def in_zip?

@@ -182,7 +182,7 @@ module Rfd
         main.activate_pane row / maxy
         @current_row = row
       else
-        @current_row = 0
+        @current_row = items.size > 2 ? 2 : 0
       end
 
       item = items[current_row]
@@ -257,7 +257,7 @@ module Rfd
       sort_items_according_to_current_direction
       draw_items
       switch_page 0
-      move_cursor 0
+      move_cursor
     end
 
     # Change the file permission of the selected files and directories.
@@ -379,11 +379,11 @@ module Rfd
       sort_items_according_to_current_direction
       draw_items
       draw_total_items
-      move_cursor 0
+      move_cursor
     rescue RegexpError => e
       command_line.show_error "Invalid regex: #{e.message}"
       switch_page 0
-      move_cursor 0
+      move_cursor
     end
 
     # Copy selected files and directories to the destination.

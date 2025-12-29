@@ -168,7 +168,7 @@ module Rfd
 
     def preview_text(w, max_width)
       content = File.read(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace) rescue nil
-      unless content
+      if content.nil? || content.include?("\x00")
         w.setpos(w.maxy / 2, 1)
         w.addstr('[Binary file]'.center(max_width))
         return

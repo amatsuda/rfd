@@ -698,7 +698,7 @@ module Rfd
         clear_command_line
         ret
       end
-    rescue Interrupt
+    rescue Interrupt, Rfd::CommandCancelled
       clear_command_line
     end
 
@@ -709,7 +709,7 @@ module Rfd
       execute_external_command pause: true do
         system cmd
       end
-    rescue Interrupt
+    rescue Interrupt, Rfd::CommandCancelled
     ensure
       command_line.clear
       command_line.noutrefresh

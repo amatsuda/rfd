@@ -82,7 +82,7 @@ module Rfd
             q
           when ' '  # space
             space
-          when 127  # DEL
+          when 127, Curses::KEY_BACKSPACE, Curses::KEY_DC  # DEL, Backspace, Delete
             del
           when Curses::KEY_DOWN
             j

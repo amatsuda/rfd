@@ -843,6 +843,29 @@ module Rfd
           w.setpos(w.maxy / 2, 1)
           w.addstr('[Image file]'.center(max_width))
         end
+      elsif current_item.pdf?
+        w.refresh
+        unless display_pdf(current_item.path, x: w.begx + 1, y: w.begy + 1, width: max_width, height: w.maxy - 2)
+          # Fallback to text extraction
+          lines = pdf_text(current_item.path, max_lines: w.maxy - 2)
+          if lines && lines.any?
+            lines.each_with_index do |line, i|
+              w.setpos(i + 1, 1)
+              display_line = +''
+              display_width = 0
+              line.chomp.each_char do |c|
+                char_width = c.bytesize == 1 ? 1 : 2
+                break if display_width + char_width > max_width
+                display_line << c
+                display_width += char_width
+              end
+              w.addstr(display_line << ' ' * (max_width - display_width))
+            end
+          else
+            w.setpos(w.maxy / 2, 1)
+            w.addstr('[PDF file]'.center(max_width))
+          end
+        end
       else
         lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue nil
         if lines
@@ -935,6 +958,36 @@ module Rfd
       else
         false
       end
+    end
+
+    # Display a PDF at the specified position by converting first page to image.
+    # Returns :image if displayed as image, :text if text extraction worked, false otherwise.
+    def display_pdf(path, x:, y:, width:, height:)
+      return false unless kitty? || sixel?
+      tmpfile = File.join(Dir.tmpdir, "rfd_pdf_preview_#{$$}.png")
+      begin
+        # Try pdftoppm first (from poppler-utils), then convert (ImageMagick)
+        if system('pdftoppm', '-png', '-f', '1', '-l', '1', '-singlefile', '-scale-to', (height * 15).to_s, path, tmpfile.sub(/\.png$/, ''), out: '/dev/null', err: '/dev/null')
+          display_image(tmpfile, x: x, y: y, width: width, height: height)
+          :image
+        elsif system('convert', '-density', '100', "#{path}[0]", '-resize', "#{width * 10}x#{height * 15}", tmpfile, out: '/dev/null', err: '/dev/null')
+          display_image(tmpfile, x: x, y: y, width: width, height: height)
+          :image
+        else
+          false
+        end
+      ensure
+        File.unlink(tmpfile) if File.exist?(tmpfile)
+      end
+    end
+
+    # Extract text from PDF for preview fallback.
+    def pdf_text(path, max_lines:)
+      IO.popen(['pdftotext', '-l', '1', '-layout', path, '-'], err: '/dev/null') do |io|
+        io.read.lines.first(max_lines)
+      end
+    rescue
+      nil
     end
 
     def in_zip?

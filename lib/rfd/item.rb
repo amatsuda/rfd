@@ -173,6 +173,16 @@ module Rfd
       end
     end
 
+    def pdf?
+      @pdf ||= begin
+        return false if directory?
+        magic = File.binread(realpath, 4).bytes
+        magic == [0x25, 0x50, 0x44, 0x46]  # %PDF
+      rescue
+        false
+      end
+    end
+
     def target
       File.readlink path if symlink?
     end

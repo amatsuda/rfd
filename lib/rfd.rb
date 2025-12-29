@@ -379,6 +379,7 @@ module Rfd
       sort_items_according_to_current_direction
       draw_items
       draw_total_items
+      move_cursor 0
     rescue RegexpError => e
       command_line.show_error "Invalid regex: #{e.message}"
       switch_page 0

@@ -788,7 +788,7 @@ module Rfd
         popup_h = main.maxy
         popup_w = main.width
         popup_y = main.begy
-        popup_x = (main.current_index == 0) ? (main.width + 1) : 1
+        popup_x = (main.current_index % 2 == 0) ? (main.width + 1) : 1
         @preview_window = Curses::Window.new(popup_h, popup_w, popup_y, popup_x)
         update_preview
       end
@@ -796,11 +796,12 @@ module Rfd
 
     def update_preview
       return unless @preview_window
-      # Reposition preview window if cursor pane changed
-      expected_x = (main.current_index == 0) ? (main.width + 1) : 1
+      # Reposition preview window if cursor pane changed (even index = left pane, odd = right)
+      expected_x = (main.current_index % 2 == 0) ? (main.width + 1) : 1
       if @preview_window.begx != expected_x
         @preview_window.close
         @preview_window = Curses::Window.new(main.maxy, main.width, main.begy, expected_x)
+        main.display current_page  # Redraw main window where old preview was
       end
       w = @preview_window
       max_width = w.maxx - 2

@@ -190,6 +190,11 @@ module Rfd
       process_command_line preset_command: 'touch_t', default_argument: current_item.mtime.tr(': -', '')
     end
 
+    # "P"review the current file in a floating window.
+    def P
+      preview
+    end
+
     # Mark or unmark "a"ll files and directories.
     def ctrl_a
       mark = marked_items.size != (items.size - 2)  # exclude . and ..

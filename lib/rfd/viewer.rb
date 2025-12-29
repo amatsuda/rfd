@@ -114,6 +114,8 @@ module Rfd
         preview_image(w, max_width)
       elsif current_item.pdf?
         preview_pdf(w, max_width)
+      elsif current_item.markdown?
+        preview_markdown(w, max_width)
       else
         preview_text(w, max_width)
       end
@@ -159,6 +161,35 @@ module Rfd
       else
         w.setpos(w.maxy / 2, 1)
         w.addstr('[Binary file]'.center(max_width))
+      end
+    end
+
+    def preview_markdown(w, max_width)
+      lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue []
+      lines.each_with_index do |line, i|
+        w.setpos(i + 1, 1)
+        text = line.chomp
+        # Determine style based on markdown syntax
+        attr = if text.start_with?('#')
+          Curses::A_BOLD
+        elsif text =~ /^```/ || text.start_with?('    ')
+          Curses.color_pair(Curses::COLOR_GREEN)
+        elsif text =~ /^[-*+] /
+          Curses.color_pair(Curses::COLOR_CYAN)
+        else
+          Curses::A_NORMAL
+        end
+        w.attron(attr) do
+          display_line = +''
+          display_width = 0
+          text.each_char do |c|
+            char_width = c.bytesize == 1 ? 1 : 2
+            break if display_width + char_width > max_width
+            display_line << c
+            display_width += char_width
+          end
+          w.addstr(display_line << ' ' * (max_width - display_width))
+        end
       end
     end
 

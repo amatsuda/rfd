@@ -183,6 +183,10 @@ module Rfd
       end
     end
 
+    def markdown?
+      !directory? && %w[.md .markdown].include?(extname.downcase)
+    end
+
     def target
       File.readlink path if symlink?
     end

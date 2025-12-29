@@ -924,11 +924,13 @@ module Rfd
       if kitty?
         print "\e_Ga=d,d=C\e\\"  # Clear previous image
         system 'kitty', '+kitten', 'icat', '--clear', '--place', "#{width}x#{height}@#{x}x#{y}", path, out: '/dev/tty', err: '/dev/null'
+        print "\e[?25l"  # Hide cursor
         true
       elsif sixel?
         print "\e[#{y};#{x}H"
         system('img2sixel', '-w', (width * 10).to_s, path, out: '/dev/tty', err: '/dev/null') ||
           system('chafa', '-f', 'sixel', '-s', "#{width}x#{height}", path, out: '/dev/tty', err: '/dev/null')
+        print "\e[?25l"  # Hide cursor
         true
       else
         false

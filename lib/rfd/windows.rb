@@ -109,7 +109,7 @@ module Rfd
   end
 
   class MainWindow < Window
-    attr_reader :current_index, :begy
+    attr_reader :current_index, :begy, :number_of_panes
     attr_writer :number_of_panes
 
     def initialize

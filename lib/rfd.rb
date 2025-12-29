@@ -805,7 +805,11 @@ module Rfd
 
       w.bkgdset Curses.color_pair(Curses::COLOR_WHITE)
       if current_item.directory?
-        # Show nothing for directories
+        entries = Dir.children(current_item.path).sort.first(w.maxy - 2) rescue []
+        entries.each_with_index do |name, i|
+          w.setpos(i + 1, 1)
+          w.addstr(name[0, max_width].ljust(max_width))
+        end
       elsif current_item.image?
         w.setpos(w.maxy / 2, 1)
         w.addstr('[Image file]'.center(max_width))

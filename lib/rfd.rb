@@ -795,20 +795,29 @@ module Rfd
       w.addstr(" #{current_item.name} "[0, w.maxx - 4])
 
       w.bkgdset Curses.color_pair(Curses::COLOR_WHITE)
-      unless current_item.directory?
-        lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue []
-        lines.each_with_index do |line, i|
-          w.setpos(i + 1, 1)
-          # Truncate line to fit display width (unicode-aware)
-          display_line = +''
-          display_width = 0
-          line.chomp.each_char do |c|
-            char_width = c.bytesize == 1 ? 1 : 2
-            break if display_width + char_width > max_width
-            display_line << c
-            display_width += char_width
+      if current_item.directory?
+        # Show nothing for directories
+      elsif current_item.image?
+        w.setpos(w.maxy / 2, 1)
+        w.addstr('[Image file]'.center(max_width))
+      else
+        lines = File.readlines(current_item.path, encoding: 'UTF-8', invalid: :replace, undef: :replace).first(w.maxy - 2) rescue nil
+        if lines
+          lines.each_with_index do |line, i|
+            w.setpos(i + 1, 1)
+            display_line = +''
+            display_width = 0
+            line.chomp.each_char do |c|
+              char_width = c.bytesize == 1 ? 1 : 2
+              break if display_width + char_width > max_width
+              display_line << c
+              display_width += char_width
+            end
+            w.addstr(display_line << ' ' * (max_width - display_width))
           end
-          w.addstr(display_line << ' ' * (max_width - display_width))
+        else
+          w.setpos(w.maxy / 2, 1)
+          w.addstr('[Binary file]'.center(max_width))
         end
       end
       w.refresh

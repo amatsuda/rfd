@@ -29,13 +29,13 @@ module Rfd
       @nodes << TreeNode.new(path: root, name: '.', depth: 0, expanded: false, children: nil, parent: nil)
       @nodes << TreeNode.new(path: File.dirname(root), name: '..', depth: 0, expanded: false, children: nil, parent: nil)
 
-      # Add first-level directories
-      add_children_for(root, 0, nil)
+      # Add first-level directories (expanded by default)
+      add_children_for(root, 0, nil, expanded: true)
 
       @cursor = 2 if @nodes.size > 2  # Start on first real directory
     end
 
-    def add_children_for(dir_path, depth, parent_node)
+    def add_children_for(dir_path, depth, parent_node, expanded: false)
       entries = Dir.children(dir_path)
         .select { |name| File.directory?(File.join(dir_path, name)) }
         .reject { |name| name.start_with?('.') }
@@ -47,11 +47,16 @@ module Rfd
           path: path,
           name: name,
           depth: depth + 1,
-          expanded: false,
+          expanded: expanded,
           children: nil,
           parent: parent_node
         )
         @nodes << node
+
+        # Recursively add children if expanded
+        if expanded && node.has_subdirs?
+          add_children_for(path, depth + 1, node, expanded: false)
+        end
       end
     rescue Errno::EACCES, Errno::ENOENT
       # Permission denied or not found, skip

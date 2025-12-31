@@ -10,3 +10,9 @@ require 'rfd'
 Dir[File.join __dir__, 'support/**/*.rb'].each {|f| require f}
 
 require 'rspec/its'
+
+RSpec.configure do |config|
+  config.after(:suite) do
+    Curses.close_screen rescue nil
+  end
+end

@@ -78,16 +78,16 @@ module Rfd
     end
 
     def preview
-      if @preview_window
-        @preview_window.close
-        @preview_window = nil
+      if @sub_window
+        @sub_window.close
+        @sub_window = nil
         move_cursor current_row
       else
         popup_h = main.maxy
         popup_w = main.width
         popup_y = main.begy
         popup_x = preview_pane_x
-        @preview_window = Curses::Window.new(popup_h, popup_w, popup_y, popup_x)
+        @sub_window = Curses::Window.new(popup_h, popup_w, popup_y, popup_x)
         update_preview
       end
     end
@@ -100,19 +100,19 @@ module Rfd
     end
 
     def update_preview
-      return unless @preview_window
+      return unless @sub_window
 
       # Cancel any pending async preview request
       @pending_preview_item = nil
 
       # Reposition preview window if cursor pane changed
       expected_x = preview_pane_x
-      if @preview_window.begx != expected_x
-        @preview_window.close
-        @preview_window = Curses::Window.new(main.maxy, main.width, main.begy, expected_x)
+      if @sub_window.begx != expected_x
+        @sub_window.close
+        @sub_window = Curses::Window.new(main.maxy, main.width, main.begy, expected_x)
         main.display current_page  # Redraw main window where old preview was
       end
-      w = @preview_window
+      w = @sub_window
       max_width = w.maxx - 2
       w.clear
 
@@ -132,7 +132,7 @@ module Rfd
       if current_item.video?
         if preview_client&.connected?
           @pending_preview_item = current_item
-          @pending_preview_window = w
+          @pending_sub_window = w
           w.setpos(w.maxy / 2, 1)
           w.addstr('[Loading...]'.center(max_width))
           w.refresh
@@ -152,7 +152,7 @@ module Rfd
       if current_item.heic?
         if preview_client&.connected?
           @pending_preview_item = current_item
-          @pending_preview_window = w
+          @pending_sub_window = w
           w.setpos(w.maxy / 2, 1)
           w.addstr('[Loading...]'.center(max_width))
           w.refresh
@@ -185,8 +185,8 @@ module Rfd
 
     # Render result from async preview server
     def render_preview_result(result)
-      return unless @preview_window && @pending_preview_window
-      w = @pending_preview_window
+      return unless @sub_window && @pending_sub_window
+      w = @pending_sub_window
       max_width = w.maxx - 2
 
       # Don't render if we've moved to a different file

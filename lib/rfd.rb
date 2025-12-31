@@ -75,7 +75,7 @@ module Rfd
       @header_r = HeaderRightWindow.new
       @command_line = CommandLineWindow.new
       @debug = DebugWindow.new if ENV['DEBUG']
-      @direction, @dir_history, @last_command, @times, @yanked_items, @preview_window = nil, [], nil, nil, nil, nil
+      @direction, @dir_history, @last_command, @times, @yanked_items, @sub_window = nil, [], nil, nil, nil, nil
 
       # Start preview server for async video preview
       start_preview_server
@@ -260,7 +260,7 @@ module Rfd
       main.display current_page
 
       header_l.draw_current_file_info item
-      update_preview if @preview_window
+      update_preview if @sub_window
       @current_row
     end
 

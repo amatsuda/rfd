@@ -79,8 +79,10 @@ module Rfd
 
     def preview
       if @sub_window.is_a?(PreviewWindow)
+        @preview_enabled = false
         close_sub_window
       else
+        @preview_enabled = true
         close_sub_window if @sub_window
         @sub_window = PreviewWindow.new(self)
         @sub_window.render

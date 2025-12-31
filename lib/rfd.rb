@@ -79,6 +79,7 @@ module Rfd
       @command_line = CommandLineWindow.new
       @debug = DebugWindow.new if ENV['DEBUG']
       @direction, @dir_history, @last_command, @times, @yanked_items, @sub_window = nil, [], nil, nil, nil, nil
+      @preview_enabled = true  # Preview is shown by default
 
       # Start preview server for async video preview
       start_preview_server
@@ -347,8 +348,14 @@ module Rfd
     # Close the sub window if open
     def close_sub_window
       if @sub_window
+        was_preview = @sub_window.is_a?(PreviewWindow)
         @sub_window.close
         @sub_window = nil
+        # Restore preview if it was enabled and we closed a non-preview window
+        if @preview_enabled && !was_preview
+          @sub_window = PreviewWindow.new(self)
+          @sub_window.render
+        end
         move_cursor current_row
       end
     end

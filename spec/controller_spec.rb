@@ -346,8 +346,8 @@ describe Rfd::Controller do
         controller.paste
       end
       subject { File }
-      it { should be_exist File.join(tmpdir, '.file1_2') }
-      it { should be_exist File.join(tmpdir, 'dir3_2') }
+      it { should be_exist File.join(tmpdir, '.file1_1') }
+      it { should be_exist File.join(tmpdir, 'dir3_1') }
     end
   end
 

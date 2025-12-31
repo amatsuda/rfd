@@ -54,6 +54,9 @@ describe Rfd::Controller do
   describe '#selected_items' do
     context 'When no items were marked' do
       context 'When the cursor is on . or ..' do
+        before do
+          controller.instance_variable_set :@current_row, 0
+        end
         its(:selected_items) { should be_empty }
       end
 
@@ -78,7 +81,8 @@ describe Rfd::Controller do
       before do
         controller.move_cursor nil
       end
-      its(:current_row) { should == 0 }
+      # Default position is now 2 (first file after . and ..)
+      its(:current_row) { should == 2 }
     end
     context 'When moving to a certain row' do
       before do

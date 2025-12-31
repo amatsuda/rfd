@@ -404,9 +404,9 @@ describe Rfd::Controller do
       it { should be_first_page }
       it { should_not be_last_page }
     end
-    context 'When on the first page' do
+    context 'When on the last page' do
       before do
-        controller.k
+        controller.ctrl_p  # Navigate to previous (last) page from first page
       end
       it { should_not be_first_page }
       it { should be_last_page }

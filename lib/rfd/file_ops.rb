@@ -346,7 +346,7 @@ module Rfd
       return unless zipfile_name
       zipfile_name += '.zip' unless zipfile_name.end_with? '.zip'
 
-      Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+      zip_file_open_for_create(zipfile_name) do |zipfile|
         selected_items.each do |item|
           next if item.symlink?
           if item.directory?
@@ -370,9 +370,9 @@ module Rfd
           FileUtils.mkdir_p dest_dir
           Zip::File.open(item) do |zip|
             zip.each do |entry|
-              dest_path = safe_extract_path(dest_dir, entry.to_s)
+              dest_path = File.join(dest_dir.to_s, entry.name)
               FileUtils.mkdir_p File.dirname(dest_path)
-              zip.extract(entry, dest_path) { true }
+              zip_extract(zip, entry, dest_dir.to_s, dest_path)
             end
           end
         end
@@ -406,11 +406,12 @@ module Rfd
         end
       else
         dest_dir = File.join(current_zip.dir, current_zip.basename)
+        FileUtils.mkdir_p dest_dir
         Zip::File.open(current_zip) do |zip|
           zip.select {|e| selected_items.map(&:name).include? e.to_s}.each do |entry|
-            dest_path = safe_extract_path(dest_dir, entry.to_s)
+            dest_path = File.join(dest_dir, entry.name)
             FileUtils.mkdir_p File.dirname(dest_path)
-            zip.extract(entry, dest_path) { true }
+            zip_extract(zip, entry, dest_dir, dest_path)
           end
         end
       end
@@ -418,6 +419,28 @@ module Rfd
     end
 
     private
+
+    # RubyZip 2/3 compatibility: open zip file for creation
+    def zip_file_open_for_create(filename, &block)
+      if Zip::File.method(:open).parameters.any? { |type, name| name == :create }
+        # RubyZip 3.x uses keyword argument
+        Zip::File.open(filename, create: true, &block)
+      else
+        # RubyZip 2.x uses constant
+        Zip::File.open(filename, Zip::File::CREATE, &block)
+      end
+    end
+
+    # RubyZip 2/3 compatibility: extract entry from zip
+    def zip_extract(zip, entry, dest_dir, dest_path)
+      if zip.method(:extract).parameters.any? { |type, name| name == :destination_directory }
+        # RubyZip 3.x uses keyword argument
+        zip.extract(entry, destination_directory: dest_dir) { true }
+      else
+        # RubyZip 2.x uses positional argument
+        zip.extract(entry, dest_path) { true }
+      end
+    end
 
     def expand_path(path)
       File.expand_path path.start_with?('/', '~') ? path : current_dir ? current_dir.join(path) : path

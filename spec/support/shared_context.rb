@@ -3,7 +3,7 @@
 RSpec.shared_context 'rfd setup' do
   include CaptureHelper
 
-  SPEC_DIR = File.expand_path('..', __dir__)
+  SPEC_DIR = File.expand_path('..', __dir__) unless defined?(SPEC_DIR)
 
   let(:spec_dir) { SPEC_DIR }
   let(:tmpdir) { File.join SPEC_DIR, 'tmpdir' }

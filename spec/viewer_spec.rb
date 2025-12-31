@@ -289,40 +289,47 @@ describe Rfd::Viewer do
     end
   end
 
-  describe 'ROUGE_COLORS constant' do
+  describe 'PreviewWindow::RougeSupport::ROUGE_COLORS constant' do
     it 'maps Comment to green' do
-      expect(Rfd::Viewer::ROUGE_COLORS['Comment']).to eq(Curses::COLOR_GREEN)
+      expect(Rfd::PreviewWindow::RougeSupport::ROUGE_COLORS['Comment']).to eq(Curses::COLOR_GREEN)
     end
 
     it 'maps Keyword to cyan' do
-      expect(Rfd::Viewer::ROUGE_COLORS['Keyword']).to eq(Curses::COLOR_CYAN)
+      expect(Rfd::PreviewWindow::RougeSupport::ROUGE_COLORS['Keyword']).to eq(Curses::COLOR_CYAN)
     end
 
     it 'maps Name.Function to magenta' do
-      expect(Rfd::Viewer::ROUGE_COLORS['Name.Function']).to eq(Curses::COLOR_MAGENTA)
+      expect(Rfd::PreviewWindow::RougeSupport::ROUGE_COLORS['Name.Function']).to eq(Curses::COLOR_MAGENTA)
     end
 
     it 'maps Literal.String to red' do
-      expect(Rfd::Viewer::ROUGE_COLORS['Literal.String']).to eq(Curses::COLOR_RED)
+      expect(Rfd::PreviewWindow::RougeSupport::ROUGE_COLORS['Literal.String']).to eq(Curses::COLOR_RED)
     end
   end
 
-  describe '#rouge_token_color' do
+  describe 'PreviewWindow#rouge_token_color' do
+    # Create a minimal test instance that doesn't require full controller
+    let(:test_instance) do
+      Class.new do
+        include Rfd::PreviewWindow::RougeSupport
+      end.new
+    end
+
     it 'returns green color pair for comments' do
       token = Rouge::Token::Tokens::Comment
-      result = viewer.send(:rouge_token_color, token)
+      result = test_instance.rouge_token_color(token)
       expect(result).to eq(Curses.color_pair(Curses::COLOR_GREEN))
     end
 
     it 'returns cyan color pair for keywords' do
       token = Rouge::Token::Tokens::Keyword
-      result = viewer.send(:rouge_token_color, token)
+      result = test_instance.rouge_token_color(token)
       expect(result).to eq(Curses.color_pair(Curses::COLOR_CYAN))
     end
 
     it 'returns A_NORMAL for unknown tokens' do
       token = Rouge::Token::Tokens::Text
-      result = viewer.send(:rouge_token_color, token)
+      result = test_instance.rouge_token_color(token)
       expect(result).to eq(Curses::A_NORMAL)
     end
   end

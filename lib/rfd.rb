@@ -15,6 +15,8 @@ require_relative 'rfd/logging'
 require_relative 'rfd/reline_ext'
 require_relative 'rfd/file_ops'
 require_relative 'rfd/viewer'
+require_relative 'rfd/sub_window'
+require_relative 'rfd/preview_window'
 require_relative 'rfd/preview/server'
 require_relative 'rfd/preview/client'
 
@@ -260,7 +262,7 @@ module Rfd
       main.display current_page
 
       header_l.draw_current_file_info item
-      update_preview if @sub_window
+      @sub_window.render if @sub_window
       @current_row
     end
 
@@ -333,6 +335,15 @@ module Rfd
     # Swktch on / off marking on the current file or directory.
     def toggle_mark
       main.toggle_mark current_item
+    end
+
+    # Close the sub window if open
+    def close_sub_window
+      if @sub_window
+        @sub_window.close
+        @sub_window = nil
+        move_cursor current_row
+      end
     end
 
     # Get a char as a String from user input.

@@ -17,6 +17,7 @@ require_relative 'rfd/file_ops'
 require_relative 'rfd/viewer'
 require_relative 'rfd/sub_window'
 require_relative 'rfd/preview_window'
+require_relative 'rfd/navigation_window'
 require_relative 'rfd/preview/server'
 require_relative 'rfd/preview/client'
 

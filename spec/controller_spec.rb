@@ -264,6 +264,15 @@ describe Rfd::Controller do
     before do
       controller.find 'file3'
       controller.toggle_mark
+      # Stub the trash command to simulate successful trashing
+      allow(controller).to receive(:system).with('trash', anything).and_return(true)
+      allow(FileUtils).to receive(:rm_rf).and_call_original
+      expect(FileUtils).to receive(:rm_rf).with([File.join(tmpdir, 'file3')]).once
+      # Re-stub system to actually delete the file for test verification
+      allow(controller).to receive(:system).with('trash', anything) do |cmd, *paths|
+        FileUtils.rm_rf(paths)
+        true
+      end
       controller.trash
     end
     it 'should be properly deleted from the current directory' do

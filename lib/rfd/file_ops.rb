@@ -224,10 +224,16 @@ module Rfd
     # Soft delete selected files and directories.
     #
     # If the OS is not OSX, performs the same as `delete` command.
+    # On macOS, tries the `trash` command first, then falls back to manual mv to ~/.Trash/.
     def trash
       unless in_zip?
         if osx?
-          FileUtils.mv selected_items.map(&:path), File.expand_path('~/.Trash/')
+          paths = selected_items.map(&:path)
+          # Try the trash command first (available via Homebrew or other package managers)
+          unless system('trash', *paths)
+            # Fall back to manual mv to ~/.Trash/
+            FileUtils.mv paths, File.expand_path('~/.Trash/')
+          end
         else
           #TODO support other OS
           FileUtils.rm_rf selected_items.map(&:path)

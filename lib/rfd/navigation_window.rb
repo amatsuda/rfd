@@ -18,6 +18,9 @@ module Rfd
       @nodes = []
       @cursor = 0
       @scroll = 0
+      @filter_mode = false
+      @filter_text = ''
+      @filtered_nodes = nil
       build_tree
     end
 
@@ -62,22 +65,44 @@ module Rfd
       # Permission denied or not found, skip
     end
 
+    def display_nodes
+      @filtered_nodes || @nodes
+    end
+
     def visible_nodes
-      @nodes[@scroll, max_height] || []
+      # Reserve one line for filter input
+      display_nodes[@scroll, max_height - 1] || []
     end
 
     def current_node
-      @nodes[@cursor]
+      display_nodes[@cursor]
     end
 
     def render
       reposition_if_needed
       @window.clear
-      draw_border('Tree (j/k:move l:expand h:collapse Enter:cd q:close)')
 
+      if @filter_mode
+        draw_border('Filter (ESC:cancel)')
+      else
+        draw_border('Tree (i:filter j/k:move l/h:expand/collapse Enter:cd q:close)')
+      end
+
+      # Filter input line (row 1) - always reserved
+      @window.setpos(1, 1)
+      if @filter_mode
+        @window.attron(Curses::A_BOLD) do
+          prompt = "> #{@filter_text}_"
+          @window.addstr(prompt[0, max_width].ljust(max_width))
+        end
+      else
+        @window.addstr(' ' * max_width)
+      end
+
+      # Tree starts at row 2
       visible_nodes.each_with_index do |node, i|
         actual_index = @scroll + i
-        @window.setpos(i + 1, 1)
+        @window.setpos(2 + i, 1)
 
         # Build display line
         indent = '  ' * node.depth
@@ -104,7 +129,18 @@ module Rfd
     end
 
     def handle_input(c)
+      if @filter_mode
+        handle_filter_input(c)
+      else
+        handle_normal_input(c)
+      end
+    end
+
+    def handle_normal_input(c)
       case c
+      when 'i'
+        enter_filter_mode
+        true
       when 'j', Curses::KEY_DOWN
         move_cursor_down
         true
@@ -123,7 +159,7 @@ module Rfd
         render
         true
       when 'G', Curses::KEY_END
-        @cursor = @nodes.size - 1
+        @cursor = display_nodes.size - 1
         adjust_scroll
         render
         true
@@ -138,10 +174,94 @@ module Rfd
       end
     end
 
+    def handle_filter_input(c)
+      case c
+      when 27  # ESC - exit filter mode
+        exit_filter_mode
+        true
+      when 10, 13  # Enter - select current node
+        select_node
+        true
+      when 127, Curses::KEY_BACKSPACE, Curses::KEY_DC  # Backspace/Delete
+        if @filter_text.length > 0
+          @filter_text = @filter_text[0..-2]
+          apply_filter
+          render
+        end
+        true
+      when Curses::KEY_DOWN, 14  # Down or Ctrl-N
+        move_cursor_down
+        true
+      when Curses::KEY_UP, 16  # Up or Ctrl-P
+        move_cursor_up
+        true
+      when String
+        # Printable character
+        @filter_text += c
+        apply_filter
+        render
+        true
+      when Integer
+        if c >= 32 && c <= 126  # Printable ASCII
+          @filter_text += c.chr
+          apply_filter
+          render
+          true
+        else
+          false
+        end
+      else
+        false
+      end
+    end
+
     private
 
+    def enter_filter_mode
+      @filter_mode = true
+      @filter_text = ''
+      @filtered_nodes = nil
+      @cursor = 0
+      @scroll = 0
+      render
+    end
+
+    def exit_filter_mode
+      @filter_mode = false
+      @filter_text = ''
+      @filtered_nodes = nil
+      @cursor = 0
+      @scroll = 0
+      render
+    end
+
+    def apply_filter
+      if @filter_text.empty?
+        @filtered_nodes = nil
+      else
+        @filtered_nodes = @nodes.select { |node| fuzzy_match?(node.name, @filter_text) }
+      end
+      @cursor = 0
+      @scroll = 0
+    end
+
+    def fuzzy_match?(text, pattern)
+      return true if pattern.empty?
+      pattern_chars = pattern.downcase.chars
+      text_lower = text.downcase
+      pattern_index = 0
+
+      text_lower.each_char do |char|
+        if char == pattern_chars[pattern_index]
+          pattern_index += 1
+          return true if pattern_index >= pattern_chars.length
+        end
+      end
+      false
+    end
+
     def move_cursor_down
-      return if @cursor >= @nodes.size - 1
+      return if @cursor >= display_nodes.size - 1
       @cursor += 1
       adjust_scroll
       render
@@ -155,10 +275,11 @@ module Rfd
     end
 
     def adjust_scroll
+      available_height = @filter_mode ? max_height - 1 : max_height
       if @cursor < @scroll
         @scroll = @cursor
-      elsif @cursor >= @scroll + max_height
-        @scroll = @cursor - max_height + 1
+      elsif @cursor >= @scroll + available_height
+        @scroll = @cursor - available_height + 1
       end
     end
 

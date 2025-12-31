@@ -2,7 +2,7 @@
 
 module Rfd
   # Tree node for directory tree browser
-  TreeNode = Struct.new(:path, :name, :depth, :expanded, :children, :parent, keyword_init: true) do
+  TreeNode = Struct.new(:path, :name, :relative_path, :depth, :expanded, :children, :parent, keyword_init: true) do
     def has_subdirs?
       return false unless File.directory?(path)
       @has_subdirs = Dir.children(path).any? { |c| File.directory?(File.join(path, c)) } if @has_subdirs.nil?
@@ -25,16 +25,15 @@ module Rfd
 
     def build_tree
       @nodes = []
-      root = controller.current_dir.path
+      @root = controller.current_dir.path
 
-      # Add . and ..
-      @nodes << TreeNode.new(path: root, name: '.', depth: 0, expanded: false, children: nil, parent: nil)
-      @nodes << TreeNode.new(path: File.dirname(root), name: '..', depth: 0, expanded: false, children: nil, parent: nil)
+      # Add ..
+      @nodes << TreeNode.new(path: File.dirname(@root), name: '..', relative_path: '..', depth: 0, expanded: false, children: nil, parent: nil)
 
       # Add first-level directories (expanded by default)
-      add_children_for(root, 0, nil, expanded: true)
+      add_children_for(@root, 0, nil, expanded: true)
 
-      @cursor = 2 if @nodes.size > 2  # Start on first real directory
+      @cursor = 1 if @nodes.size > 1  # Start on first real directory
     end
 
     def add_children_for(dir_path, depth, parent_node, expanded: false)
@@ -46,9 +45,11 @@ module Rfd
       children = []
       entries.each do |name|
         path = File.join(dir_path, name)
+        relative_path = path.delete_prefix(@root).delete_prefix('/')
         node = TreeNode.new(
           path: path,
           name: name,
+          relative_path: relative_path,
           depth: depth + 1,
           expanded: expanded,
           children: nil,
@@ -102,7 +103,7 @@ module Rfd
 
         # Build display line
         indent = '  ' * node.depth
-        icon = if node.name == '.' || node.name == '..'
+        icon = if node.name == '..'
                  ''
                elsif node.has_subdirs?
                  node.expanded ? '▾ ' : '▸ '
@@ -132,7 +133,7 @@ module Rfd
       when 10, 13  # Enter - select current node
         select_node
         true
-      when 127, Curses::KEY_BACKSPACE, Curses::KEY_DC  # Backspace/Delete
+      when 8, 127, Curses::KEY_BACKSPACE, Curses::KEY_DC  # Ctrl-H/Backspace/Delete
         if @filter_text.length > 0
           @filter_text = @filter_text[0..-2]
           apply_filter
@@ -173,11 +174,71 @@ module Rfd
     def apply_filter
       if @filter_text.empty?
         @filtered_nodes = nil
+        @cursor = 0
       else
-        @filtered_nodes = @nodes.select { |node| fuzzy_match?(node.name, @filter_text) }
+        @filtered_nodes = []
+        @filtered_paths = {}  # Track added paths to avoid duplicates
+        @first_match_index = nil
+        scan_directories_for_filter(@root, '', nil, 0)
+        @cursor = @first_match_index || 0
+        @filtered_paths = nil
+        @first_match_index = nil
       end
-      @cursor = 0
       @scroll = 0
+      adjust_scroll
+    end
+
+    def scan_directories_for_filter(dir_path, relative_prefix, parent_node, depth)
+      entries = Dir.children(dir_path)
+        .select { |name| File.directory?(File.join(dir_path, name)) }
+        .reject { |name| name.start_with?('.') }
+        .sort
+
+      entries.each do |name|
+        path = File.join(dir_path, name)
+        relative_path = relative_prefix.empty? ? name : "#{relative_prefix}/#{name}"
+
+        # Create node (may be added if this or descendant matches)
+        node = TreeNode.new(
+          path: path,
+          name: name,
+          relative_path: relative_path,
+          depth: depth,
+          expanded: true,
+          children: nil,
+          parent: parent_node
+        )
+
+        if fuzzy_match?(relative_path, @filter_text)
+          # Add all ancestors first
+          add_ancestors_to_filter(node)
+          # Add this node if not already added
+          unless @filtered_paths[path]
+            @filtered_paths[path] = true
+            @first_match_index ||= @filtered_nodes.size  # First actual match
+            @filtered_nodes << node
+          end
+        end
+
+        # Recursively scan subdirectories
+        scan_directories_for_filter(path, relative_path, node, depth + 1)
+      end
+    rescue Errno::EACCES, Errno::ENOENT
+      # Permission denied or not found, skip
+    end
+
+    def add_ancestors_to_filter(node)
+      ancestors = []
+      current = node.parent
+      while current
+        break if @filtered_paths[current.path]
+        ancestors.unshift(current)
+        current = current.parent
+      end
+      ancestors.each do |ancestor|
+        @filtered_paths[ancestor.path] = true
+        @filtered_nodes << ancestor
+      end
     end
 
     def fuzzy_match?(text, pattern)
@@ -221,7 +282,7 @@ module Rfd
     def toggle_node
       node = current_node
       return unless node
-      return if node.name == '.' || node.name == '..'
+      return if node.name == '..'
       return unless node.has_subdirs?
 
       if node.expanded
@@ -234,7 +295,7 @@ module Rfd
     def expand_node
       node = current_node
       return unless node
-      return if node.name == '.' || node.name == '..'
+      return if node.name == '..'
       return unless node.has_subdirs?
       return if node.expanded
 
@@ -254,9 +315,11 @@ module Rfd
 
           entries.each do |name|
             path = File.join(node.path, name)
+            relative_path = path.delete_prefix(@root).delete_prefix('/')
             child = TreeNode.new(
               path: path,
               name: name,
+              relative_path: relative_path,
               depth: node.depth + 1,
               expanded: false,
               children: nil,

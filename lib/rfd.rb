@@ -86,6 +86,8 @@ module Rfd
     end
 
     def start_preview_server
+      return if ENV['RFD_SKIP_PREVIEW_SERVER']
+
       @preview_socket_path = "/tmp/rfd_preview_#{Process.pid}.sock"
       File.unlink(@preview_socket_path) rescue nil
 

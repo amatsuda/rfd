@@ -43,6 +43,7 @@ module Rfd
         .reject { |name| name.start_with?('.') }
         .sort
 
+      children = []
       entries.each do |name|
         path = File.join(dir_path, name)
         node = TreeNode.new(
@@ -53,6 +54,7 @@ module Rfd
           children: nil,
           parent: parent_node
         )
+        children << node
         @nodes << node
 
         # Recursively add children if expanded
@@ -60,6 +62,9 @@ module Rfd
           add_children_for(path, depth + 1, node, expanded: false)
         end
       end
+
+      # Set children on parent so collapse works
+      parent_node.children = children if parent_node
     rescue Errno::EACCES, Errno::ENOENT
       # Permission denied or not found, skip
     end
@@ -81,7 +86,7 @@ module Rfd
       reposition_if_needed
       @window.clear
 
-      draw_border('Navigate (Enter:cd ESC:close)')
+      draw_border('Navigate (^O:fold Enter:cd ESC:close)')
 
       # Filter input line (row 1)
       @window.setpos(1, 1)
@@ -134,11 +139,14 @@ module Rfd
           render
         end
         true
-      when Curses::KEY_DOWN, 14  # Down or Ctrl-N
+      when 14  # Ctrl-N
         move_cursor_down
         true
-      when Curses::KEY_UP, 16  # Up or Ctrl-P
+      when 16  # Ctrl-P
         move_cursor_up
+        true
+      when 15  # Ctrl-O - toggle expand/collapse
+        toggle_node
         true
       when String
         # Printable character
@@ -207,6 +215,19 @@ module Rfd
         @scroll = @cursor
       elsif @cursor >= @scroll + available_height
         @scroll = @cursor - available_height + 1
+      end
+    end
+
+    def toggle_node
+      node = current_node
+      return unless node
+      return if node.name == '.' || node.name == '..'
+      return unless node.has_subdirs?
+
+      if node.expanded
+        collapse_node
+      else
+        expand_node
       end
     end
 

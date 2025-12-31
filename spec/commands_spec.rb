@@ -630,10 +630,10 @@ describe Rfd::Commands do
       end
     end
 
-    describe '#@ (cd)' do
-      it 'calls process_command_line with cd' do
-        expect(controller).to receive(:process_command_line).with(preset_command: 'cd')
+    describe '#@ (navigation)' do
+      it 'opens NavigationWindow' do
         controller.public_send('@')
+        expect(controller.instance_variable_get(:@sub_window)).to be_a(Rfd::NavigationWindow)
       end
     end
 

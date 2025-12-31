@@ -148,6 +148,12 @@ module Rfd
           c = Curses.getch
           next if c.nil? || c == -1  # Timeout, continue loop
 
+          # Let sub_window handle input first if it wants to
+          if @sub_window && @sub_window.handle_input(c)
+            Curses.doupdate
+            next
+          end
+
           ret = case c
           when 10, 13  # enter, return
             enter
@@ -432,7 +438,7 @@ module Rfd
         Backspace    Go to parent directory
         -            Go back to previous directory
         ~            Go to home directory
-        @            Change directory (cd)
+        @            Directory tree navigation
 
       File Operations
         Space        Mark/unmark file

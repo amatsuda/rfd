@@ -265,9 +265,11 @@ module Rfd
       process_command_line preset_command: 'grep'
     end
 
-    # Change current directory (cd).
+    # Open directory tree browser for changing directory.
     define_method(:'@') do
-      process_command_line preset_command: 'cd'
+      close_sub_window if @sub_window
+      @sub_window = NavigationWindow.new(self)
+      @sub_window.render
     end
 
     # Execute a shell command in an external shell.

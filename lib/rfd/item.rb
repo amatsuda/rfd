@@ -208,6 +208,23 @@ module Rfd
       !directory? && %w[.mp4 .avi .mov .mkv .webm .flv .wmv .m4v .mpeg .mpg].include?(extname.downcase)
     end
 
+    # Returns the preview type symbol for the preview server
+    #
+    # Order matters here:
+    # - video? must come before heic? because MOV/MP4 files share the same
+    #   "ftyp" magic bytes at offset 4 that heic? checks for
+    # - heic? must come before image? because HEIC conversion is slow and
+    #   needs async handling, while other image formats can be displayed directly
+    def preview_type
+      return :directory if directory?
+      return :video if video?
+      return :heic if heic?
+      return :image if image?
+      return :pdf if pdf?
+      return :markdown if markdown?
+      :text
+    end
+
     def target
       File.readlink path if symlink?
     end

@@ -53,7 +53,9 @@ module Rfd
     def view_image
       return view unless current_item.image?
       if display_image(current_item.path, x: 1, y: 5, width: Curses.cols - 2, height: Curses.lines - 6)
+        Curses.stdscr.timeout = -1
         Curses.getch
+        Curses.stdscr.timeout = 100
         print "\e_Ga=d,d=C\e\\" if kitty?  # Clear Kitty graphics
         move_cursor current_row
       elsif osx?
@@ -66,7 +68,9 @@ module Rfd
       command_line.writeln 0, "Playing: #{current_item.name} (press any key to stop)"
       command_line.refresh
       player_pid = spawn_audio_player(current_item.path)
+      Curses.stdscr.timeout = -1
       Curses.getch
+      Curses.stdscr.timeout = 100
       Process.kill('TERM', player_pid) rescue nil
       Process.wait(player_pid) rescue nil
       clear_command_line
@@ -97,6 +101,10 @@ module Rfd
 
     def update_preview
       return unless @preview_window
+
+      # Cancel any pending async preview request
+      @pending_preview_item = nil
+
       # Reposition preview window if cursor pane changed
       expected_x = preview_pane_x
       if @preview_window.begx != expected_x
@@ -120,12 +128,51 @@ module Rfd
       w.addstr(" #{current_item.name} "[0, w.maxx - 4])
 
       w.bkgdset Curses.color_pair(Curses::COLOR_WHITE)
+
+      if current_item.video?
+        if preview_client&.connected?
+          @pending_preview_item = current_item
+          @pending_preview_window = w
+          w.setpos(w.maxy / 2, 1)
+          w.addstr('[Loading...]'.center(max_width))
+          w.refresh
+          preview_client.request(
+            item: current_item,
+            width: max_width,
+            height: w.maxy - 2
+          )
+        else
+          w.setpos(w.maxy / 2, 1)
+          w.addstr('[Video file]'.center(max_width))
+          w.refresh
+        end
+        return
+      end
+
+      if current_item.heic?
+        if preview_client&.connected?
+          @pending_preview_item = current_item
+          @pending_preview_window = w
+          w.setpos(w.maxy / 2, 1)
+          w.addstr('[Loading...]'.center(max_width))
+          w.refresh
+          preview_client.request(
+            item: current_item,
+            width: max_width,
+            height: w.maxy - 2
+          )
+        else
+          w.setpos(w.maxy / 2, 1)
+          w.addstr('[HEIC file]'.center(max_width))
+          w.refresh
+        end
+        return
+      end
+
       if current_item.directory?
         preview_directory(w, max_width)
       elsif current_item.image?
         preview_image(w, max_width)
-      elsif current_item.video?
-        preview_video(w, max_width)
       elsif current_item.pdf?
         preview_pdf(w, max_width)
       elsif current_item.markdown?
@@ -134,6 +181,169 @@ module Rfd
         preview_text(w, max_width)
       end
       w.refresh
+    end
+
+    # Render result from async preview server
+    def render_preview_result(result)
+      return unless @preview_window && @pending_preview_window
+      w = @pending_preview_window
+      max_width = w.maxx - 2
+
+      # Don't render if we've moved to a different file
+      return unless @pending_preview_item
+      return unless @pending_preview_item.path == current_item.path
+
+      # Clear the content area (preserve border)
+      (1...(w.maxy - 1)).each do |row|
+        w.setpos(row, 1)
+        w.addstr(' ' * max_width)
+      end
+
+      case result.status
+      when :success
+        render_successful_preview(w, result, max_width)
+      when :error
+        w.setpos(w.maxy / 2, 1)
+        w.addstr("[Error: #{result.error}]"[0, max_width].center(max_width))
+      end
+
+      w.refresh
+    end
+
+    def render_successful_preview(w, result, max_width)
+      case result.file_type
+      when :directory, :text, :markdown, :pdf_text
+        render_text_result(w, result.lines, max_width)
+      when :code
+        render_code_result(w, result.lines, max_width)
+      when :video
+        render_video_result(w, result, max_width)
+      when :pdf, :heic
+        render_pdf_result(w, result, max_width)
+      when :binary
+        render_text_result(w, result.lines, max_width)
+      end
+    end
+
+    def render_text_result(w, lines, max_width)
+      return unless lines
+      lines.each_with_index do |line_data, i|
+        w.setpos(i + 1, 1)
+        text = line_data['text'] || line_data[:text] || ''
+        attrs = line_data['attrs'] || line_data[:attrs] || []
+        center = line_data['center'] || line_data[:center]
+
+        attr = text_attr_from_names(attrs)
+        display_text = center ? text.center(max_width) : text.ljust(max_width)
+        w.attron(attr) { w.addstr(display_text[0, max_width]) }
+      end
+    end
+
+    def render_code_result(w, lines, max_width)
+      return unless lines
+      lines.each_with_index do |line_data, i|
+        w.setpos(i + 1, 1)
+        segments = line_data['segments'] || line_data[:segments] || []
+        col = 0
+        segments.each do |seg|
+          char = seg['char'] || seg[:char]
+          color_name = seg['color'] || seg[:color]
+          color = color_name ? color_pair_from_name(color_name) : Curses::A_NORMAL
+          w.attron(color) { w.addstr(char) }
+          col += 1
+        end
+        # Fill rest of line
+        w.addstr(' ' * (max_width - col)) if col < max_width
+      end
+    end
+
+    def render_video_result(w, result, max_width)
+      metadata = result.metadata || {}
+      thumbnail = result.thumbnail_path
+
+      if thumbnail && File.exist?(thumbnail)
+        # Calculate space for metadata at bottom
+        metadata_lines = format_video_metadata_from_hash(metadata, max_width)
+        image_height = w.maxy - 2 - metadata_lines.size
+
+        if image_height > 2 && display_image(thumbnail, x: w.begx + 1, y: w.begy + 1, width: max_width, height: image_height)
+          # Image displayed, show metadata below
+          metadata_lines.each_with_index do |line, i|
+            w.setpos(w.maxy - metadata_lines.size - 1 + i, 1)
+            w.addstr(line[0, max_width].ljust(max_width))
+          end
+        else
+          # No image support, show metadata
+          render_video_metadata_only(w, metadata_lines, max_width)
+        end
+        File.unlink(thumbnail) rescue nil
+      else
+        # No thumbnail, just show metadata
+        metadata_lines = format_video_metadata_from_hash(metadata, max_width)
+        render_video_metadata_only(w, metadata_lines, max_width)
+      end
+    end
+
+    def render_video_metadata_only(w, metadata_lines, max_width)
+      w.setpos(1, 1)
+      w.addstr('[Video file]'.center(max_width))
+      metadata_lines.each_with_index do |line, i|
+        w.setpos(3 + i, 1)
+        w.addstr(line[0, max_width].ljust(max_width))
+      end
+    end
+
+    def format_video_metadata_from_hash(metadata, max_width)
+      lines = []
+      lines << "Duration: #{metadata['duration'] || metadata[:duration]}" if metadata['duration'] || metadata[:duration]
+      lines << "Size: #{metadata['size'] || metadata[:size]}" if metadata['size'] || metadata[:size]
+      resolution = metadata['resolution'] || metadata[:resolution]
+      codec = metadata['codec'] || metadata[:codec]
+      lines << "#{resolution} #{codec}" if resolution
+      fps = metadata['fps'] || metadata[:fps]
+      lines << "#{fps} fps" if fps
+      audio = metadata['audio'] || metadata[:audio]
+      lines << "Audio: #{audio}" if audio
+      lines
+    end
+
+    def render_pdf_result(w, result, max_width)
+      thumbnail = result.thumbnail_path
+      if thumbnail && File.exist?(thumbnail)
+        display_image(thumbnail, x: w.begx + 1, y: w.begy + 1, width: max_width, height: w.maxy - 2)
+        File.unlink(thumbnail) rescue nil
+      elsif result.lines&.any?
+        render_text_result(w, result.lines, max_width)
+      else
+        w.setpos(w.maxy / 2, 1)
+        label = result.file_type == :heic ? '[HEIC file]' : '[PDF file]'
+        w.addstr(label.center(max_width))
+      end
+    end
+
+    def text_attr_from_names(attrs)
+      return Curses::A_NORMAL unless attrs&.any?
+      attr = Curses::A_NORMAL
+      attrs.each do |a|
+        case a.to_s
+        when 'bold' then attr |= Curses::A_BOLD
+        when 'green' then attr |= Curses.color_pair(Curses::COLOR_GREEN)
+        when 'cyan' then attr |= Curses.color_pair(Curses::COLOR_CYAN)
+        when 'red' then attr |= Curses.color_pair(Curses::COLOR_RED)
+        when 'magenta' then attr |= Curses.color_pair(Curses::COLOR_MAGENTA)
+        end
+      end
+      attr
+    end
+
+    def color_pair_from_name(name)
+      case name.to_s
+      when 'green' then Curses.color_pair(Curses::COLOR_GREEN)
+      when 'cyan' then Curses.color_pair(Curses::COLOR_CYAN)
+      when 'red' then Curses.color_pair(Curses::COLOR_RED)
+      when 'magenta' then Curses.color_pair(Curses::COLOR_MAGENTA)
+      else Curses::A_NORMAL
+      end
     end
 
     private

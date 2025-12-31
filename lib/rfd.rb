@@ -15,6 +15,8 @@ require_relative 'rfd/logging'
 require_relative 'rfd/reline_ext'
 require_relative 'rfd/file_ops'
 require_relative 'rfd/viewer'
+require_relative 'rfd/preview/server'
+require_relative 'rfd/preview/client'
 
 module Rfd
   VERSION = Gem.loaded_specs['rfd'] ? Gem.loaded_specs['rfd'].version.to_s : '0'
@@ -74,14 +76,74 @@ module Rfd
       @command_line = CommandLineWindow.new
       @debug = DebugWindow.new if ENV['DEBUG']
       @direction, @dir_history, @last_command, @times, @yanked_items, @preview_window = nil, [], nil, nil, nil, nil
+
+      # Start preview server for async video preview
+      start_preview_server
+    end
+
+    def preview_client
+      @preview_client
+    end
+
+    def start_preview_server
+      @preview_socket_path = "/tmp/rfd_preview_#{Process.pid}.sock"
+      File.unlink(@preview_socket_path) rescue nil
+
+      # Fork the preview server process
+      @preview_server_pid = fork do
+        # Detach from terminal and close inherited file descriptors
+        $stdin.reopen('/dev/null')
+        $stdout.reopen('/dev/null')
+        $stderr.reopen('/dev/null')
+
+        $0 = 'rfd-preview-server'
+        server = Preview::Server.new(@preview_socket_path)
+        server.run
+      end
+
+      # In parent: wait for socket and connect client
+      sleep 0.2  # Give server time to start
+      @preview_client = Preview::Client.new(@preview_socket_path)
+      retries = 20
+      while retries > 0 && !@preview_client.connected?
+        @preview_client.connect
+        break if @preview_client.connected?
+        sleep 0.05
+        retries -= 1
+      end
+    rescue => e
+      # If server startup fails, log and continue without async preview
+      Rfd.logger&.error("Preview server startup failed: #{e.message}")
+      @preview_client = nil
+    end
+
+    def stop_preview_server
+      @preview_client&.close
+      if @preview_server_pid
+        Process.kill('TERM', @preview_server_pid) rescue nil
+        Process.wait(@preview_server_pid) rescue nil
+      end
+      File.unlink(@preview_socket_path) rescue nil if @preview_socket_path
     end
 
     # The main loop.
     def run
+      Curses.stdscr.timeout = 100  # Non-blocking getch with 100ms timeout
       loop do
         begin
+          # Check for async preview results
+          if @preview_client&.ready?
+            if (result = @preview_client.poll_result)
+              render_preview_result(result)
+              Curses.doupdate
+            end
+          end
+
           number_pressed = false
-          ret = case (c = Curses.getch)
+          c = Curses.getch
+          next if c.nil? || c == -1  # Timeout, continue loop
+
+          ret = case c
           when 10, 13  # enter, return
             enter
           when 27  # ESC
@@ -141,6 +203,7 @@ module Rfd
         end
       end
     ensure
+      stop_preview_server
       print "\e[?25h"  # Restore cursor
       Curses.close_screen
     end
@@ -272,7 +335,9 @@ module Rfd
 
     # Get a char as a String from user input.
     def get_char
+      Curses.stdscr.timeout = -1  # Blocking mode for user input
       c = Curses.getch
+      Curses.stdscr.timeout = 100  # Restore non-blocking mode
       c if (0..255) === c.ord
     end
 
@@ -321,10 +386,15 @@ module Rfd
     def ask(prompt = '(y/n)')
       command_line.set_prompt prompt
       command_line.refresh
-      while (c = Curses.getch)
-        next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
-        clear_command_line
-        break (c == 'y') || (c == 'Y')
+      Curses.stdscr.timeout = -1  # Blocking mode for user input
+      begin
+        while (c = Curses.getch)
+          next unless [?N, ?Y, ?n, ?y, 3, 27] .include? c  # N, Y, n, y, ^c, esc
+          clear_command_line
+          break (c == 'y') || (c == 'Y')
+        end
+      ensure
+        Curses.stdscr.timeout = 100  # Restore non-blocking mode
       end
     end
 
@@ -399,7 +469,9 @@ module Rfd
         win.addstr(line.chomp[0, w - 4])
       end
       win.refresh
+      Curses.stdscr.timeout = -1
       Curses.getch
+      Curses.stdscr.timeout = 100
       win.close
       move_cursor current_row
     end
@@ -412,7 +484,11 @@ module Rfd
       yield
     ensure
       Curses.reset_prog_mode
-      Curses.getch if pause
+      if pause
+        Curses.stdscr.timeout = -1
+        Curses.getch
+        Curses.stdscr.timeout = 100
+      end
       #NOTE needs to draw borders and ls again here since the stdlib Curses.refresh fails to retrieve the previous screen
       Rfd::Window.draw_borders
       Curses.refresh

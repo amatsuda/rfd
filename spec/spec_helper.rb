@@ -4,6 +4,7 @@ $LOAD_PATH.unshift(__dir__)
 
 # Skip preview server in test environment (avoids fork/reopen conflicts)
 ENV['RFD_SKIP_PREVIEW_SERVER'] = '1'
+ENV['TERM'] ||= 'xterm-256color'
 
 require 'rfd'
 

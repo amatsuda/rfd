@@ -18,7 +18,6 @@ module Rfd
       @nodes = []
       @cursor = 0
       @scroll = 0
-      @filter_mode = false
       @filter_text = ''
       @filtered_nodes = nil
       build_tree
@@ -82,21 +81,13 @@ module Rfd
       reposition_if_needed
       @window.clear
 
-      if @filter_mode
-        draw_border('Filter (ESC:cancel)')
-      else
-        draw_border('Tree (i:filter j/k:move l/h:expand/collapse Enter:cd q:close)')
-      end
+      draw_border('Navigate (Enter:cd ESC:close)')
 
-      # Filter input line (row 1) - always reserved
+      # Filter input line (row 1)
       @window.setpos(1, 1)
-      if @filter_mode
-        @window.attron(Curses::A_BOLD) do
-          prompt = "> #{@filter_text}_"
-          @window.addstr(prompt[0, max_width].ljust(max_width))
-        end
-      else
-        @window.addstr(' ' * max_width)
+      @window.attron(Curses::A_BOLD) do
+        prompt = "> #{@filter_text}_"
+        @window.addstr(prompt[0, max_width].ljust(max_width))
       end
 
       # Tree starts at row 2
@@ -129,55 +120,9 @@ module Rfd
     end
 
     def handle_input(c)
-      if @filter_mode
-        handle_filter_input(c)
-      else
-        handle_normal_input(c)
-      end
-    end
-
-    def handle_normal_input(c)
       case c
-      when 'i'
-        enter_filter_mode
-        true
-      when 'j', Curses::KEY_DOWN
-        move_cursor_down
-        true
-      when 'k', Curses::KEY_UP
-        move_cursor_up
-        true
-      when 'l', Curses::KEY_RIGHT
-        expand_node
-        true
-      when 'h', Curses::KEY_LEFT
-        collapse_node
-        true
-      when 'g', Curses::KEY_HOME
-        @cursor = 0
-        adjust_scroll
-        render
-        true
-      when 'G', Curses::KEY_END
-        @cursor = display_nodes.size - 1
-        adjust_scroll
-        render
-        true
-      when 10, 13  # Enter
-        select_node
-        true
-      when 'q', 27  # q or ESC
+      when 27  # ESC - close window
         controller.close_sub_window
-        true
-      else
-        false
-      end
-    end
-
-    def handle_filter_input(c)
-      case c
-      when 27  # ESC - exit filter mode
-        exit_filter_mode
         true
       when 10, 13  # Enter - select current node
         select_node
@@ -216,24 +161,6 @@ module Rfd
     end
 
     private
-
-    def enter_filter_mode
-      @filter_mode = true
-      @filter_text = ''
-      @filtered_nodes = nil
-      @cursor = 0
-      @scroll = 0
-      render
-    end
-
-    def exit_filter_mode
-      @filter_mode = false
-      @filter_text = ''
-      @filtered_nodes = nil
-      @cursor = 0
-      @scroll = 0
-      render
-    end
 
     def apply_filter
       if @filter_text.empty?
@@ -275,7 +202,7 @@ module Rfd
     end
 
     def adjust_scroll
-      available_height = @filter_mode ? max_height - 1 : max_height
+      available_height = max_height - 1  # Reserve one line for filter input
       if @cursor < @scroll
         @scroll = @cursor
       elsif @cursor >= @scroll + available_height

@@ -3,31 +3,7 @@ require 'spec_helper'
 require 'rfd'
 
 describe Rfd::Controller do
-  include CaptureHelper
-
-  around do |example|
-    @stdout = capture(:stdout) do
-      FileUtils.cp_r File.join(__dir__, 'testdir'), tmpdir
-      @rfd = Rfd.start tmpdir
-      def (@rfd.main).maxy
-        3
-      end
-
-      example.run
-
-      FileUtils.rm_r tmpdir
-      Dir.chdir __dir__
-    end
-  end
-
-  after :all do
-    Curses.close_screen
-  end
-
-  let(:tmpdir) { File.join __dir__, 'tmpdir' }
-  let!(:controller) { @rfd }
-  subject { controller }
-  let(:items) { controller.items }
+  include_context 'rfd setup'
 
   describe '#spawn_panes' do
     before { controller.spawn_panes 3 }
@@ -431,22 +407,5 @@ describe Rfd::Controller do
     end
     subject { items[10] }
     it { should be_marked }
-  end
-
-  describe 'times' do
-    subject { controller.times }
-    context 'before accepting 0-9' do
-      it { should == 1 }
-    end
-    context 'When 0-9 were typed' do
-      before do
-        controller.public_send '3'
-        controller.public_send '7'
-      end
-      after do
-        controller.instance_variable_set :@times, nil
-      end
-      it { should == 37 }
-    end
   end
 end

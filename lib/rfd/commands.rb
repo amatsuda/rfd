@@ -1,92 +1,114 @@
 # frozen_string_literal: true
 
+using Module.new {
+  refine Module do
+    def group(_label)
+      yield
+    end
+  end
+}
+
 module Rfd
   module Commands
     # Navigation commands for cursor movement and directory traversal.
     module Navigation
-      # Move cursor up/down.
-      def j
-        move_cursor (current_row + times) % items.size
+      group 'j/k' do
+        # Move cursor up/down.
+        def j
+          move_cursor (current_row + times) % items.size
+        end
+
+        # Move the cursor up.
+        def k
+          move_cursor (current_row - times) % items.size
+        end
       end
 
-      # Move the cursor up.
-      def k
-        move_cursor (current_row - times) % items.size
+      group 'h/l' do
+        # Move cursor left/right between panes.
+        def h
+          (y = current_row - maxy) >= 0 and move_cursor y
+        end
+
+        # Move the cursor to the right pane.
+        def l
+          (y = current_row + maxy) < items.size and move_cursor y
+        end
       end
 
-      # Move cursor left/right between panes.
-      def h
-        (y = current_row - maxy) >= 0 and move_cursor y
+      group 'g/G' do
+        # Go to first/last item.
+        def g
+          move_cursor 0
+        end
+
+        # Go to last item.
+        def G
+          move_cursor items.size - 1
+        end
       end
 
-      # Move the cursor to the right pane.
-      def l
-        (y = current_row + maxy) < items.size and move_cursor y
+      group 'H/M/L' do
+        # Go to top/middle/bottom of screen.
+        def H
+          move_cursor current_page * max_items
+        end
+
+        # Go to middle of screen.
+        def M
+          move_cursor current_page * max_items + displayed_items.size / 2
+        end
+
+        # Go to bottom of screen.
+        def L
+          move_cursor current_page * max_items + displayed_items.size - 1
+        end
       end
 
-      # Go to first/last item.
-      def g
-        move_cursor 0
+      group 'f{char}/F{char}' do
+        # Find file starting with given character.
+        def f
+          c = get_char and (@last_command, @last_command_reverse = -> { find c }, -> { find_reverse c }) && @last_command.call
+        end
+
+        # Find file starting with given character (reverse).
+        def F
+          c = get_char and (@last_command, @last_command_reverse = -> { find_reverse c }, -> { find c }) && @last_command.call
+        end
       end
 
-      # Go to last item.
-      def G
-        move_cursor items.size - 1
+      group 'n/N' do
+        # Repeat last find forward/backward.
+        def n
+          @last_command.call if @last_command
+        end
+
+        # Repeat last find in reverse direction.
+        def N
+          @last_command_reverse.call if @last_command_reverse
+        end
       end
 
-      # Go to top/middle/bottom of screen.
-      def H
-        move_cursor current_page * max_items
-      end
+      group 'Ctrl-n/p' do
+        # Next/previous page.
+        def ctrl_n
+          move_cursor (current_page + 1) % total_pages * max_items if total_pages > 1
+        end
 
-      # Go to middle of screen.
-      def M
-        move_cursor current_page * max_items + displayed_items.size / 2
-      end
+        # Back to previous page.
+        def ctrl_p
+          move_cursor (current_page - 1) % total_pages * max_items if total_pages > 1
+        end
 
-      # Go to bottom of screen.
-      def L
-        move_cursor current_page * max_items + displayed_items.size - 1
-      end
+        # Back to previous page.
+        def ctrl_b
+          ctrl_p
+        end
 
-      # Find file starting with given character.
-      def f
-        c = get_char and (@last_command, @last_command_reverse = -> { find c }, -> { find_reverse c }) && @last_command.call
-      end
-
-      # Find file starting with given character (reverse).
-      def F
-        c = get_char and (@last_command, @last_command_reverse = -> { find_reverse c }, -> { find c }) && @last_command.call
-      end
-
-      # Repeat last find forward/backward.
-      def n
-        @last_command.call if @last_command
-      end
-
-      # Repeat last find in reverse direction.
-      def N
-        @last_command_reverse.call if @last_command_reverse
-      end
-
-      # Next/previous page.
-      def ctrl_n
-        move_cursor (current_page + 1) % total_pages * max_items if total_pages > 1
-      end
-
-      # Back to previous page.
-      def ctrl_p
-        move_cursor (current_page - 1) % total_pages * max_items if total_pages > 1
-      end
-
-      # Back to previous page.
-      def ctrl_b
-        ctrl_p
-      end
-
-      # Forward to next page.
-      def ctrl_f
-        ctrl_n
+        # Forward to next page.
+        def ctrl_f
+          ctrl_n
+        end
       end
 
       # Open directory or view file.
@@ -193,57 +215,65 @@ module Rfd
         process_command_line preset_command: 'rename'
       end
 
-      # Trash/delete selected items.
-      def d
-        if selected_items.any?
-          if ask %Q[Are you sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
-            trash
+      group 'd/D' do
+        # Trash/delete selected items.
+        def d
+          if selected_items.any?
+            if ask %Q[Are you sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
+              trash
+            end
+          end
+        end
+
+        # Hard delete selected items.
+        def D
+          if selected_items.any?
+            if ask %Q[Are you sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
+              delete
+            end
           end
         end
       end
 
-      # Hard delete selected items.
-      def D
-        if selected_items.any?
-          if ask %Q[Are you sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
-            delete
-          end
+      group 't/K' do
+        # Touch file / make directory.
+        def t
+          process_command_line preset_command: 'touch'
+        end
+
+        # Make a new directory.
+        def K
+          process_command_line preset_command: 'mkdir'
+        end
+
+        # Update file timestamp.
+        def T
+          process_command_line preset_command: 'touch_t', default_argument: current_item.mtime.tr(': -', '')
         end
       end
 
-      # Touch file / make directory.
-      def t
-        process_command_line preset_command: 'touch'
+      group 'y/p' do
+        # Yank/paste selected items.
+        def y
+          yank
+        end
+
+        # Paste yanked items.
+        def p
+          paste
+        end
       end
 
-      # Make a new directory.
-      def K
-        process_command_line preset_command: 'mkdir'
-      end
+      group 'z/u' do
+        # Zip/unarchive files.
+        def z
+          process_command_line preset_command: 'zip'
+        end
 
-      # Update file timestamp.
-      def T
-        process_command_line preset_command: 'touch_t', default_argument: current_item.mtime.tr(': -', '')
-      end
-
-      # Yank/paste selected items.
-      def y
-        yank
-      end
-
-      # Paste yanked items.
-      def p
-        paste
-      end
-
-      # Zip/unarchive files.
-      def z
-        process_command_line preset_command: 'zip'
-      end
-
-      # Unarchive zip/tar.gz files.
-      def u
-        unarchive
+        # Unarchive zip/tar.gz files.
+        def u
+          unarchive
+        end
       end
 
       # Change permission (chmod).
@@ -264,14 +294,16 @@ module Rfd
 
     # Viewing commands for displaying file contents.
     module Viewing
-      # View/edit file.
-      def v
-        view
-      end
+      group 'v/e' do
+        # View/edit file.
+        def v
+          view
+        end
 
-      # Edit current file.
-      def e
-        edit
+        # Edit current file.
+        def e
+          edit
+        end
       end
 
       # Open with system viewer.

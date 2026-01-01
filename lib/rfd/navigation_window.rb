@@ -27,6 +27,9 @@ module Rfd
       @nodes = []
       @root = controller.current_dir.path
 
+      # Cache all directories with a single glob call
+      cache_all_directories
+
       # Add ..
       @nodes << TreeNode.new(path: File.dirname(@root), name: '..', relative_path: '..', depth: 0, expanded: false, children: nil, parent: nil)
 
@@ -34,6 +37,17 @@ module Rfd
       add_children_for(@root, 0, nil, expanded: true)
 
       @cursor = 1 if @nodes.size > 1  # Start on first real directory
+    end
+
+    def cache_all_directories
+      @dir_cache = Dir.glob("#{@root}/**/*/")
+        .map { |path| path.chomp('/') }  # Remove trailing slash
+        .reject { |path| path.split('/').any? { |part| part.start_with?('.') } }
+        .map { |path| path.delete_prefix(@root).delete_prefix('/') }
+        .reject(&:empty?)
+        .sort
+    rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
+      @dir_cache = []
     end
 
     def add_children_for(dir_path, depth, parent_node, expanded: false)
@@ -195,7 +209,7 @@ module Rfd
           pattern = @filter_text[1..-1]  # Remove leading /
           scan_absolute_path_directories('/', '/', pattern)
         else
-          scan_directories_for_filter(@root, '', 0, @filter_text)
+          scan_directories_for_filter(@filter_text)
         end
 
         @cursor = @first_match_index || 0
@@ -235,26 +249,16 @@ module Rfd
       # Permission denied or not found, skip
     end
 
-    def scan_directories_for_filter(dir_path, relative_prefix, depth, pattern)
-      entries = Dir.children(dir_path)
-        .select { |name| File.directory?(File.join(dir_path, name)) }
-        .reject { |name| name.start_with?('.') }
-        .sort
+    def scan_directories_for_filter(pattern)
+      # Filter from cache - no system calls!
+      @dir_cache.each do |relative_path|
+        next unless fuzzy_match?(relative_path, pattern)
 
-      entries.each do |name|
-        path = File.join(dir_path, name)
-        relative_path = relative_prefix.empty? ? name : "#{relative_prefix}/#{name}"
-
-        if fuzzy_match?(relative_path, pattern)
-          # Only create nodes when there's a match
-          add_match_with_ancestors(path, name, relative_path, depth)
-        end
-
-        # Recursively scan subdirectories (no node creation here)
-        scan_directories_for_filter(path, relative_path, depth + 1, pattern)
+        path = File.join(@root, relative_path)
+        depth = relative_path.count('/')
+        name = File.basename(relative_path)
+        add_match_with_ancestors(path, name, relative_path, depth)
       end
-    rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
-      # Permission denied or not found, skip
     end
 
     def add_match_with_ancestors(path, name, relative_path, depth)

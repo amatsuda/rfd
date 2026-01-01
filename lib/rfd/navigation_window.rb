@@ -140,6 +140,11 @@ module Rfd
           render
         end
         true
+      when 21  # Ctrl-U - clear filter
+        @filter_text = ''
+        apply_filter
+        render
+        true
       when 14  # Ctrl-N
         move_cursor_down
         true

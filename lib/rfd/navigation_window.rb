@@ -184,13 +184,51 @@ module Rfd
         @filtered_nodes = []
         @filtered_paths = {}  # Track added paths to avoid duplicates
         @first_match_index = nil
-        scan_directories_for_filter(@root, '', nil, 0)
+
+        # Special case: ~ means scan from home directory (first level only for performance)
+        if @filter_text.start_with?('~')
+          home = File.expand_path('~')
+          pattern = @filter_text[1..-1].sub(/^\//, '')  # Remove leading ~/ or ~
+          scan_home_directories(home, pattern)
+        else
+          scan_directories_for_filter(@root, '', nil, 0, @filter_text)
+        end
+
         @cursor = @first_match_index || 0
         @filtered_paths = nil
         @first_match_index = nil
       end
       @scroll = 0
       adjust_scroll
+    end
+
+    # Fast scan for ~ paths - only first level, no recursion
+    def scan_home_directories(home, pattern)
+      entries = Dir.children(home)
+        .select { |name| File.directory?(File.join(home, name)) }
+        .reject { |name| name.start_with?('.') }
+        .sort
+
+      entries.each do |name|
+        path = File.join(home, name)
+        relative_path = "~/#{name}"
+
+        next unless fuzzy_match?(name, pattern)
+
+        node = TreeNode.new(
+          path: path,
+          name: name,
+          relative_path: relative_path,
+          depth: 0,
+          expanded: false,
+          children: nil,
+          parent: nil
+        )
+        @first_match_index ||= @filtered_nodes.size
+        @filtered_nodes << node
+      end
+    rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
+      # Permission denied or not found, skip
     end
 
     def scan_directories_for_filter(dir_path, relative_prefix, parent_node, depth, pattern)
@@ -214,7 +252,9 @@ module Rfd
           parent: parent_node
         )
 
-        if fuzzy_match?(relative_path, @filter_text)
+        # For ~ paths, match against path after ~/
+        match_path = relative_prefix == '~' || relative_prefix.start_with?('~/') ? relative_path[2..-1] : relative_path
+        if fuzzy_match?(match_path || '', pattern)
           # Add all ancestors first
           add_ancestors_to_filter(node)
           # Add this node if not already added
@@ -226,7 +266,7 @@ module Rfd
         end
 
         # Recursively scan subdirectories
-        scan_directories_for_filter(path, relative_path, node, depth + 1)
+        scan_directories_for_filter(path, relative_path, node, depth + 1, pattern)
       end
     rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
       # Permission denied or not found, skip

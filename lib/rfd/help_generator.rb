@@ -80,6 +80,7 @@ module Rfd
 
         # Match comments followed by method definitions
         # Handles: def name, def -, def /, define_method(:name), define_method(:'name')
+        # Works with nested modules
         source.scan(/^\s*#\s*(.+?)\n\s*(?:def\s+(\S+)|define_method\(:'?([^')\s]+)'?\))/) do |comment, def_name, define_name|
           method_name = (def_name || define_name).to_sym
           comments[method_name] = clean_comment(comment)

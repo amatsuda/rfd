@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 module Rfd
   module Commands
-    # Change permission ("A"ttributes) of selected files and directories.
+    # Change permission (chmod).
     def a
       process_command_line preset_command: 'chmod'
     end
 
-    # "c"opy selected files and directories.
+    # Copy selected items.
     def c
       return unless selected_items.any?
       close_sub_window if @sub_window
@@ -16,7 +16,7 @@ module Rfd
       @sub_window.render
     end
 
-    # Soft "d"elete (actually mv to the trash folder on OSX) selected files and directories.
+    # Trash/delete selected items.
     def d
       if selected_items.any?
         if ask %Q[Are you sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
@@ -25,27 +25,27 @@ module Rfd
       end
     end
 
-    # Open current file or directory with the "e"ditor
+    # Edit current file.
     def e
       edit
     end
 
-    # "f"ind the first file or directory of which name starts with the given String.
+    # Find file starting with given character.
     def f
       c = get_char and (@last_command, @last_command_reverse = -> { find c }, -> { find_reverse c }) && @last_command.call
     end
 
-    # Move the cursor to the top of the list.
+    # Go to first/last item.
     def g
       move_cursor 0
     end
 
-    # Move the cursor to the left pane.
+    # Move cursor left/right between panes.
     def h
       (y = current_row - maxy) >= 0 and move_cursor y
     end
 
-    # Move the cursor down.
+    # Move cursor up/down.
     def j
       move_cursor (current_row + times) % items.size
     end
@@ -70,7 +70,7 @@ module Rfd
       @sub_window.render
     end
 
-    # Redo the latest f or F.
+    # Repeat last find forward/backward.
     def n
       @last_command.call if @last_command
     end
@@ -80,7 +80,7 @@ module Rfd
       @last_command_reverse.call if @last_command_reverse
     end
 
-    # "o"pen selected files and directories with the OS "open" command.
+    # Open with system viewer.
     def o
       if selected_items.any?
         system 'open', *selected_items.map(&:path)
@@ -109,47 +109,47 @@ module Rfd
       process_command_line preset_command: 'rename'
     end
 
-    # "s"ort displayed files and directories in the given order.
+    # Sort files.
     def s
       process_command_line preset_command: 'sort'
     end
 
-    # Create a new file, or update its timestamp if the file already exists ("t"ouch).
+    # Touch file / make directory.
     def t
       process_command_line preset_command: 'touch'
     end
 
-    # "u"narchive .zip and .tar.gz files within selected files and directories into current_directory.
+    # Unarchive zip/tar.gz files.
     def u
       unarchive
     end
 
-    # "o"pen selected files and directories with the viewer.
+    # View/edit file.
     def v
       view
     end
 
-    # Change o"w"ner of selected files and directories.
+    # Change owner (chown).
     def w
       process_command_line preset_command: 'chown'
     end
 
-    # "y"ank selected file / directory names.
+    # Yank/paste selected items.
     def y
       yank
     end
 
-    # Archive selected files and directories into a "z"ip file.
+    # Zip/unarchive files.
     def z
       process_command_line preset_command: 'zip'
     end
 
-    # "C"opy paths of selected files and directory to the "C"lipboard.
+    # Copy path to clipboard.
     def C
       clipboard
     end
 
-    # Hard "d"elete selected files and directories.
+    # Hard delete selected items.
     def D
       if selected_items.any?
         if ask %Q[Are you sure want to delete #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
@@ -163,54 +163,54 @@ module Rfd
       c = get_char and (@last_command, @last_command_reverse = -> { find_reverse c }, -> { find c }) && @last_command.call
     end
 
-    # Move the cursor to the top.
+    # Go to top/middle/bottom of screen.
     def H
       move_cursor current_page * max_items
     end
 
-    # Move the cursor to the bottom of the list.
+    # Go to last item.
     def G
       move_cursor items.size - 1
     end
 
-    # Ma"K"e a directory.
+    # Make a new directory.
     def K
       process_command_line preset_command: 'mkdir'
     end
 
-    # Move the cursor to the bottom.
+    # Go to bottom of screen.
     def L
       move_cursor current_page * max_items + displayed_items.size - 1
     end
 
-    # Move the cursor to the "M"iddle.
+    # Go to middle of screen.
     def M
       move_cursor current_page * max_items + displayed_items.size / 2
     end
 
-    # "O"pen terminal here.
+    # Open terminal here.
     def O
       dir = current_item.directory? ? current_item.path : current_dir.path
       escaped_dir = dir.gsub('\\', '\\\\\\\\').gsub('"', '\\"')
       system 'osascript', '-e', %Q[tell app "Terminal" to do script "cd \\"#{escaped_dir}\\""] if osx?
     end
 
-    # "S"ymlink the current file or directory
+    # Create symlink.
     def S
       process_command_line preset_command: 'symlink'
     end
 
-    # "T"ouch the current file. This updates current item's timestamp (equivalent to `touch -t`).
+    # Update file timestamp.
     def T
       process_command_line preset_command: 'touch_t', default_argument: current_item.mtime.tr(': -', '')
     end
 
-    # "P"review the current file in a floating window.
+    # Toggle preview window.
     def P
       preview
     end
 
-    # Mark or unmark "a"ll files and directories.
+    # Mark/unmark all items.
     def ctrl_a
       mark = marked_items.size != (items.size - 2)  # exclude . and ..
       items.each {|i| i.toggle_mark unless i.marked? == mark}
@@ -219,12 +219,12 @@ module Rfd
       move_cursor current_row
     end
 
-    # "b"ack to the previous page.
+    # Back to previous page.
     def ctrl_b
       ctrl_p
     end
 
-    # "f"orward to the next page.
+    # Forward to next page.
     def ctrl_f
       ctrl_n
     end
@@ -234,17 +234,17 @@ module Rfd
       ls
     end
 
-    # Forward to the "n"ext page.
+    # Next/previous page.
     def ctrl_n
       move_cursor (current_page + 1) % total_pages * max_items if total_pages > 1
     end
 
-    # Back to the "p"revious page.
+    # Back to previous page.
     def ctrl_p
       move_cursor (current_page - 1) % total_pages * max_items if total_pages > 1
     end
 
-    # Split the main "w"indow into given number of columns.
+    # Set number of panes.
     def ctrl_w
       if @times
         spawn_panes @times.to_i
@@ -260,34 +260,34 @@ module Rfd
       end
     end
 
-    # Return to the previous directory (popd).
+    # Go back to previous directory.
     def -
       popd
     end
 
-    # Jump to home directory.
+    # Go to home directory.
     define_method(:'~') do
       cd '~'
     end
 
-    # Search files and directories from the current directory.
+    # Search files (grep).
     def /
       process_command_line preset_command: 'grep'
     end
 
-    # Open directory tree browser for changing directory.
+    # Directory tree navigation.
     define_method(:'@') do
       close_sub_window if @sub_window
       @sub_window = NavigationWindow.new(self)
       @sub_window.render
     end
 
-    # Execute a shell command in an external shell.
+    # Execute shell command.
     define_method(:!) do
       process_shell_command
     end
 
-    # Execute a command in the controller context.
+    # Execute rfd command.
     define_method(:':') do
       process_command_line
     end
@@ -297,7 +297,7 @@ module Rfd
       help
     end
 
-    # cd into a directory, or view a file.
+    # Open directory or view file.
     def enter
       if current_item.name == '.'  # do nothing
       elsif current_item.name == '..'
@@ -317,7 +317,7 @@ module Rfd
       end
     end
 
-    # Toggle mark, and move down.
+    # Mark/unmark file and move down.
     def space
       times.times do
         toggle_mark
@@ -326,7 +326,7 @@ module Rfd
       draw_marked_items
     end
 
-    # cd to the upper hierarchy.
+    # Go to parent directory.
     def del
       if current_dir.path != '/'
         dir_was = times == 1 ? current_dir.name : File.basename(current_dir.join(['..'] * (times - 1)))

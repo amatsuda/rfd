@@ -201,25 +201,27 @@ describe Rfd::Controller do
     # This requires user input, skip in automated tests
   end
 
-  describe 'HELP_TEXT' do
-    it 'is defined' do
-      expect(Rfd::Controller::HELP_TEXT).not_to be_nil
+  describe 'HelpGenerator' do
+    let(:help_text) { Rfd::HelpGenerator.generate }
+
+    it 'generates help text' do
+      expect(help_text).not_to be_nil
     end
 
     it 'contains navigation section' do
-      expect(Rfd::Controller::HELP_TEXT).to include('Navigation')
+      expect(help_text).to include('Navigation')
     end
 
     it 'contains file operations section' do
-      expect(Rfd::Controller::HELP_TEXT).to include('File Operations')
+      expect(help_text).to include('File Operations')
     end
 
     it 'contains viewing section' do
-      expect(Rfd::Controller::HELP_TEXT).to include('Viewing')
+      expect(help_text).to include('Viewing')
     end
 
     it 'contains quit instruction' do
-      expect(Rfd::Controller::HELP_TEXT).to include('Quit')
+      expect(help_text).to include('Quit')
     end
   end
 

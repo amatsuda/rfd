@@ -20,6 +20,7 @@ require_relative 'rfd/preview_window'
 require_relative 'rfd/navigation_window'
 require_relative 'rfd/preview/server'
 require_relative 'rfd/preview/client'
+require_relative 'rfd/help_generator'
 
 module Rfd
   VERSION = Gem.loaded_specs['rfd'] ? Gem.loaded_specs['rfd'].version.to_s : '0'
@@ -432,53 +433,8 @@ module Rfd
       end
     end
 
-    HELP_TEXT = <<~HELP
-      Navigation
-        j/k, ↑/↓     Move cursor up/down
-        h/l, ←/→     Move cursor left/right (between panes)
-        g/G, Home/End  Go to first/last item
-        H/M/L        Go to top/middle/bottom of screen
-        f{char}      Find file starting with {char}
-        n/N          Repeat last find / in reverse
-        Ctrl-n/p     Next/previous page
-        Enter        Open directory or view file
-        Backspace    Go to parent directory
-        -            Go back to previous directory
-        ~            Go to home directory
-        @            Directory tree navigation
-
-      File Operations
-        Space        Mark/unmark file
-        Ctrl-a       Mark/unmark all
-        c/m/r        Copy/move/rename
-        d/D          Trash/delete
-        t/K          Touch file / mkdir
-        y/p          Yank/paste
-        z/u          Zip/unarchive
-        a/w          Chmod/chown
-        S            Create symlink
-
-      Viewing
-        v/e          View/edit file
-        o            Open with system viewer
-        P            Toggle preview window
-        /            Search (grep)
-        s            Sort
-
-      Other
-        C            Copy path to clipboard
-        O            Open terminal here
-        Ctrl-w{n}    Set number of panes
-        !            Execute shell command
-        :            Execute rfd command
-        q            Quit
-        ?            This help
-
-      Environment: RFD_NO_ICONS=1 to disable file icons (icons require Nerd Font)
-    HELP
-
     def help
-      lines = HELP_TEXT.lines
+      lines = HelpGenerator.generate.lines
       h = [lines.size + 2, Curses.lines - 6].min
       w = [lines.map(&:size).max + 4, Curses.cols - 4].min
       y = (Curses.lines - h) / 2

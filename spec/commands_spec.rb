@@ -557,9 +557,9 @@ describe Rfd::Commands do
     end
 
     describe '#m (mv)' do
-      it 'calls process_command_line with mv' do
-        expect(controller).to receive(:process_command_line).with(preset_command: 'mv')
+      it 'opens NavigationWindow for destination selection' do
         controller.m
+        expect(controller.instance_variable_get(:@sub_window)).to be_a(Rfd::NavigationWindow)
       end
     end
 

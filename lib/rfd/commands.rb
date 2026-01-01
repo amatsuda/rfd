@@ -62,7 +62,12 @@ module Rfd
 
     # "m"ove selected files and directories.
     def m
-      process_command_line preset_command: 'mv'
+      return unless selected_items.any?
+      close_sub_window if @sub_window
+      @sub_window = NavigationWindow.new(self, title: 'Move to (Enter:select ESC:cancel)', include_files: true) do |dest|
+        mv dest
+      end
+      @sub_window.render
     end
 
     # Redo the latest f or F.

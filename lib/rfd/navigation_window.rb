@@ -7,7 +7,7 @@ module Rfd
       return false unless File.directory?(path)
       @has_subdirs = Dir.children(path).any? { |c| File.directory?(File.join(path, c)) } if @has_subdirs.nil?
       @has_subdirs
-    rescue Errno::EACCES, Errno::ENOENT
+    rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
       false
     end
   end
@@ -66,7 +66,7 @@ module Rfd
 
       # Set children on parent so collapse works
       parent_node.children = children if parent_node
-    rescue Errno::EACCES, Errno::ENOENT
+    rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
       # Permission denied or not found, skip
     end
 
@@ -193,7 +193,7 @@ module Rfd
       adjust_scroll
     end
 
-    def scan_directories_for_filter(dir_path, relative_prefix, parent_node, depth)
+    def scan_directories_for_filter(dir_path, relative_prefix, parent_node, depth, pattern)
       entries = Dir.children(dir_path)
         .select { |name| File.directory?(File.join(dir_path, name)) }
         .reject { |name| name.start_with?('.') }
@@ -228,7 +228,7 @@ module Rfd
         # Recursively scan subdirectories
         scan_directories_for_filter(path, relative_path, node, depth + 1)
       end
-    rescue Errno::EACCES, Errno::ENOENT
+    rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
       # Permission denied or not found, skip
     end
 
@@ -332,7 +332,7 @@ module Rfd
             )
             children << child
           end
-        rescue Errno::EACCES, Errno::ENOENT
+        rescue Errno::EACCES, Errno::ENOENT, Errno::EPERM
           # Permission denied or not found
         end
         node.children = children

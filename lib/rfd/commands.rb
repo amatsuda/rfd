@@ -8,7 +8,12 @@ module Rfd
 
     # "c"opy selected files and directories.
     def c
-      process_command_line preset_command: 'cp'
+      return unless selected_items.any?
+      close_sub_window if @sub_window
+      @sub_window = NavigationWindow.new(self, title: 'Copy to (Enter:select ESC:cancel)', include_files: true) do |dest|
+        cp dest
+      end
+      @sub_window.render
     end
 
     # Soft "d"elete (actually mv to the trash folder on OSX) selected files and directories.

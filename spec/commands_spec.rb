@@ -550,9 +550,9 @@ describe Rfd::Commands do
     end
 
     describe '#c (cp)' do
-      it 'calls process_command_line with cp' do
-        expect(controller).to receive(:process_command_line).with(preset_command: 'cp')
+      it 'opens NavigationWindow for destination selection' do
         controller.c
+        expect(controller.instance_variable_get(:@sub_window)).to be_a(Rfd::NavigationWindow)
       end
     end
 

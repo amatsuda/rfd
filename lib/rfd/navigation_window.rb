@@ -13,13 +13,16 @@ module Rfd
   end
 
   class NavigationWindow < SubWindow
-    def initialize(controller)
-      super
+    def initialize(controller, title: nil, include_files: false, &on_select)
+      super(controller)
       @nodes = []
       @cursor = 0
       @scroll = 0
       @filter_text = ''
       @filtered_nodes = nil
+      @title = title
+      @include_files = include_files
+      @on_select = on_select
       build_tree
     end
 
@@ -40,7 +43,8 @@ module Rfd
     end
 
     def cache_all_directories
-      @dir_cache = Dir.glob("#{@root}/**/*/")
+      glob_pattern = @include_files ? "#{@root}/**/*" : "#{@root}/**/*/"
+      @dir_cache = Dir.glob(glob_pattern)
         .map { |path| path.chomp('/') }  # Remove trailing slash
         .reject { |path| path.split('/').any? { |part| part.start_with?('.') } }
         .map { |path| path.delete_prefix(@root).delete_prefix('/') }
@@ -51,29 +55,31 @@ module Rfd
     end
 
     def add_children_for(dir_path, depth, parent_node, expanded: false)
-      entries = Dir.children(dir_path)
-        .select { |name| File.directory?(File.join(dir_path, name)) }
-        .reject { |name| name.start_with?('.') }
-        .sort
+      all_entries = Dir.children(dir_path).reject { |name| name.start_with?('.') }
+
+      # Separate directories and files, sort each group
+      dirs = all_entries.select { |name| File.directory?(File.join(dir_path, name)) }.sort
+      files = @include_files ? all_entries.reject { |name| File.directory?(File.join(dir_path, name)) }.sort : []
 
       children = []
-      entries.each do |name|
+      (dirs + files).each do |name|
         path = File.join(dir_path, name)
+        is_dir = File.directory?(path)
         relative_path = path.delete_prefix(@root).delete_prefix('/')
         node = TreeNode.new(
           path: path,
           name: name,
           relative_path: relative_path,
           depth: depth + 1,
-          expanded: expanded,
+          expanded: is_dir ? expanded : false,
           children: nil,
           parent: parent_node
         )
         children << node
         @nodes << node
 
-        # Recursively add children if expanded
-        if expanded && node.has_subdirs?
+        # Recursively add children if expanded (only for directories)
+        if is_dir && expanded && node.has_subdirs?
           add_children_for(path, depth + 1, node, expanded: false)
         end
       end
@@ -101,7 +107,7 @@ module Rfd
       reposition_if_needed
       @window.clear
 
-      draw_border('Navigate (^O:fold Enter:cd ESC:close)')
+      draw_border(@title || 'Navigate (^O:fold Enter:cd ESC:close)')
 
       # Filter input line (row 1)
       @window.setpos(1, 1)
@@ -435,9 +441,28 @@ module Rfd
 
     def select_node
       node = current_node
+
+      # If no matches but filter text exists, use filter text as literal path
+      if node.nil? && !@filter_text.empty?
+        controller.close_sub_window
+        if @on_select
+          @on_select.call(@filter_text)
+        end
+        return
+      end
+
       return unless node
-      controller.cd(node.path)
-      controller.close_sub_window
+
+      if @on_select
+        # Copy selected path to input for editing, don't execute yet
+        @filter_text = node.relative_path
+        @filtered_nodes = []  # Clear matches so next Enter executes
+        @cursor = 0
+        render
+      else
+        controller.close_sub_window
+        controller.cd(node.path)
+      end
     end
   end
 end

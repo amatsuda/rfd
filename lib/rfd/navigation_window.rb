@@ -186,10 +186,14 @@ module Rfd
         @first_match_index = nil
 
         # Special case: ~ means scan from home directory (first level only for performance)
+        # Special case: / means scan from root directory (first level only for performance)
         if @filter_text.start_with?('~')
           home = File.expand_path('~')
           pattern = @filter_text[1..-1].sub(/^\//, '')  # Remove leading ~/ or ~
-          scan_home_directories(home, pattern)
+          scan_absolute_path_directories(home, '~', pattern)
+        elsif @filter_text.start_with?('/')
+          pattern = @filter_text[1..-1]  # Remove leading /
+          scan_absolute_path_directories('/', '/', pattern)
         else
           scan_directories_for_filter(@root, '', nil, 0, @filter_text)
         end
@@ -202,16 +206,16 @@ module Rfd
       adjust_scroll
     end
 
-    # Fast scan for ~ paths - only first level, no recursion
-    def scan_home_directories(home, pattern)
-      entries = Dir.children(home)
-        .select { |name| File.directory?(File.join(home, name)) }
+    # Fast scan for absolute paths (~ or /) - only first level, no recursion
+    def scan_absolute_path_directories(base_path, prefix, pattern)
+      entries = Dir.children(base_path)
+        .select { |name| File.directory?(File.join(base_path, name)) }
         .reject { |name| name.start_with?('.') }
         .sort
 
       entries.each do |name|
-        path = File.join(home, name)
-        relative_path = "~/#{name}"
+        path = File.join(base_path, name)
+        relative_path = prefix == '/' ? "/#{name}" : "#{prefix}/#{name}"
 
         next unless fuzzy_match?(name, pattern)
 

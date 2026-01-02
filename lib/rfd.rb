@@ -456,7 +456,9 @@ module Rfd
       Curses.getch
       Curses.stdscr.timeout = 100
       win.close
-      move_cursor current_row
+      Rfd::Window.draw_borders
+      Curses.refresh
+      ls
     end
 
     private

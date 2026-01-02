@@ -133,7 +133,7 @@ module Rfd
       end
 
       # Go to parent directory.
-      def del
+      def backspace
         if current_dir.path != '/'
           dir_was = times == 1 ? current_dir.name : File.basename(current_dir.join(['..'] * (times - 1)))
           cd File.expand_path(current_dir.join(['..'] * times))

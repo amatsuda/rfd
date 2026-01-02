@@ -164,7 +164,7 @@ module Rfd
           when ' '  # space
             space
           when 127, Curses::KEY_BACKSPACE, Curses::KEY_DC  # DEL, Backspace, Delete
-            del
+            backspace
           when Curses::KEY_DOWN
             j
           when Curses::KEY_UP

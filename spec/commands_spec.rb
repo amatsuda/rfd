@@ -431,10 +431,10 @@ describe Rfd::Commands do
 
     end
 
-    describe '#del (go to parent directory)' do
+    describe '#backspace (go to parent directory)' do
       before do
         controller.cd 'dir1'
-        controller.del
+        controller.backspace
       end
 
       its('current_dir.path') { should == tmpdir }

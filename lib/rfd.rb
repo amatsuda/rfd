@@ -58,6 +58,7 @@ module Rfd
   def self.start(dir = '.', log: nil)
     Rfd.log_to log if log
 
+    Bookmark.load
     init_curses
     Rfd::Window.draw_borders
     Curses.stdscr.noutrefresh

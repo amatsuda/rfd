@@ -107,7 +107,7 @@ module Rfd
       reposition_if_needed
       @window.clear
 
-      draw_border(@title || 'Navigate (^O:fold Enter:cd ESC:close)')
+      draw_border(@title || 'Navigate (@:bookmark ^O:fold Enter:cd ESC:close)')
 
       # Filter input line (row 1)
       @filter.render(@window, 1, max_width)
@@ -145,6 +145,11 @@ module Rfd
       case c
       when 27  # ESC - close window
         controller.close_sub_window
+        true
+      when 64, ?@  # @ - switch to bookmark view
+        controller.close_sub_window
+        controller.instance_variable_set(:@sub_window, BookmarkWindow.new(controller))
+        controller.instance_variable_get(:@sub_window).render
         true
       when 10, 13  # Enter - select current node
         select_node

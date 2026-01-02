@@ -97,9 +97,9 @@ module Rfd
     # Fetch files from current directory or current .zip file.
     def fetch_items_from_filesystem_or_zip
       unless in_zip?
-        @items = Dir.foreach(current_dir).map {|fn|
-          load_item dir: current_dir, name: fn
-        }.to_a.partition {|i| %w(. ..).include? i.name}.flatten
+        dot = load_item(dir: current_dir, name: '.')
+        dotdot = load_item(dir: current_dir, name: '..')
+        @items = [dot, dotdot, *Dir.children(current_dir).map { |fn| load_item dir: current_dir, name: fn }]
       else
         @items = [load_item(dir: current_dir, name: '.', stat: File.stat(current_dir)),
           load_item(dir: current_dir, name: '..', stat: File.stat(File.dirname(current_dir)))]

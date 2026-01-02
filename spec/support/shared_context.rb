@@ -15,6 +15,7 @@ RSpec.shared_context 'rfd setup' do
       def (@rfd.main).maxy
         3
       end
+      @rfd.ls  # Refresh with stubbed maxy
 
       example.run
 

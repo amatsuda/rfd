@@ -174,16 +174,16 @@ module Rfd
           when Curses::KEY_RIGHT
             l
           when Curses::KEY_NPAGE  # Page Down
-            ctrl_n
+            public_send :'^n'
           when Curses::KEY_PPAGE  # Page Up
-            ctrl_p
+            public_send :'^p'
           when Curses::KEY_HOME
             g
           when Curses::KEY_END
             G
           when Curses::KEY_CTRL_A..Curses::KEY_CTRL_Z
             chr = ((c - 1 + 65) ^ 0b0100000).chr
-            public_send "ctrl_#{chr}" if respond_to?("ctrl_#{chr}")
+            public_send :"^#{chr}" if respond_to?(:"^#{chr}")
           when ?0..?9
             public_send c
             number_pressed = true

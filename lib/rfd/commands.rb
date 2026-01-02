@@ -89,25 +89,26 @@ module Rfd
         end
       end
 
-      group 'Ctrl-n/p' do
-        # Next/previous page.
-        def ctrl_n
+      # Next/previous page.
+      group '^n/^p' do
+        # Forward to next page.
+        define_method(:'^n') do
           move_cursor (current_page + 1) % total_pages * max_items if total_pages > 1
         end
 
         # Back to previous page.
-        def ctrl_p
+        define_method(:'^p') do
           move_cursor (current_page - 1) % total_pages * max_items if total_pages > 1
         end
 
         # Back to previous page.
-        def ctrl_b
-          ctrl_p
+        define_method(:'^b') do
+          public_send :'^p'
         end
 
         # Forward to next page.
-        def ctrl_f
-          ctrl_n
+        define_method(:'^f') do
+          public_send :'^n'
         end
       end
 
@@ -182,7 +183,7 @@ module Rfd
       end
 
       # Mark/unmark all items.
-      def ctrl_a
+      define_method(:'^a') do
         mark = marked_items.size != (items.size - 2)  # exclude . and ..
         items.each {|i| i.toggle_mark unless i.marked? == mark}
         draw_items
@@ -346,7 +347,7 @@ module Rfd
       end
 
       # Set number of panes.
-      def ctrl_w
+      define_method(:'^w') do
         if @times
           spawn_panes @times.to_i
           ls
@@ -354,7 +355,7 @@ module Rfd
       end
 
       # Refresh the screen.
-      def ctrl_l
+      define_method(:'^l') do
         ls
       end
 

@@ -162,29 +162,29 @@ describe Rfd::Commands do
   end
 
   describe 'page navigation commands' do
-    describe '#ctrl_n (next page)' do
-      before { controller.ctrl_n }
+    describe '#^n (next page)' do
+      before { controller.public_send :'^n' }
       its(:current_page) { should == 1 }
     end
 
-    describe '#ctrl_p (previous page)' do
+    describe '#^p (previous page)' do
       before do
-        controller.ctrl_n
-        controller.ctrl_p
+        controller.public_send :'^n'
+        controller.public_send :'^p'
       end
       its(:current_page) { should == 0 }
     end
 
-    describe '#ctrl_b (alias for ctrl_p)' do
+    describe '#^b (alias for ^p)' do
       before do
-        controller.ctrl_n
-        controller.ctrl_b
+        controller.public_send :'^n'
+        controller.public_send :'^b'
       end
       its(:current_page) { should == 0 }
     end
 
-    describe '#ctrl_f (alias for ctrl_n)' do
-      before { controller.ctrl_f }
+    describe '#^f (alias for ^n)' do
+      before { controller.public_send :'^f' }
       its(:current_page) { should == 1 }
     end
   end
@@ -277,9 +277,9 @@ describe Rfd::Commands do
       its(:current_row) { should == 5 }
     end
 
-    describe '#ctrl_a (mark/unmark all)' do
+    describe '#^a (mark/unmark all)' do
       context 'when no items are marked' do
-        before { controller.ctrl_a }
+        before { controller.public_send :'^a' }
 
         it 'marks all items except . and ..' do
           items[2..-1].all?(&:marked?).should be true
@@ -290,8 +290,8 @@ describe Rfd::Commands do
 
       context 'when all items are marked' do
         before do
-          controller.ctrl_a
-          controller.ctrl_a
+          controller.public_send :'^a'
+          controller.public_send :'^a'
         end
 
         it 'unmarks all items' do
@@ -510,30 +510,30 @@ describe Rfd::Commands do
   end
 
   describe 'screen commands' do
-    describe '#ctrl_l (refresh)' do
+    describe '#^l (refresh)' do
       before do
         @original_items_count = items.size
-        controller.ctrl_l
+        controller.public_send :'^l'
       end
       it 'refreshes the listing' do
         controller.items.size.should == @original_items_count
       end
     end
 
-    describe '#ctrl_w (split panes)' do
+    describe '#^w (split panes)' do
       before do
         controller.public_send('2')
-        controller.ctrl_w
+        controller.public_send :'^w'
       end
       it 'changes the number of panes' do
         controller.main.instance_variable_get(:@number_of_panes).should == 2
       end
     end
 
-    describe '#ctrl_w without times' do
+    describe '#^w without times' do
       before do
         @original_panes = controller.main.instance_variable_get(:@number_of_panes)
-        controller.ctrl_w
+        controller.public_send :'^w'
       end
       it 'does nothing' do
         controller.main.instance_variable_get(:@number_of_panes).should == @original_panes

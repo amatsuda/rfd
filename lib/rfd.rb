@@ -113,7 +113,7 @@ module Rfd
       end
 
       # In parent: wait for socket and connect client
-      sleep 0.2  # Give server time to start
+      sleep 0.1  # Give server time to start
       @preview_client = Preview::Client.new(@preview_socket_path)
       retries = 20
       while retries > 0 && !@preview_client.connected?

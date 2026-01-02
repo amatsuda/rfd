@@ -15,7 +15,7 @@ module Rfd
       def initialize(socket_path)
         @socket_path = socket_path
         @socket = nil
-        @buffer = +""
+        @buffer = +''
         @results = Queue.new
         @current_request_id = nil
         @connected = false

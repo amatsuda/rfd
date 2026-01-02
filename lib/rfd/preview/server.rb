@@ -65,7 +65,7 @@ module Rfd
       end
 
       def handle_client(client)
-        buffer = +""
+        buffer = +''
         while @running && (data = client.gets)
           buffer << data
           while (idx = buffer.index("\n"))
@@ -224,7 +224,7 @@ module Rfd
       end
 
       def generate_markdown_preview(request)
-        content = File.read(request.file_path, encoding: 'UTF-8', invalid: :replace, undef: :replace) rescue ""
+        content = File.read(request.file_path, encoding: 'UTF-8', invalid: :replace, undef: :replace) rescue ''
         lines = content.lines.first(request.height - 2).map do |line|
           text = line.chomp
           attr = if text.start_with?('#')

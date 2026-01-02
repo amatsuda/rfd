@@ -374,7 +374,7 @@ module Rfd
     end
 
     def clear_command_line
-      command_line.writeln 0, ""
+      command_line.writeln 0, ''
       command_line.clear
       command_line.noutrefresh
       print "\e[?25l"  # Hide cursor

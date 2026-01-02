@@ -25,7 +25,7 @@ module Rfd
           display_name = category.name.split('::').last.gsub(/([a-z])([A-Z])/, '\1 \2')
           lines << display_name
           entries.each do |entry|
-            lines << format("  %-14s %s", entry[:key], entry[:description])
+            lines << format('  %-14s %s', entry[:key], entry[:description])
           end
           lines << ''
         end

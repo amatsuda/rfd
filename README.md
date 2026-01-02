@@ -8,7 +8,7 @@ rfd is a terminal-based filesystem explorer, inspired by the legendary freesoft 
 
 ## Requirements
 
-* Ruby 2.0 or newer
+* Ruby 2.5 or newer
 * NCurses with wide character support (ncursesw) recommended for best Unicode display
 
 ### macOS: Setting up ncursesw for Unicode borders

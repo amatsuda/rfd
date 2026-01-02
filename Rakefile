@@ -11,3 +11,15 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
 end
 
 task :default => :spec
+
+namespace :build do
+  desc 'Generate help text cache'
+  task :help do
+    require_relative 'lib/rfd/help_generator'
+    Rfd::HelpGenerator.write_cache
+    puts "Generated #{Rfd::HelpGenerator::CACHE_FILE}"
+  end
+end
+
+# Generate help before building the gem
+Rake::Task[:build].enhance(['build:help'])

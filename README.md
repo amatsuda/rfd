@@ -1,6 +1,6 @@
 # rfd (Ruby on Files & Directories)
 
-rfd is a terminal-based filesystem explorer, inspired by the legendary freesoft MS-DOS filer, "FD".
+rfd is a terminal-based filesystem explorer, inspired by the legendary freesoft MS-DOS filer "FD", with Vim flavor.
 
 ## Installation
 
@@ -37,19 +37,23 @@ You can also pass in a starting directory name, which defaults to `.`.
 
     % rfd ~/src/rails
 
+
 ## Commands
 
 You can send commands to rfd by pressing some chars on your keyboard, just like Vim.
 If you're unfamiliar with this sort of command system, I recommend you to play with `vimtutor` before you go any further.
 
+Press `?` to see the built-in help screen with all available commands.
+
 All available commands in rfd are defined as Ruby methods here. https://github.com/amatsuda/rfd/tree/master/lib/rfd/commands.rb
 
 ### Changing the current directory
 
-* `<Enter>`: cd into the directory where the cursor is on.
+* `<Enter>`: cd into the directory where the cursor is on. For files, opens with viewer.
 * `<Delete>` (or \<Backspace\> on your keyboard, probably?): Go up to the upper directory (cd ..).
 * `-`: Get back to where you once belonged (popd).
-* `@`: cd to a directory given via the command-line window.
+* `@`: Open directory tree browser for navigation.
+* `~`: Go to home directory.
 
 ### Moving the cursor
 
@@ -83,6 +87,7 @@ You can find a file by typing the first letter of it immediately after the find 
 * `f{char}`: Move to the next file / directory of which name starts with the given char.
 * `F{char}`: Move to the previous file / directory of which name starts with the given char.
 * `n`: Repeat the last `f` or `F`.
+* `N`: Repeat the last `f` or `F` in reverse direction.
 
 ### Searching, sorting
 
@@ -115,8 +120,8 @@ The mark is drawn as a `*` char on the left of each file / directory name.
 
 As stated above, you can send a command to one or more files / directories. In this document, the term "selected items" means "(the marked files / directories) || (the file / directory on which the cursor is on)".
 
-* `c`: Copy selected items (cp).
-* `m`: Move selected items (mv).
+* `c`: Copy selected items (cp). Opens tree browser to select destination.
+* `m`: Move selected items (mv). Opens tree browser to select destination.
 * `d`: Move selected items into the Trash.
 * `D`: Delete selected items.
 * `r`: Rename selected items. This command takes a sed-like argument separated by a `/`. For example, changing all .html files' extension to .html.erb could be done by `\.html$/.html.erb`.
@@ -141,10 +146,11 @@ As stated above, you can send a command to one or more files / directories. In t
 
 ### Viewing, Editing, Opening
 
-* `<Enter>`: View current file with the system $VIEWER such as `less`.
+* `<Enter>`: Open directory, or view file. For images, shows inline preview. For audio, plays with system player.
 * `v`: View current file with the system $VIEWER such as `less`.
 * `e`: Edit current file with the system $EDITOR such as `vim`.
 * `o`: Send the `open` command.
+* `P`: Toggle preview window (shows file contents with syntax highlighting).
 
 ### Manipulating archives
 
@@ -169,12 +175,60 @@ Mouse is available if your terminal supports it. You can move the cursor by clic
 * `C`: Copy selected items' paths to the clipboard.
 * `O`: Open a new terminal window at the current directory.
 * `!`: Execute a shell command.
+* `?`: Show help screen.
 * `q`: Quit the app.
 
 ## How to manually execute a command, or how the commands are executed
 
 By pressing `:`, you can enter the command-line mode. Any string given in the command line after `:` will be executed as Ruby method call in the `Controller` instance.
 For instance, `:j` brings your cursor down, `:mkdir foo` makes a directory named "foo". And `:q!` of course works as you might expect, since `q!` method is implemented so.
+
+
+## Features
+
+### File Icons
+
+rfd displays file type icons using Nerd Fonts. If you have a Nerd Font installed, you'll see icons for directories, symlinks, and various file types (Ruby, JavaScript, Markdown, etc.).
+
+To disable icons:
+
+    % RFD_NO_ICONS=1 rfd
+
+### Preview Window
+
+When the file list is multi-paned (default), rfd shows the preview window in an inactive pane. The preview window shows a preview of the file or directory where the cursor is on.
+
+* **Code files**: Syntax-highlighted preview (via Rouge)
+* **Directories**: List of contents
+* **Archives**: Tree view of zip/tar.gz contents
+* **Markdown**: Formatted with headers and lists highlighted
+* **Images**: Inline preview (in supported terminals)
+* **Binary files**: Indicated as `[Binary file]`
+
+However, with this feature enabled, the cursor would not move smoothly. In that case, you can disable (toggle) the preview window by pressing `P`.
+
+### Directory Tree Browser
+
+Press `@` to open an interactive directory tree browser with:
+* **Fuzzy filtering**: Type to filter directories
+* **Tree navigation**: `j/k` or arrows to move, `Enter` to select
+* **Expand/collapse**: `h/l` to collapse/expand directories
+* **Quick access**: `~` for home, `/` for root
+* **Bookmarks**: `@` to switch to bookmark view
+
+### Bookmarks
+
+Save frequently used directories for quick access:
+* In tree or bookmark view, press `^B` to toggle bookmark on current directory
+* Press `@` twice (or `@` then `@` in tree view) to see bookmarks
+* Bookmarks are saved to `~/.config/rfd/bookmarks`
+
+
+## Environment Variables
+
+* `RFD_NO_ICONS`: Set to `1` to disable file icons (useful if you don't have a Nerd Font installed)
+* `EDITOR`: Editor used for the `e` command (default: vim)
+* `VIEWER`: Viewer used for the `v` command (default: less)
 
 ## Contributing
 

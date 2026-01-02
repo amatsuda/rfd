@@ -499,6 +499,7 @@ describe Rfd::Commands do
       before do
         controller.find 'file1'
         controller.toggle_mark
+        allow(controller).to receive(:clipboard_command).and_return('pbcopy')
         allow(IO).to receive(:popen).with('pbcopy', 'w').and_yield(StringIO.new)
       end
 

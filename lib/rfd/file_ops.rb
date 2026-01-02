@@ -336,9 +336,10 @@ module Rfd
       end
     end
 
-    # Copy selected files and directories' path into clipboard on OSX.
+    # Copy selected files and directories' path into clipboard.
     def clipboard
-      IO.popen('pbcopy', 'w') {|f| f << selected_items.map(&:path).join(' ')} if osx?
+      cmd = clipboard_command
+      IO.popen(cmd, 'w') {|f| f << selected_items.map(&:path).join(' ')} if cmd
     end
 
     # Archive selected files and directories into a .zip file.
@@ -461,6 +462,24 @@ module Rfd
 
     def osx?
       @_osx ||= RbConfig::CONFIG['host_os'] =~ /darwin/
+    end
+
+    def linux?
+      @_linux ||= RbConfig::CONFIG['host_os'] =~ /linux/
+    end
+
+    def clipboard_command
+      @_clipboard_command ||= if osx?
+        'pbcopy'
+      elsif linux?
+        if system('which xclip > /dev/null 2>&1')
+          'xclip -selection clipboard'
+        elsif system('which xsel > /dev/null 2>&1')
+          'xsel --clipboard --input'
+        elsif system('which wl-copy > /dev/null 2>&1')
+          'wl-copy'
+        end
+      end
     end
 
     def in_zip?

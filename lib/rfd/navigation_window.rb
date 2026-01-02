@@ -18,7 +18,7 @@ module Rfd
       @nodes = []
       @cursor = 0
       @scroll = 0
-      @filter_text = ''
+      @filter = FilterInput.new { apply_filter }
       @filtered_nodes = nil
       @title = title
       @include_files = include_files
@@ -110,11 +110,7 @@ module Rfd
       draw_border(@title || 'Navigate (^O:fold Enter:cd ESC:close)')
 
       # Filter input line (row 1)
-      @window.setpos(1, 1)
-      @window.attron(Curses::A_BOLD) do
-        prompt = "> #{@filter_text}_"
-        @window.addstr(prompt[0, max_width].ljust(max_width))
-      end
+      @filter.render(@window, 1, max_width)
 
       # Tree starts at row 2
       visible_nodes.each_with_index do |node, i|
@@ -153,18 +149,6 @@ module Rfd
       when 10, 13  # Enter - select current node
         select_node
         true
-      when 8, 127, Curses::KEY_BACKSPACE, Curses::KEY_DC  # Ctrl-H/Backspace/Delete
-        if @filter_text.length > 0
-          @filter_text = @filter_text[0..-2]
-          apply_filter
-          render
-        end
-        true
-      when 21  # Ctrl-U - clear filter
-        @filter_text = ''
-        apply_filter
-        render
-        true
       when 14  # Ctrl-N
         move_cursor_down
         true
@@ -174,30 +158,20 @@ module Rfd
       when 15  # Ctrl-O - toggle expand/collapse
         toggle_node
         true
-      when String
-        # Printable character
-        @filter_text += c
-        apply_filter
-        render
-        true
-      when Integer
-        if c >= 32 && c <= 126  # Printable ASCII
-          @filter_text += c.chr
-          apply_filter
+      else
+        if @filter.handle_input(c)
           render
           true
         else
           false
         end
-      else
-        false
       end
     end
 
     private
 
     def apply_filter
-      if @filter_text.empty?
+      if @filter.empty?
         @filtered_nodes = nil
         @cursor = 0
       else
@@ -207,15 +181,15 @@ module Rfd
 
         # Special case: ~ means scan from home directory (first level only for performance)
         # Special case: / means scan from root directory (first level only for performance)
-        if @filter_text.start_with?('~')
+        if @filter.text.start_with?('~')
           home = File.expand_path('~')
-          pattern = @filter_text[1..-1].sub(/^\//, '')  # Remove leading ~/ or ~
+          pattern = @filter.text[1..-1].sub(/^\//, '')  # Remove leading ~/ or ~
           scan_absolute_path_directories(home, '~', pattern)
-        elsif @filter_text.start_with?('/')
-          pattern = @filter_text[1..-1]  # Remove leading /
+        elsif @filter.text.start_with?('/')
+          pattern = @filter.text[1..-1]  # Remove leading /
           scan_absolute_path_directories('/', '/', pattern)
         else
-          scan_directories_for_filter(@filter_text)
+          scan_directories_for_filter(@filter.text)
         end
 
         @cursor = @first_match_index || 0
@@ -237,7 +211,7 @@ module Rfd
         path = File.join(base_path, name)
         relative_path = prefix == '/' ? "/#{name}" : "#{prefix}/#{name}"
 
-        next unless fuzzy_match?(name, pattern)
+        next unless @filter.fuzzy_match?(name, pattern)
 
         node = TreeNode.new(
           path: path,
@@ -258,7 +232,7 @@ module Rfd
     def scan_directories_for_filter(pattern)
       # Filter from cache - no system calls!
       @dir_cache.each do |relative_path|
-        next unless fuzzy_match?(relative_path, pattern)
+        next unless @filter.fuzzy_match?(relative_path, pattern)
 
         path = File.join(@root, relative_path)
         depth = relative_path.count('/')
@@ -301,21 +275,6 @@ module Rfd
         children: nil,
         parent: nil
       )
-    end
-
-    def fuzzy_match?(text, pattern)
-      return true if pattern.empty?
-      pattern_chars = pattern.downcase.chars
-      text_lower = text.downcase
-      pattern_index = 0
-
-      text_lower.each_char do |char|
-        if char == pattern_chars[pattern_index]
-          pattern_index += 1
-          return true if pattern_index >= pattern_chars.length
-        end
-      end
-      false
     end
 
     def move_cursor_down
@@ -443,10 +402,10 @@ module Rfd
       node = current_node
 
       # If no matches but filter text exists, use filter text as literal path
-      if node.nil? && !@filter_text.empty?
+      if node.nil? && !@filter.empty?
         controller.close_sub_window
         if @on_select
-          @on_select.call(@filter_text)
+          @on_select.call(@filter.text)
         end
         return
       end
@@ -455,7 +414,7 @@ module Rfd
 
       if @on_select
         # Copy selected path to input for editing, don't execute yet
-        @filter_text = node.relative_path
+        @filter.text = node.relative_path
         @filtered_nodes = []  # Clear matches so next Enter executes
         @cursor = 0
         render

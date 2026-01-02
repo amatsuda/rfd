@@ -21,6 +21,7 @@ require_relative 'rfd/navigation_window'
 require_relative 'rfd/preview/server'
 require_relative 'rfd/preview/client'
 require_relative 'rfd/help_generator'
+require_relative 'rfd/filter_input'
 
 module Rfd
   VERSION = Gem.loaded_specs['rfd'] ? Gem.loaded_specs['rfd'].version.to_s : '0'

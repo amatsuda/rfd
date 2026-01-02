@@ -2,18 +2,30 @@
 
 using Module.new {
   refine Module do
-    def group(_label)
+    def group(label, description)
+      methods_before = instance_methods(false)
       yield
+      Rfd::Commands.command_groups << {category: self, label: label, methods: instance_methods(false) - methods_before, description: description}
+    end
+
+    def nohelp(meth)
+      Rfd::Commands.no_help_methods << meth
     end
   end
 }
 
 module Rfd
   module Commands
+    @command_groups, @no_help_methods, @categories = [], [], []
+
+    class << self
+      attr_accessor :command_groups, :no_help_methods, :categories
+    end
+
     # Navigation commands for cursor movement and directory traversal.
     module Navigation
-      group 'j/k' do
-        # Move cursor up/down.
+      group 'j/k', 'Move cursor down/up.' do
+        # Move cursor down.
         def j
           move_cursor (current_row + times) % items.size
         end
@@ -24,8 +36,8 @@ module Rfd
         end
       end
 
-      group 'h/l' do
-        # Move cursor left/right between panes.
+      group 'h/l', 'Move cursor left/right between panes.' do
+        # Move cursor left between panes.
         def h
           (y = current_row - maxy) >= 0 and move_cursor y
         end
@@ -36,8 +48,8 @@ module Rfd
         end
       end
 
-      group 'g/G' do
-        # Go to first/last item.
+      group 'g/G', 'Go to first/last item.' do
+        # Go to first item.
         def g
           move_cursor 0
         end
@@ -48,8 +60,8 @@ module Rfd
         end
       end
 
-      group 'H/M/L' do
-        # Go to top/middle/bottom of screen.
+      group 'H/M/L', 'Go to top/middle/bottom of screen.' do
+        # Go to top of screen.
         def H
           move_cursor current_page * max_items
         end
@@ -65,7 +77,7 @@ module Rfd
         end
       end
 
-      group 'f{char}/F{char}' do
+      group 'f{char}/F{char}', 'Find file starting with given character.' do
         # Find file starting with given character.
         def f
           c = get_char and (@last_command, @last_command_reverse = -> { find c }, -> { find_reverse c }) && @last_command.call
@@ -77,8 +89,8 @@ module Rfd
         end
       end
 
-      group 'n/N' do
-        # Repeat last find forward/backward.
+      group 'n/N', 'Repeat last find forward/backward.' do
+        # Repeat last find forward.
         def n
           @last_command.call if @last_command
         end
@@ -89,8 +101,7 @@ module Rfd
         end
       end
 
-      # Next/previous page.
-      group '^n/^p' do
+      group '^n/^p', 'Next/previous page.' do
         # Forward to next page.
         define_method(:'^n') do
           move_cursor (current_page + 1) % total_pages * max_items if total_pages > 1
@@ -102,17 +113,17 @@ module Rfd
         end
 
         # Back to previous page.
-        define_method(:'^b') do
+        nohelp define_method(:'^b') {
           public_send :'^p'
-        end
+        }
 
         # Forward to next page.
-        define_method(:'^f') do
+        nohelp define_method(:'^f') {
           public_send :'^n'
-        end
+        }
       end
 
-      # Open directory or view file.
+      # Enter: Open directory or view file.
       def enter
         if current_item.name == '.'  # do nothing
         elsif current_item.name == '..'
@@ -132,7 +143,7 @@ module Rfd
         end
       end
 
-      # Go to parent directory.
+      # Backspace: Go to parent directory.
       def backspace
         if current_dir.path != '/'
           dir_was = times == 1 ? current_dir.name : File.basename(current_dir.join(['..'] * (times - 1)))
@@ -159,12 +170,12 @@ module Rfd
       end
 
       # Move cursor position by mouse click.
-      def click(y: nil, x: nil)
+      nohelp def click(y: nil, x: nil)
         move_cursor_by_click y: y, x: x
       end
 
       # Move cursor position and enter.
-      def double_click(y: nil, x: nil)
+      nohelp def double_click(y: nil, x: nil)
         if move_cursor_by_click y: y, x: x
           enter
         end
@@ -173,7 +184,7 @@ module Rfd
 
     # File operation commands for manipulating files and directories.
     module FileOperations
-      # Mark/unmark file and move down.
+      # Space: Mark/unmark file and move down.
       def space
         times.times do
           toggle_mark
@@ -216,8 +227,8 @@ module Rfd
         process_command_line preset_command: 'rename'
       end
 
-      group 'd/D' do
-        # Trash/delete selected items.
+      group 'd/D', 'Trash/delete selected items.' do
+        # Trash selected items.
         def d
           if selected_items.any?
             if ask %Q[Are you sure want to trash #{selected_items.one? ? selected_items.first.name : "these #{selected_items.size} files"}? (y/n)]
@@ -236,8 +247,8 @@ module Rfd
         end
       end
 
-      group 't/K' do
-        # Touch file / make directory.
+      group 't/K', 'Touch file / make directory.' do
+        # Touch file.
         def t
           process_command_line preset_command: 'touch'
         end
@@ -248,13 +259,13 @@ module Rfd
         end
 
         # Update file timestamp.
-        def T
+        nohelp def T
           process_command_line preset_command: 'touch_t', default_argument: current_item.mtime.tr(': -', '')
         end
       end
 
-      group 'y/p' do
-        # Yank/paste selected items.
+      group 'y/p', 'Yank/paste selected items.' do
+        # Yank selected items.
         def y
           yank
         end
@@ -265,8 +276,8 @@ module Rfd
         end
       end
 
-      group 'z/u' do
-        # Zip/unarchive files.
+      group 'z/u', 'Zip/unarchive files.' do
+        # Zip files.
         def z
           process_command_line preset_command: 'zip'
         end
@@ -295,8 +306,8 @@ module Rfd
 
     # Viewing commands for displaying file contents.
     module Viewing
-      group 'v/e' do
-        # View/edit file.
+      group 'v/e', 'View/edit file.' do
+        # View file.
         def v
           view
         end
@@ -375,7 +386,7 @@ module Rfd
       end
 
       # Quit the app immediately.
-      def q!
+      nohelp def q!
         raise StopIteration
       end
 
@@ -386,16 +397,19 @@ module Rfd
 
       # Number of times to repeat the next command.
       (?0..?9).each do |n|
-        define_method(n) do
-          @times ||= ''
-          @times += n
-        end
+        nohelp define_method(n) {
+          @times = (@times || '') + n
+        }
       end
     end
 
     include Navigation
+    @categories << Navigation
     include FileOperations
+    @categories << FileOperations
     include Viewing
+    @categories << Viewing
     include Other
+    @categories << Other
   end
 end

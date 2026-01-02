@@ -1,112 +1,74 @@
 # frozen_string_literal: true
 
+# Ensure commands are loaded to register groups
+require_relative 'commands' unless defined?(Rfd::Commands)
+
 module Rfd
   module HelpGenerator
-    # Category mappings: [display_key, method_name]
-    # Method name is used to look up the comment from commands.rb
-    CATEGORIES = {
-      'Navigation' => [
-        ['j/k', :j, :k],
-        ['h/l', :h, :l],
-        ['g/G', :g, :G],
-        ['H/M/L', :H, :M, :L],
-        ['f{char}/F{char}', :f],
-        ['n/N', :n, :N],
-        ['Ctrl-n/p', :ctrl_n],
-        ['Enter', :enter],
-        ['Backspace', :del],
-        ['-', :'-'],
-        ['~', :'~'],
-        ['@', :'@']
-      ],
-      'File Operations' => [
-        ['Space', :space],
-        ['Ctrl-a', :ctrl_a],
-        ['c', :c],
-        ['m', :m],
-        ['r', :r],
-        ['d/D', :d, :D],
-        ['t/K', :t, :K],
-        ['y/p', :y, :p],
-        ['z/u', :z, :u],
-        ['a', :a],
-        ['w', :w],
-        ['S', :S]
-      ],
-      'Viewing' => [
-        ['v/e', :v, :e],
-        ['o', :o],
-        ['P', :P],
-        ['/', :'/'],
-        ['s', :s]
-      ],
-      'Other' => [
-        ['C', :C],
-        ['O', :O],
-        ['Ctrl-w{n}', :ctrl_w],
-        ['!', :'!'],
-        [':', :':'],
-        ['q', :q],
-        ['?', :'?']
-      ]
-    }.freeze
-
     class << self
       def generate
-        comments = parse_commands_file
-        lines = []
+        comments, lines = parse_comments, []
 
-        CATEGORIES.each do |category, entries|
-          lines << category
+        Rfd::Commands.categories.each do |category|
+          entries = build_entries_for(category, comments)
+          next if entries.empty?
+
+          display_name = category.name.split('::').last.gsub(/([a-z])([A-Z])/, '\1 \2')
+          lines << display_name
           entries.each do |entry|
-            key_display = entry[0]
-            method_names = entry[1..]
-            description = build_description(method_names, comments)
-            lines << format("  %-14s %s", key_display, description)
+            lines << format("  %-14s %s", entry[:key], entry[:description])
           end
-          lines << ""
+          lines << ''
         end
 
-        lines << "Environment: RFD_NO_ICONS=1 to disable file icons (icons require Nerd Font)"
+        lines << 'Environment: RFD_NO_ICONS=1 to disable file icons (icons require Nerd Font)'
         lines.join("\n")
       end
 
       private
 
-      def parse_commands_file
-        commands_path = File.join(__dir__, 'commands.rb')
-        source = File.read(commands_path)
+      def build_entries_for(category, comments)
+        entries, seen_methods  = [], Set.new
+
+        # Get groups for this module
+        groups = Rfd::Commands.command_groups.select {|g| g[:category] == category }
+        groups.each do |group|
+          description = group[:description].sub(/\.\s*$/, '')
+          entries << {key: group[:label], description: description}
+          seen_methods.merge(group[:methods])
+        end
+
+        # Get standalone methods from the module
+        category.instance_methods(false).each do |method_name|
+          next if seen_methods.include?(method_name)
+          next if Rfd::Commands.no_help_methods.include?(method_name)
+
+          comment = comments[method_name] || {}
+          key = comment[:key] || method_name.to_s
+          description = comment[:description] || 'No description'
+          entries << {key: key, description: description}
+        end
+
+        entries
+      end
+
+      def parse_comments
+        source = File.read(File.join(__dir__, 'commands.rb'))
         comments = {}
 
-        # Match comments followed by method definitions
-        # Handles: def name, def -, def /, define_method(:name), define_method(:'name')
-        # Works with nested modules
+        # Parse comments for standalone methods
+        # Supports "Key: Description" or just "Description"
         source.scan(/^\s*#\s*(.+?)\n\s*(?:def\s+(\S+)|define_method\(:'?([^')\s]+)'?\))/) do |comment, def_name, define_name|
           method_name = (def_name || define_name).to_sym
-          comments[method_name] = clean_comment(comment)
+          text = comment.sub(/\.\s*$/, '').strip
+          if text =~ /^(\S+):\s*(.+)$/
+            comments[method_name] = {key: $1, description: $2}
+          else
+            comments[method_name] = {description: text}
+          end
         end
 
         comments
-      end
-
-      def clean_comment(comment)
-        # Remove quoted key indicators like "c"opy -> copy
-        # and clean up the description
-        comment
-          .gsub(/"(\w)"/, '\1')  # "c"opy -> copy
-          .sub(/\.\s*$/, '')      # Remove trailing period
-          .strip
-      end
-
-      def build_description(method_names, comments)
-        # Use the first method's comment as the base description
-        primary = method_names.first
-        desc = comments[primary]
-        return "No description" unless desc
-
-        # Capitalize first letter
-        desc = desc[0].upcase + desc[1..] if desc.length > 0
-        desc
       end
     end
   end

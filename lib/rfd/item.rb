@@ -148,6 +148,10 @@ module Rfd
       end
     end
 
+    def archive?
+      zip? || gz?
+    end
+
     def image?
       @image ||= begin
         return false if directory?

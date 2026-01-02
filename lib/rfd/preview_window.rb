@@ -44,6 +44,8 @@ module Rfd
         render_heic(item)
       elsif item.directory?
         render_directory(item)
+      elsif item.archive?
+        render_archive(item)
       elsif item.image?
         render_image(item)
       elsif item.pdf?
@@ -104,6 +106,92 @@ module Rfd
         @window.setpos(i + 1, 1)
         @window.addstr(name[0, max_width].ljust(max_width))
       end
+    end
+
+    def render_archive(item)
+      entries = if item.zip?
+        list_zip_entries(item.path)
+      elsif item.gz?
+        list_tar_gz_entries(item.path)
+      else
+        []
+      end
+
+      tree_lines = build_archive_tree(entries)
+      tree_lines.first(max_height).each_with_index do |line, i|
+        @window.setpos(i + 1, 1)
+        @window.addstr(line[0, max_width].ljust(max_width))
+      end
+    rescue => e
+      @window.setpos(@window.maxy / 2, 1)
+      @window.addstr('[Archive error]'.center(max_width))
+    end
+
+    def build_archive_tree(entries)
+      # Build tree structure from flat paths
+      tree = {}
+      entries.each do |path|
+        parts = path.split('/').reject(&:empty?)
+        current = tree
+        parts.each do |part|
+          current[part] ||= {}
+          current = current[part]
+        end
+      end
+
+      # Render tree to lines
+      lines = []
+      render_tree_node(tree, '', lines, true)
+      lines
+    end
+
+    def render_tree_node(node, prefix, lines, is_root)
+      sorted_keys = node.keys.sort_by { |k| [node[k].empty? ? 1 : 0, k.downcase] }
+      sorted_keys.each_with_index do |name, idx|
+        is_last = (idx == sorted_keys.length - 1)
+        children = node[name]
+
+        if is_root
+          connector = ''
+          child_prefix = ''
+        else
+          connector = is_last ? '└── ' : '├── '
+          child_prefix = is_last ? '    ' : '│   '
+        end
+
+        display_name = children.empty? ? name : "#{name}/"
+        lines << "#{prefix}#{connector}#{display_name}"
+
+        unless children.empty?
+          render_tree_node(children, prefix + child_prefix, lines, false)
+        end
+      end
+    end
+
+    def list_zip_entries(path)
+      entries = []
+      Zip::File.open(path) do |zip|
+        zip.each { |entry| entries << entry.name }
+      end
+      entries.sort
+    end
+
+    def list_tar_gz_entries(path)
+      entries = []
+      Zlib::GzipReader.open(path) do |gz|
+        Gem::Package::TarReader.new(gz) do |tar|
+          tar.each { |entry| entries << entry.full_name }
+        end
+      end
+      entries.sort
+    rescue Zlib::GzipFile::Error
+      # Not a gzip file, try plain tar
+      File.open(path, 'rb') do |f|
+        Gem::Package::TarReader.new(f) do |tar|
+          tar.each { |entry| entries << entry.full_name }
+        end
+      end
+      entries.sort
     end
 
     def render_image(item)

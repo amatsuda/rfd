@@ -5,8 +5,17 @@ require_relative 'commands' unless defined?(Rfd::Commands)
 
 module Rfd
   module HelpGenerator
+    CACHE_FILE = File.join(__dir__, 'help.txt')
+
     class << self
       def generate
+        # Use cached file if available
+        return File.read(CACHE_FILE) if File.exist?(CACHE_FILE)
+
+        build
+      end
+
+      def build
         comments, lines = parse_comments, []
 
         Rfd::Commands.categories.each do |category|
@@ -23,6 +32,10 @@ module Rfd
 
         lines << 'Environment: RFD_NO_ICONS=1 to disable file icons (icons require Nerd Font)'
         lines.join("\n")
+      end
+
+      def write_cache
+        File.write(CACHE_FILE, build)
       end
 
       private
